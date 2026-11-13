@@ -87,7 +87,7 @@
   }
   function download(f) {
     getDl().then(function (d) {
-      if (!d) { window.open(f.chemin, '_blank'); return; }
+      if (!d) { var a = document.createElement('a'); a.href = f.chemin; a.download = f.chemin.split('/').pop(); document.body.appendChild(a); a.click(); a.remove(); return; }
       return fetch(f.chemin).then(function (r) { if (!r.ok) throw new Error('http'); return r.blob(); })
         .then(function (b) { return d.save({ filename: f.chemin.split('/').pop(), data: b }); })
         .then(function () { toast('Fichier enregistré.'); }, function (e) { if (!e || e.code !== 'declined') toast('Téléchargement impossible pour le moment.'); });
@@ -109,6 +109,7 @@
     if (s.diaporama) { var d = el('a', 'btn pri', 'Ouvrir le diaporama'); d.href = s.diaporama; a.appendChild(d); }
     if (s.support) { var p = el('a', 'btn', 'Support de cours'); p.href = s.support; a.appendChild(p); }
     else if (ok) { var q = el('a', 'btn', 'Support de cours bientôt'); q.setAttribute('aria-disabled', 'true'); q.href = '#'; a.appendChild(q); }
+    if (s.tp) { var tpb = el('a', 'btn', 'Sujet de TP'); tpb.href = s.tp; a.appendChild(tpb); }
     if (a.children.length) c.appendChild(a);
     g.appendChild(c);
   });

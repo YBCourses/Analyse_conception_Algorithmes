@@ -367,15 +367,16 @@
     function draw() {
       var n = Math.pow(2, p); lab.textContent = '= ' + p + '  (n = ' + fr(n) + ')'; box.innerHTML = '';
       var size = n, k = 0, rows = [];
+      var bh = p > 8 ? 22 : (p > 6 ? 30 : 42), mg = p > 8 ? 2 : (p > 6 ? 4 : 7), fz = p > 8 ? 21 : (p > 6 ? 25 : 28);
       while (true) {
         var w = Math.max(size / n * 100, 1.5);
-        var bar = h('div', { style: 'height:44px;border-radius:10px;background:var(--c-log);width:0;transition:width .7s cubic-bezier(.2,.7,.2,1) ' + (k * 0.12) + 's;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#fff;font:700 24px var(--mono)' }, size > n / 6 ? fr(size) : '');
-        var row = h('div', { style: 'display:grid;grid-template-columns:230px 1fr 90px;gap:18px;align-items:center;margin:7px 0;font-size:28px' }, h('span', { class: 'muted' }, k === 0 ? 'Départ' : 'Après ' + k + ' coupe' + (k > 1 ? 's' : '')), h('div', null, bar), h('b', { class: 'mono' }, fr(size)));
+        var bar = h('div', { style: 'height:' + bh + 'px;border-radius:8px;background:var(--c-log);width:0;transition:width .7s cubic-bezier(.2,.7,.2,1) ' + (k * 0.12) + 's;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#fff;font:700 ' + Math.min(24, bh - 4) + 'px var(--mono)' }, (size > n / 6 && bh > 26) ? fr(size) : '');
+        var row = h('div', { style: 'display:grid;grid-template-columns:230px 1fr 90px;gap:18px;align-items:center;margin:' + mg + 'px 0;font-size:' + fz + 'px' }, h('span', { class: 'muted' }, k === 0 ? 'Départ' : 'Après ' + k + ' coupe' + (k > 1 ? 's' : '')), h('div', null, bar), h('b', { class: 'mono' }, fr(size)));
         box.appendChild(row); rows.push([bar, w]);
         if (size <= 1) break; size = size / 2; k++;
       }
       setTimeout(function () { rows.forEach(function (r) { r[0].style.width = r[1] + '%'; }); }, 40);
-      box.appendChild(h('div', { class: 'callout', style: 'margin-top:14px;font-size:32px' }, 'Pour n = ' + fr(n) + ' : ', h('b', null, p + ' coupes'), ' suffisent pour arriver à 1 élément. C’est le logarithme : ', h('b', { class: 'mono' }, 'log₂(' + fr(n) + ') = ' + p)));
+      box.appendChild(h('div', { class: 'callout', style: 'margin-top:12px;font-size:30px;padding:16px 28px' }, 'Pour n = ' + fr(n) + ' : ', h('b', null, p + ' coupes'), ' suffisent pour arriver à 1 élément. C’est le logarithme : ', h('b', { class: 'mono' }, 'log₂(' + fr(n) + ') = ' + p)));
     }
     draw();
   }
@@ -421,7 +422,7 @@
         grid.appendChild(chip); setTimeout((function (c) { return function () { c.style.opacity = 1; c.style.transform = 'none'; }; })(chip), 30);
       }
       info.innerHTML = '';
-      info.append(h('div', { class: 'txt' }, 'Chaque élément est <b>pris ou laissé</b> : 2 choix. Avec ', h('b', null, k), ' éléments : ', h('b', { class: 'mono' }, '2 × 2 × … × 2 = 2' + sup(k) + ' = ' + fr(total)), ' sous-ensembles.'),
+      info.append(h('div', { class: 'txt' }, 'Chaque élément est ', h('b', null, 'pris ou laissé'), ' : 2 choix. Avec ', h('b', null, k), ' éléments : ', h('b', { class: 'mono' }, '2 × 2 × … × 2 = 2' + sup(k) + ' = ' + fr(total)), ' sous-ensembles.'),
         h('div', { class: 'callout warn' }, 'Chaque élément ajouté ', h('b', null, 'double'), ' le nombre de cas. Avec 10 éléments : ', h('b', null, '1 024'), '. Avec 30 : ', h('b', null, '1 073 741 824'), '. Avec 60 : plus de ', h('b', null, '10¹⁸'), '.'));
     }
     draw();
@@ -484,16 +485,26 @@
   function bigO(root) {
     root = $(root); root.classList.add('sim');
     var c1 = 3, c2 = 5, NMAX = 12;
-    var W = 1600, H = 400, m = { l: 80, r: 20, t: 14, b: 48 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var W = 1600, H = 236, m = { l: 80, r: 20, t: 12, b: 40 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
     var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', role: 'img', 'aria-label': 'Définition de O et Omega' });
-    var out = h('div', { class: 'col', style: 'font-size:32px;margin-top:12px;gap:10px' });
+    var out = h('div', { class: 'col', style: 'font-size:30px;margin-top:8px;gap:8px' });
+    var chk = h('div', { style: 'margin-top:6px' });
     var f = function (n) { return 3 * n * n + 5 * n + 2; };
     function n0(test) { for (var n = 0; n <= 200; n++) { var ok = true; for (var k = n; k <= 200; k++) if (!test(k)) { ok = false; break; } if (ok) return n; } return null; }
     var s2 = h('input', { type: 'range', min: 3, max: 10, step: 0.5, value: c2, 'aria-label': 'c2', oninput: upd });
     var s1 = h('input', { type: 'range', min: 0.5, max: 4, step: 0.5, value: c1, 'aria-label': 'c1', oninput: upd });
     var l2 = h('span', { class: 'mono acc' }), l1 = h('span', { class: 'mono acc' });
-    root.append(svg, h('div', { class: 'ctl' }, h('label', null, 'Plafond c₂', s2, l2), h('label', null, 'Plancher c₁', s1, l1)), out);
+    root.append(svg, h('div', { class: 'ctl', style: 'margin-top:4px' }, h('label', null, 'Plafond c₂', s2, l2), h('label', null, 'Plancher c₁', s1, l1)), chk, out);
     function upd() { c2 = +s2.value; c1 = +s1.value; draw(); }
+    function chkTable() {
+      var ns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], t = h('table', { class: 'tbl chk', style: 'font-size:22px;width:100%' });
+      t.appendChild(h('tr', null, h('th', null, 'n'), ns.map(function (n) { return h('th', { class: 'num' }, n); })));
+      t.appendChild(h('tr', null, h('td', { class: 'mono' }, 'f(n)'), ns.map(function (n) { return h('td', { class: 'num' }, fr(f(n))); })));
+      t.appendChild(h('tr', null, h('td', { class: 'mono' }, 'c₂·n²'), ns.map(function (n) { return h('td', { class: 'num' }, fr(c2 * n * n)); })));
+      t.appendChild(h('tr', null, h('td', null, 'f ≤ c₂·n² ?'), ns.map(function (n) { var ok = f(n) <= c2 * n * n; return h('td', { class: 'num ' + (ok ? 't-ok' : 't-bad') }, ok ? '✓' : '✗'); })));
+      t.appendChild(h('tr', null, h('td', null, 'f ≥ c₁·n² ?'), ns.map(function (n) { var ok = f(n) >= c1 * n * n; return h('td', { class: 'num ' + (ok ? 't-ok' : 't-bad') }, ok ? '✓' : '✗'); })));
+      return t;
+    }
     function draw() {
       l2.textContent = '= ' + c2; l1.textContent = '= ' + c1;
       svg.innerHTML = '';
@@ -509,6 +520,7 @@
       path(function (n) { return c1 * n * n; }, 'var(--c-log)', 4, '12 8');
       path(f, 'var(--c-n)', 7);
       svg.appendChild(sv('text', { x: X(NMAX) - 6, y: Y(f(NMAX)) - 14, 'text-anchor': 'end', 'font-size': 26, style: 'fill:var(--c-n);font-weight:700' }, 'f(n) = 3n² + 5n + 2'));
+      chk.innerHTML = ''; chk.appendChild(chkTable());
       out.innerHTML = '';
       out.append(
         h('div', null, up === null ? h('span', { class: 'bad' }, 'c₂ = ' + c2 + ' est trop petit : aucun n₀ ne convient, f dépasse toujours c₂·n².') : [h('span', { class: 'ok' }, 'f(n) ≤ ' + c2 + '·n² dès n₀ = ' + up), ' donc f = O(n²).']),
@@ -552,71 +564,264 @@
     root.appendChild(row);
   }
 
-  /* ---------- Boucles ---------- */
+    /* ---------- Boucles : le code, les variables et la grille avancent ensemble ---------- */
   function loops(root) {
     root = $(root); root.classList.add('sim');
     var kinds = {
-      simple: { code: 'pour i de 1 à n faire\n    opération()', f: function (n) { return n; }, tx: 'n', max: 12 },
-      double: { code: 'pour i de 1 à n faire\n  pour j de 1 à n faire\n    opération()', f: function (n) { return n * n; }, tx: 'n × n = n²', max: 10 },
-      tri: { code: 'pour i de 1 à n faire\n  pour j de 1 à i faire\n    opération()', f: function (n) { return n * (n + 1) / 2; }, tx: 'n(n+1)/2', max: 10 },
-      log: { code: 'i ← 1\ntant que i ≤ n faire\n    opération()\n    i ← 2 × i', f: function (n) { return Math.floor(Math.log2(n)) + 1; }, tx: '⌊log₂ n⌋ + 1', max: 64 }
+      simple: { code: ['pour i de 1 à n faire', '    opération()'], f: function (n) { return n; }, tx: 'n', max: 12, def: 6 },
+      double: { code: ['pour i de 1 à n faire', '  pour j de 1 à n faire', '    opération()'], f: function (n) { return n * n; }, tx: 'n × n = n²', max: 8, def: 4 },
+      tri: { code: ['pour i de 1 à n faire', '  pour j de 1 à i faire', '    opération()'], f: function (n) { return n * (n + 1) / 2; }, tx: 'n(n+1)/2', max: 8, def: 4 },
+      log: { code: ['i ← 1', 'tant que i ≤ n faire', '    opération()', '    i ← 2 × i'], f: function (n) { return Math.floor(Math.log2(n)) + 1; }, tx: '⌊log₂ n⌋ + 1', max: 64, def: 16 }
     };
-    var kind = 'double', n = 6, k = 0, timer = null, cells = [];
-    var codeEl = h('div', { class: 'code free' }), gridEl = h('div'), info = h('div', { class: 'col' });
+    var kind = 'double', n = 4, trace = [], cells = [], cellEls = [], cb;
+    var codeHold = h('div'), gridEl = h('div'), varsEl = h('table', { class: 'vars' }), noteEl = h('div', { class: 'note', style: 'min-height:96px;font-size:28px' }), opsEl = h('div', { class: 'ops' });
     var lab = h('span', { class: 'mono acc' });
-    var rng = h('input', { type: 'range', min: 1, max: 10, value: n, 'aria-label': 'n', oninput: function () { n = +rng.value; reset(); } });
-    var kindSel = h('select', { 'aria-label': 'Type de boucle', onchange: function () { kind = kindSel.value; n = Math.min(n, kinds[kind].max); rng.max = kinds[kind].max; if (kind === 'log') n = 16; rng.value = n; reset(); } },
+    var rng = h('input', { type: 'range', min: 1, max: 8, value: n, 'aria-label': 'n', oninput: function () { n = +rng.value; rebuild(); } });
+    var kindSel = h('select', { 'aria-label': 'Type de boucle', onchange: function () { kind = kindSel.value; var K = kinds[kind]; rng.max = K.max; n = K.def; rng.value = n; rebuild(); } },
       h('option', { value: 'simple' }, 'Une boucle'), h('option', { value: 'double', selected: true }, 'Deux boucles imbriquées'), h('option', { value: 'tri' }, 'Boucle interne bornée par i'), h('option', { value: 'log' }, 'Variable doublée'));
-    var play = btn('▶ Lecture', function () { if (timer) halt(); else { if (k >= cells.length) reset(); timer = setInterval(function () { if (k >= cells.length) halt(); else { k++; draw(); } }, Math.max(70, 700 / Math.sqrt(cells.length))); play.textContent = '❚❚ Pause'; } }, 'pri');
-    function halt() { clearInterval(timer); timer = null; play.textContent = '▶ Lecture'; }
-    root.append(h('div', { class: 'split even', style: 'align-items:start;gap:40px' }, h('div', { class: 'col' }, codeEl, info), gridEl),
-      h('div', { class: 'ctl' }, h('label', null, 'Boucle', kindSel), h('label', null, 'n', rng, lab), btn('Pas ▶', function () { halt(); if (k < cells.length) { k++; draw(); } }), play, btn('↺', function () { halt(); reset(); })));
     function build() {
-      cells = [];
-      if (kind === 'simple') for (var i = 1; i <= n; i++) cells.push([i, 1]);
-      if (kind === 'double') for (var a = 1; a <= n; a++) for (var b = 1; b <= n; b++) cells.push([a, b]);
-      if (kind === 'tri') for (var a2 = 1; a2 <= n; a2++) for (var b2 = 1; b2 <= a2; b2++) cells.push([a2, b2]);
-      if (kind === 'log') for (var v = 1; v <= n; v *= 2) cells.push([v, 1]);
-    }
-    function reset() { halt(); build(); k = 0; draw(); }
-    function draw() {
-      var K = kinds[kind]; lab.textContent = '= ' + n;
-      codeEl.innerHTML = pc(K.code);
-      gridEl.innerHTML = '';
-      var g;
-      if (kind === 'simple') { g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + Math.min(n, 12) + ',62px)' }); for (var i = 1; i <= n; i++) g.appendChild(h('div', { class: 'gc ' + (i <= k ? (i === k ? 'cur' : 'on') : '') }, i)); }
-      else if (kind === 'log') {
-        g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + cells.length + ',auto)' });
-        cells.forEach(function (c, ix) { g.appendChild(h('div', { class: 'gc ' + (ix < k ? (ix === k - 1 ? 'cur' : 'on') : ''), style: 'width:auto;padding:0 14px;min-width:62px;font-size:22px' }, 'i=' + c[0])); });
+      var K = kinds[kind], t = [], count = 0, i, a, b;
+      cells = []; lab.textContent = '= ' + n;
+      t.push({ line: -1, i: null, j: null, count: 0, cell: -1, note: 'Prêt. On va exécuter ce programme pour <b>n = ' + n + '</b>. Chaque case de la grille représente <b>une exécution</b> de opération().' });
+      if (kind === 'simple') {
+        for (i = 1; i <= n; i++) {
+          t.push({ line: 0, i: i, j: null, count: count, cell: -1, note: 'La boucle donne <b>i = ' + i + '</b>.' });
+          cells.push([i, 1]); count++;
+          t.push({ line: 1, i: i, j: null, count: count, cell: count - 1, note: '<b>opération()</b> s’exécute. Compteur : ' + count + '.' });
+        }
+      } else if (kind === 'double' || kind === 'tri') {
+        for (a = 1; a <= n; a++) {
+          t.push({ line: 0, i: a, j: null, count: count, cell: -1, note: 'La boucle extérieure donne <b>i = ' + a + '</b>.' });
+          var jm = kind === 'double' ? n : a;
+          for (b = 1; b <= jm; b++) {
+            t.push({ line: 1, i: a, j: b, count: count, cell: -1, note: 'La boucle intérieure donne <b>j = ' + b + '</b> (j va de 1 à ' + (kind === 'double' ? 'n = ' + n : 'i = ' + a) + ').' });
+            cells.push([a, b]); count++;
+            t.push({ line: 2, i: a, j: b, count: count, cell: count - 1, note: '<b>opération()</b> s’exécute pour (i, j) = (' + a + ', ' + b + '). Compteur : ' + count + '.' });
+          }
+        }
       } else {
-        g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + n + ',62px)' });
+        var v = 1;
+        t.push({ line: 0, i: 1, j: null, count: 0, cell: -1, note: '<b>i ← 1</b>.' });
+        while (true) {
+          var ok = v <= n;
+          t.push({ line: 1, i: v, j: null, count: count, cell: -1, note: 'Test <b>i ≤ n</b> : ' + v + ' ≤ ' + n + ' ? <b>' + (ok ? 'vrai' : 'faux, la boucle s’arrête') + '</b>.' });
+          if (!ok) break;
+          cells.push([v, 1]); count++;
+          t.push({ line: 2, i: v, j: null, count: count, cell: count - 1, note: '<b>opération()</b> s’exécute. Compteur : ' + count + '.' });
+          t.push({ line: 3, i: 2 * v, j: null, count: count, cell: -1, note: '<b>i ← 2 × i</b> : i vaut maintenant ' + (2 * v) + '.' });
+          v *= 2;
+        }
+      }
+      t.push({ line: -1, i: null, j: null, count: count, cell: -1, note: 'Terminé : <b>' + count + '</b> exécutions pour n = ' + n + '. Formule : <b>' + K.tx + '</b>.' });
+      trace = t;
+      cb = codeBlock(K.code); codeHold.innerHTML = ''; codeHold.appendChild(cb.el);
+      // grille
+      gridEl.innerHTML = ''; cellEls = [];
+      var g;
+      if (kind === 'simple') {
+        g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + Math.min(n, 6) + ',72px)' });
+        cells.forEach(function (c) { var e = h('div', { class: 'gc', style: 'width:72px;height:72px' }, c[0]); g.appendChild(e); cellEls.push(e); });
+      } else if (kind === 'log') {
+        g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + Math.min(cells.length, 4) + ',auto)' });
+        cells.forEach(function (c) { var e = h('div', { class: 'gc', style: 'width:auto;height:72px;padding:0 18px;min-width:96px;font-size:26px' }, 'i = ' + c[0]); g.appendChild(e); cellEls.push(e); });
+      } else {
+        var sz = n > 6 ? 62 : 80;
+        g = h('div', { class: 'grid-loop', style: 'grid-template-columns:repeat(' + n + ',' + sz + 'px)' });
         var pos = {}; cells.forEach(function (c, ix) { pos[c[0] + ',' + c[1]] = ix; });
-        for (var a = 1; a <= n; a++) for (var b = 1; b <= n; b++) {
-          var ix2 = pos[a + ',' + b];
-          if (ix2 === undefined) g.appendChild(h('div', { class: 'gc skip' }));
-          else g.appendChild(h('div', { class: 'gc ' + (ix2 < k ? (ix2 === k - 1 ? 'cur' : 'on') : '') }));
+        for (a = 1; a <= n; a++) for (b = 1; b <= n; b++) {
+          var ix = pos[a + ',' + b], e;
+          if (ix === undefined) e = h('div', { class: 'gc skip', style: 'width:' + sz + 'px;height:' + sz + 'px' });
+          else { e = h('div', { class: 'gc', style: 'width:' + sz + 'px;height:' + sz + 'px;font-size:20px' }, a + ',' + b); cellEls[ix] = e; }
+          g.appendChild(e);
         }
       }
       gridEl.appendChild(g);
-      info.innerHTML = '';
-      info.append(h('div', { class: 'ops' }, k + ' / ' + cells.length, h('small', null, 'exécutions de opération()')),
-        h('div', { class: 'callout', style: 'font-size:32px' }, 'Total pour n = ' + n + ' : ', h('b', null, fr(K.f(n))), h('br'), 'Formule : ', h('b', { class: 'mono' }, K.tx)));
+      if (kind !== 'simple' && kind !== 'log') gridEl.appendChild(h('div', { class: 'small', style: 'margin-top:10px' }, 'Chaque case porte le couple (i, j) de son exécution.'));
     }
-    reset();
+    function render(k) {
+      var st = trace[k], K = kinds[kind];
+      cb.lines.forEach(function (l, ix) { l.classList.toggle('hl', ix === st.line); });
+      varsEl.innerHTML = '';
+      [['i', st.i], ['j', st.j]].forEach(function (p) { if (p[0] === 'j' && (kind === 'simple' || kind === 'log')) return; varsEl.appendChild(h('tr', null, h('td', { class: 'n' }, p[0]), h('td', { class: 'v' }, p[1] === null ? '—' : String(p[1])))); });
+      opsEl.innerHTML = ''; opsEl.append(String(st.count), h('small', null, 'exécutions de opération()'));
+      noteEl.innerHTML = st.note;
+      cellEls.forEach(function (e, ix) { e.className = 'gc' + (ix < st.count ? (ix === st.cell ? ' cur' : ' on') : ''); });
+    }
+    build();
+    var sp = stepper(function () { return trace.length; }, render, { delay: 260 });
+    function rebuild() { build(); sp.reset(); }
+    root.append(h('div', { class: 'split even', style: 'align-items:start;gap:44px' }, h('div', { class: 'col', style: 'gap:14px' }, codeHold, varsEl, opsEl, noteEl), gridEl),
+      h('div', { class: 'ctl' }, h('label', null, 'Boucle', kindSel), h('label', null, 'n', rng, lab)), sp.el);
+    sp.go(0);
   }
 
-  /* ---------- Récursivité : appels qui descendent, résultats qui remontent ---------- */
+  /* ---------- Calcul à la main : une seule colonne, la valeur remonte jusqu'en haut ---------- */
+  function hand(root) {
+    root = $(root); root.classList.add('sim');
+    var N = 4, fv = function (m) { return m <= 1 ? 1 : m * fv(m - 1); };
+    var wrap = h('div', { style: 'position:relative;min-height:380px' }), rows = [], tok = 0;
+    var banner = h('div', { style: 'border-radius:16px;padding:12px 24px;font-size:27px;font-weight:700;margin-bottom:12px;transition:background .5s,color .5s' });
+    var note = h('div', { class: 'note', style: 'font-size:29px;min-height:84px;margin-top:6px' });
+    var fly = h('div', { style: 'position:absolute;left:0;top:0;padding:4px 18px;border-radius:12px;background:var(--ok);color:#fff;font:800 36px var(--mono);opacity:0;z-index:3;pointer-events:none' }, '');
+    var list = h('div');
+    for (var i = 0; i <= N; i++) {
+      (function (i) {
+        var m = N - i;
+        var row = h('div', { style: 'margin:0 0 8px ' + (i * 58) + 'px;display:flex;align-items:center;gap:14px;font:600 34px var(--mono);color:var(--head);padding:7px 20px;border:3px solid var(--line);border-radius:16px;background:var(--surface);width:fit-content;opacity:0;transform:translateX(-30px);transition:opacity .6s, transform .6s cubic-bezier(.2,.7,.2,1), border-color .5s, background .5s' });
+        if (i > 0) row.appendChild(h('span', { style: 'color:var(--blue);font-size:34px' }, '↳'));
+        row.appendChild(h('span', null, 'fact(' + m + ')'));
+        row._m = m;
+        if (m > 0) {
+          row.appendChild(h('span', { style: 'color:var(--muted)' }, '= ' + m + ' ×'));
+          var hole = h('span', { style: 'border:3px dashed var(--blue);border-radius:12px;padding:0 14px;min-width:120px;text-align:center;color:var(--blue);transition:background .4s, color .4s, border-color .4s' }, 'fact(' + (m - 1) + ')');
+          var res = h('span', { style: 'opacity:0;transition:opacity .5s;color:var(--ok);font-weight:800' }, '= ' + m + ' × ' + fv(m - 1) + ' = ' + fv(m));
+          row.append(hole, res); row._hole = hole; row._res = res;
+        } else {
+          var base = h('span', { style: 'color:var(--ok);font-weight:800;background:var(--ok-soft);border-radius:12px;padding:0 16px' }, '= 1');
+          row.append(base, h('span', { class: 'small', style: 'font-family:var(--font);color:var(--warn);font-weight:700;font-size:25px' }, 'cas de base'));
+          row._res = base;
+        }
+        rows.push(row); list.appendChild(row);
+      })(i);
+    }
+    wrap.append(list, fly);
+    function pos(el) { var a = el.getBoundingClientRect(), b = wrap.getBoundingClientRect(), s = b.width / wrap.offsetWidth || 1; return { x: (a.left - b.left) / s, y: (a.top - b.top) / s, w: a.width / s, h: a.height / s }; }
+    function fill(L, anim) {
+      var r = rows[L], m = r._m;
+      r._hole.textContent = fv(m - 1); r._hole.style.background = 'var(--ok-soft)'; r._hole.style.color = 'var(--ok)'; r._hole.style.borderColor = 'var(--ok)'; r._hole.style.borderStyle = 'solid';
+      r._res.style.opacity = 1; r.style.borderColor = 'var(--ok)'; r.style.background = 'var(--ok-soft)';
+    }
+    function reset(L) {
+      var r = rows[L], m = r._m;
+      r._hole.textContent = 'fact(' + (m - 1) + ')'; r._hole.style.background = 'transparent'; r._hole.style.color = 'var(--blue)'; r._hole.style.borderColor = 'var(--blue)'; r._hole.style.borderStyle = 'dashed';
+      r._res.style.opacity = 0; r.style.borderColor = 'var(--blue)'; r.style.background = 'var(--accent-soft)';
+    }
+    function render(k) {
+      var my = ++tok, shown = Math.min(k, N);
+      fly.style.opacity = 0;
+      rows.forEach(function (r, i) {
+        var vis = i <= shown; r.style.opacity = vis ? 1 : 0; r.style.transform = vis ? 'none' : 'translateX(-30px)';
+        if (i === N) { r.style.borderColor = k >= N ? 'var(--warn)' : 'var(--line)'; r.style.background = k >= N ? 'var(--warn-soft)' : 'var(--surface)'; }
+        else if (vis) reset(i); else { r.style.borderColor = 'var(--line)'; r.style.background = 'var(--surface)'; }
+      });
+      var anim = null;
+      for (var t = 1; t <= N; t++) {
+        var L = N - t;
+        if (k > N + t) fill(L);
+        else if (k === N + t) anim = L;
+      }
+      if (anim !== null) {
+        var L2 = anim, src = rows[L2 + 1]._res, tgt = rows[L2]._hole, s = pos(src), d = pos(tgt);
+        fly.textContent = fv(rows[L2]._m - 1);
+        fly.style.transition = 'none'; fly.style.transform = 'translate(' + s.x + 'px,' + s.y + 'px)'; fly.style.opacity = 1;
+        void fly.offsetWidth;
+        fly.style.transition = 'transform 1s cubic-bezier(.4,0,.2,1), opacity .3s'; fly.style.transform = 'translate(' + (d.x + 14) + 'px,' + d.y + 'px)';
+        setTimeout(function () { if (my !== tok) return; fill(L2); fly.style.opacity = 0; }, 1050);
+      }
+      var ph, bg, fg, msg;
+      if (k < N) { ph = '① DESCENTE · chaque appel attend la réponse du suivant'; bg = 'var(--accent-soft)'; fg = 'var(--accent)'; var mm = N - k; msg = k === 0 ? 'Pour calculer <b>fact(' + N + ')</b>, on a besoin de <b>fact(' + (N - 1) + ')</b>. On l’appelle et <b>on attend</b> sa réponse.' : '<b>fact(' + (mm + 1) + ')</b> attend toujours. Pour répondre, <b>fact(' + mm + ')</b> a besoin de <b>fact(' + (mm - 1) + ')</b>.'; }
+      else if (k === N) { ph = '② CAS DE BASE · la descente s’arrête'; bg = 'var(--warn-soft)'; fg = 'var(--warn)'; msg = '<b>fact(0)</b> connaît sa réponse sans rien appeler : <b>1</b>. C’est le tournant : <b>les réponses vont maintenant remonter</b>.'; }
+      else if (k <= 2 * N) { var t2 = k - N, Ls = N - t2, v = fv(rows[Ls]._m - 1), res = fv(rows[Ls]._m); ph = '③ REMONTÉE · la réponse rejoint l’appel qui attendait'; bg = 'var(--ok-soft)'; fg = 'var(--ok)'; msg = 'La réponse <b>' + v + '</b> monte vers <b>fact(' + rows[Ls]._m + ')</b>, qui attendait. Il peut enfin calculer <b>' + rows[Ls]._m + ' × ' + v + ' = ' + res + '</b>.'; }
+      else { ph = '✔ RÉSULTAT'; bg = 'var(--ok-soft)'; fg = 'var(--ok)'; msg = 'La réponse est arrivée tout en haut : <b>fact(' + N + ') = ' + fv(N) + '</b>. Chaque appel a reçu la réponse de celui du dessous.'; }
+      banner.textContent = ph; banner.style.background = bg; banner.style.color = fg; note.innerHTML = msg;
+    }
+    var sp = stepper(2 * N + 2, render, { delay: 2300, noSpeed: true });
+    root.append(banner, wrap, note, sp.el);
+  }
+
+  /* ---------- Fusionner deux paquets triés ---------- */
+  function mergeStep(root) {
+    root = $(root); root.classList.add('sim');
+    var A = [1, 2, 5, 8], B = [3, 4, 7, 9], tr = [], i = 0, j = 0, out = [], q = 0;
+    tr.push({ i: 0, j: 0, out: [], q: 0, hl: null, txt: 'Deux paquets <b>déjà triés</b>. On veut un seul paquet trié. On ne regarde que le <b>premier</b> élément de chaque paquet.' });
+    while (i < A.length && j < B.length) {
+      q++;
+      tr.push({ i: i, j: j, out: out.slice(), q: q, hl: { a: i, b: j }, txt: 'On compare <b>' + A[i] + '</b> (paquet A) et <b>' + B[j] + '</b> (paquet B).' });
+      if (A[i] <= B[j]) { out.push(A[i]); i++; tr.push({ i: i, j: j, out: out.slice(), q: q, hl: { win: 'A', ix: i - 1 }, txt: '<b>' + out[out.length - 1] + '</b> est le plus petit : il passe dans le résultat. On avance dans le paquet A.' }); }
+      else { out.push(B[j]); j++; tr.push({ i: i, j: j, out: out.slice(), q: q, hl: { win: 'B', ix: j - 1 }, txt: '<b>' + out[out.length - 1] + '</b> est le plus petit : il passe dans le résultat. On avance dans le paquet B.' }); }
+    }
+    while (i < A.length) { out.push(A[i]); i++; tr.push({ i: i, j: j, out: out.slice(), q: q, hl: { win: 'A', ix: i - 1 }, txt: 'Le paquet B est vide : on recopie <b>' + out[out.length - 1] + '</b> sans comparer.' }); }
+    while (j < B.length) { out.push(B[j]); j++; tr.push({ i: i, j: j, out: out.slice(), q: q, hl: { win: 'B', ix: j - 1 }, txt: 'Le paquet A est vide : on recopie <b>' + out[out.length - 1] + '</b> sans comparer.' }); }
+    tr[tr.length - 1].txt += ' <b>Terminé :</b> chaque nombre a été déplacé une seule fois, donc fusionner n nombres coûte <b>au plus n opérations</b>.';
+    var ea = h('div'), eb = h('div'), eo = h('div'), cnt = h('div', { class: 'ops' }), note = h('div', { class: 'note', style: 'font-size:30px;min-height:96px' });
+    function lab(t) { return h('div', { class: 'small', style: 'margin:8px 0 2px;font-weight:700;color:var(--head)' }, t); }
+    function render(k) {
+      var s = tr[k], ca = {}, cbb = {}, co = {}, x;
+      for (x = 0; x < A.length; x++) if (x < s.i) ca[x] = 'done';
+      for (x = 0; x < B.length; x++) if (x < s.j) cbb[x] = 'done';
+      if (s.hl && s.hl.a !== undefined) { ca[s.hl.a] = 'cur'; cbb[s.hl.b] = 'cur'; }
+      if (s.hl && s.hl.win === 'A') ca[s.hl.ix] = 'found';
+      if (s.hl && s.hl.win === 'B') cbb[s.hl.ix] = 'found';
+      var ov = []; for (x = 0; x < A.length + B.length; x++) { ov.push(x < s.out.length ? s.out[x] : '·'); if (x < s.out.length) co[x] = 'found'; }
+      arrayViz(ea, { values: A, cls: ca, ptrs: { i: s.i < A.length ? s.i : null }, cw: 84 });
+      arrayViz(eb, { values: B, cls: cbb, ptrs: { j: s.j < B.length ? s.j : null }, cw: 84 });
+      arrayViz(eo, { values: ov, cls: co, ptrs: {}, cw: 84 });
+      cnt.innerHTML = ''; cnt.append(String(s.q), h('small', null, 'comparaisons · ' + s.out.length + ' / ' + (A.length + B.length) + ' nombres placés'));
+      note.innerHTML = s.txt;
+    }
+    root.append(h('div', { class: 'split even', style: 'align-items:start;gap:44px' }, h('div', null, lab('Paquet A (trié)'), ea, lab('Paquet B (trié)'), eb), h('div', null, lab('Résultat (trié)'), eo, cnt, note)));
+    var sp = stepper(tr.length, render, { delay: 1500 });
+    root.appendChild(sp.el);
+  }
+
+  /* ---------- Tri fusion : on coupe jusqu'au bout, puis on recolle ---------- */
+  function mergeAnim(root) {
+    root = $(root); root.classList.add('sim');
+    var VALS = [5, 2, 8, 1, 9, 3, 7, 4], p = 3, n = 8, levels = [];
+    var banner = h('div', { style: 'border-radius:16px;padding:10px 22px;font-size:28px;font-weight:700;margin-bottom:12px;transition:background .5s,color .5s' });
+    var cap = h('div', { class: 'callout', style: 'min-height:128px;font-size:31px;margin-top:12px' }), box = h('div');
+    for (var d = 0; d <= p; d++) {
+      (function (d) {
+        var cnt = Math.pow(2, d), size = n / cnt;
+        var row = h('div', { style: 'display:grid;grid-template-columns:1fr 440px;gap:22px;align-items:center;margin:6px 0;opacity:0;transform:translateY(-14px);transition:opacity .7s, transform .7s cubic-bezier(.2,.7,.2,1)' });
+        var cells = h('div', { style: 'display:grid;grid-template-columns:repeat(' + cnt + ',1fr);gap:8px' }), bx = [];
+        for (var i = 0; i < cnt; i++) { var e = h('div', { style: 'border:3px solid var(--blue);background:var(--accent-soft);color:var(--head);border-radius:12px;text-align:center;font:700 28px var(--mono);padding:8px 0;white-space:nowrap;overflow:hidden;transition:background .6s, border-color .6s, color .6s' }, VALS.slice(i * size, (i + 1) * size).join(' ')); cells.appendChild(e); bx.push(e); }
+        var cost = h('div', { style: 'font-size:25px;line-height:1.3;opacity:0;transition:opacity .7s' });
+        row.append(cells, cost); box.appendChild(row); levels.push({ row: row, bx: bx, cost: cost, cnt: cnt, size: size });
+      })(d);
+    }
+    function render(k) {
+      levels.forEach(function (L, d) {
+        var vis = d <= Math.min(k, p), sorted = k >= (6 - d) && (d < p ? true : k >= p);
+        L.row.style.opacity = vis ? 1 : 0; L.row.style.transform = vis ? 'none' : 'translateY(-14px)';
+        L.bx.forEach(function (e, i) {
+          var slice = VALS.slice(i * L.size, (i + 1) * L.size), txt = (sorted ? slice.slice().sort(function (a, b) { return a - b; }) : slice).join(' ');
+          e.textContent = txt; e.style.background = sorted ? 'var(--ok-soft)' : 'var(--accent-soft)'; e.style.borderColor = sorted ? 'var(--ok)' : 'var(--blue)'; e.style.color = sorted ? 'var(--ok)' : 'var(--head)';
+        });
+        var showCost = d < p && k >= 6 - d;
+        L.cost.style.opacity = showCost ? 1 : 0;
+        L.cost.innerHTML = d < p ? L.cnt + ' fusion' + (L.cnt > 1 ? 's' : '') + ' de deux paquets de ' + (L.size / 2) + ' : <b class="acc">' + n + ' opérations</b> au plus' : '';
+      });
+      var ph, bg, fg, t;
+      if (k <= p) { ph = '① DIVISER · on coupe en deux, encore et encore'; bg = 'var(--accent-soft)'; fg = 'var(--accent)'; }
+      else { ph = '② COMBINER · on recolle deux paquets triés en un paquet trié'; bg = 'var(--ok-soft)'; fg = 'var(--ok)'; }
+      var T = [
+        'On part d’un paquet de <b>8 nombres dans le désordre</b>.',
+        '<b>Diviser :</b> on coupe le paquet en deux moitiés de 4 nombres.',
+        'On recommence sur chaque moitié : quatre paquets de <b>2 nombres</b>.',
+        'On coupe encore : huit paquets d’<b>un seul nombre</b>. Un seul nombre est déjà trié : c’est le <b>cas de base</b>, on ne divise plus.',
+        '<b>Combiner :</b> on fusionne les paquets deux à deux (comme à la diapositive précédente) : quatre paquets <b>triés</b> de 2 nombres.',
+        'On fusionne encore : deux paquets triés de <b>4 nombres</b>.',
+        'Dernière fusion : un seul paquet <b>trié de 8 nombres</b>. Terminé ! Chaque niveau de fusion a coûté au plus 8 opérations.'
+      ];
+      banner.textContent = ph; banner.style.background = bg; banner.style.color = fg; cap.innerHTML = T[k];
+    }
+    var sp = stepper(7, render, { delay: 2300, noSpeed: true });
+    root.append(banner, box, cap, sp.el);
+  }
+
+/* ---------- Récursivité : appels qui descendent, résultats qui remontent ---------- */
   function factAnim(root, opts) {
     root = $(root); root.classList.add('sim');
     var N = 4, mode = (opts && opts.mode) || 'base', cards = [], dArrows = [], uArrows = [], events = [];
     var fv = function (n) { return n <= 1 ? 1 : n * fv(n - 1); };
     var left = h('div', { class: 'col', style: 'flex:0 0 640px' });
-    var codeB = codeBlock(['fonction fact(n):', '    si n = 0 alors retourner 1', '    retourner n × fact(n-1)']);
+    var codeB, codeHold = h('div'), LN = { rec: 2 };
     var phase = h('div', { style: 'border-radius:16px;padding:12px 20px;font-size:27px;font-weight:700;transition:background .6s, color .6s;text-align:center' });
     var counters = h('div', { class: 'row', style: 'gap:30px' });
     var note = h('div', { class: 'note', style: 'font-size:29px;min-height:130px' });
     var toggle = btn(mode === 'base' ? 'Retirer le cas de base' : 'Remettre le cas de base', function () { mode = mode === 'base' ? 'nobase' : 'base'; toggle.textContent = mode === 'base' ? 'Retirer le cas de base' : 'Remettre le cas de base'; toggle.classList.toggle('on', mode === 'nobase'); build(); sp.reset(); }, 'sm' + (mode === 'nobase' ? ' on' : ''));
-    left.append(codeB.el, phase, counters, note, h('div', null, toggle));
+    left.append(codeHold, phase, counters, note, h('div', null, toggle));
     var right = h('div', { style: 'flex:1;min-width:0;position:relative' });
     var wrap = h('div', { class: 'row', style: 'align-items:flex-start;gap:36px;flex-wrap:nowrap' });
     wrap.append(left, right);
@@ -628,6 +833,9 @@
       var count = mode === 'base' ? N + 1 : 6, big = mode === 'base';
       var cpad = big ? '11px 24px' : '7px 20px', cf = big ? 34 : 30, ah = big ? 46 : 38, lf = big ? 24 : 21;
       right.innerHTML = ''; cards = []; dArrows = []; uArrows = []; events = [];
+      LN = { rec: mode === 'base' ? 2 : 1 };
+      codeB = codeBlock(mode === 'base' ? ['fonction fact(n):', '    si n = 0 alors retourner 1', '    retourner n × fact(n-1)'] : ['fonction fact(n):', '    retourner n × fact(n-1)']);
+      codeHold.innerHTML = ''; codeHold.appendChild(codeB.el);
       var col = h('div', { style: 'display:flex;flex-direction:column;align-items:stretch' });
       for (var i = 0; i < count; i++) {
         var nn = N - i;
@@ -643,13 +851,13 @@
       }
       right.appendChild(col);
       events.push({ k: 'call', i: 0, line: 0, t: 'On appelle <b>fact(' + N + ')</b>. Une première fiche est posée sur la pile.' });
-      for (var j = 1; j < count; j++) events.push({ k: 'call', i: j, line: 2, t: '<b>fact(' + (N - j + 1) + ')</b> ne peut pas répondre seule : elle a besoin de <b>fact(' + (N - j) + ')</b>. Nouvel appel, nouvelle fiche, la précédente <b>attend</b>.' });
+      for (var j = 1; j < count; j++) events.push({ k: 'call', i: j, line: LN.rec, t: '<b>fact(' + (N - j + 1) + ')</b> ne peut pas répondre seule : elle a besoin de <b>fact(' + (N - j) + ')</b>. Nouvel appel, nouvelle fiche, la précédente <b>attend</b>.' });
       if (mode === 'base') {
         events.push({ k: 'base', i: count - 1, line: 1, t: '<b>n = 0</b> : c’est le <b>cas de base</b>. Cet appel sait répondre sans en refaire un autre : il rend <b>1</b>.' });
         for (var r = count - 2; r >= 0; r--) { var nr = N - r; events.push({ k: 'ret', i: r, line: 2, t: 'La réponse <b>' + fv(nr - 1) + '</b> remonte. <b>fact(' + nr + ')</b> calcule <b>' + nr + ' × ' + fv(nr - 1) + ' = ' + fv(nr) + '</b> et la rend à son tour.' }); }
         events.push({ k: 'end', i: 0, line: -1, t: 'Terminé : <b>fact(' + N + ') = ' + fv(N) + '</b>. Les fiches sont retirées de la pile une à une.' });
       } else {
-        events.push({ k: 'over', i: count - 1, line: 1, t: 'Sans cas de base, <b>rien n’arrête les appels</b> : la pile se remplit sans fin jusqu’à la saturation de la mémoire.' });
+        events.push({ k: 'over', i: count - 1, line: LN.rec, t: 'Sans cas de base, <b>rien n’arrête les appels</b> : la pile se remplit sans fin jusqu’à la saturation de la mémoire.' });
       }
     }
     function render(k) {
@@ -775,24 +983,24 @@
       var n = Math.pow(2, p); box.innerHTML = ''; levels = [];
       for (var d = 0; d <= p; d++) {
         var cnt = Math.pow(2, d), size = n / cnt;
-        var row = h('div', { style: 'display:grid;grid-template-columns:1fr 470px;gap:22px;align-items:center;margin:7px 0;opacity:0;transform:translateY(-14px);transition:opacity .7s, transform .7s cubic-bezier(.2,.7,.2,1)' });
+        var row = h('div', { style: 'display:grid;grid-template-columns:1fr 560px;gap:22px;align-items:center;margin:7px 0;opacity:0;transform:translateY(-14px);transition:opacity .7s, transform .7s cubic-bezier(.2,.7,.2,1)' });
         var cells = h('div', { style: 'display:grid;grid-template-columns:repeat(' + cnt + ',1fr);gap:6px' });
         for (var i = 0; i < cnt; i++) {
           var txt = size <= 4 && p <= 3 ? VALS.slice(i * size, i * size + size).join(' ') : (size === 1 ? VALS[i] : size);
           cells.appendChild(h('div', { style: 'background:var(--accent-soft);border:3px solid var(--blue);border-radius:10px;text-align:center;font:700 ' + (cnt > 8 ? 20 : 26) + 'px var(--mono);padding:6px 0;color:var(--head);overflow:hidden;white-space:nowrap' }, txt));
         }
-        var cost = h('div', { style: 'font-size:27px;opacity:0;transition:opacity .7s' }, d < p ? [cnt + ' morceau' + (cnt > 1 ? 'x' : '') + ' × ', h('b', null, size), ' = ', h('b', { class: 'acc' }, n), ' opérations'] : [cnt + ' morceaux de taille 1 : ', h('b', null, 'plus rien à couper')]);
+        var cost = h('div', { style: 'font-size:25px;line-height:1.3;opacity:0;transition:opacity .7s' }, d < p ? [cnt + ' morceau' + (cnt > 1 ? 'x' : '') + ' de taille ', h('b', null, size), ' : chacun coûte ', h('b', null, size), ' à recoller, soit ', h('b', { class: 'acc' }, n), ' opérations'] : [cnt + ' morceaux de taille 1 : ', h('b', null, 'rien à recoller (cas de base)')]);
         row.append(cells, cost); box.appendChild(row); levels.push({ row: row, cost: cost });
       }
     }
     function render(k) {
       var n = Math.pow(2, p);
-      levels.forEach(function (L, d) { var vis = d <= Math.min(k, p); L.row.style.opacity = vis ? 1 : 0; L.row.style.transform = vis ? 'none' : 'translateY(-14px)'; L.cost.style.opacity = (vis && d < p && d < k) || (d === p && k >= p) ? 1 : 0; });
+      levels.forEach(function (L, d) { var vis = d <= Math.min(k, p); L.row.style.opacity = vis ? 1 : 0; L.row.style.transform = vis ? 'none' : 'translateY(-14px)'; L.cost.style.opacity = vis ? 1 : 0; });
       var t;
-      if (k === 0) t = 'On part d’un problème de taille <b>' + n + '</b>. C’est la <b>racine</b> de l’arbre.';
-      else if (k < p) t = '<b>Niveau ' + k + '.</b> Chaque morceau est coupé en <b>deux moitiés</b> : on obtient ' + Math.pow(2, k) + ' morceaux de taille ' + (n / Math.pow(2, k)) + '. Pour <b>recoller</b> les morceaux du niveau précédent, il faut en tout <b>n = ' + n + '</b> opérations.';
-      else if (k === p) t = '<b>Niveau ' + p + '.</b> Les morceaux sont de taille 1 : on ne peut plus couper. On s’arrête.';
-      else t = 'Il y a <b>' + p + ' niveaux de recollage</b> (log₂ ' + n + ' = ' + p + '), chacun coûte <b>n = ' + n + '</b> : total <b>n × log₂ n = ' + (n * p) + '</b>. C’est <b>T(n) = Θ(n log n)</b>.';
+      if (k === 0) t = 'On part d’un problème de taille <b>n = ' + n + '</b> : c’est la <b>racine</b> de l’arbre. On le coupe en deux moitiés, on résout chaque moitié, puis on <b>recolle</b> les deux résultats. Ce recollage coûte <b>' + n + ' opérations</b> (colonne de droite).';
+      else if (k < p) t = '<b>Niveau ' + k + '.</b> Chaque morceau est coupé en <b>deux moitiés</b> : on obtient ' + Math.pow(2, k) + ' morceaux de taille ' + (n / Math.pow(2, k)) + '. Chaque morceau demande un recollage proportionnel à sa taille : ensemble, ils coûtent encore <b>' + n + ' opérations</b>.';
+      else if (k === p) t = '<b>Niveau ' + p + '.</b> Les morceaux sont de taille 1 : on ne coupe plus (cas de base) et il n’y a plus rien à recoller.';
+      else t = 'Il y a <b>' + p + ' niveaux</b> qui coûtent chacun <b>' + n + '</b> (le nombre de niveaux est log₂ ' + n + ' = ' + p + ') : total <b>' + n + ' × ' + p + ' = ' + (n * p) + '</b>, soit <b>T(n) = n × log₂ n</b>. C’est la complexité <b>Θ(n log n)</b>.';
       cap.innerHTML = t;
     }
     build(); sp.go(0);
@@ -870,5 +1078,5 @@
     root.append(h('div', { class: 'q', html: cfg.q }), opts, why);
   }
 
-  window.Sim = { tracer: tracer, arrayViz: arrayViz, sum: sumSim, guess: guess, race: race, raceBars: raceBars, growth: growth, times: times, halving: halving, handshake: handshake, subsets: subsets, contrib: contrib, simplify: simplify, bigO: bigO, cases: casesSim, loops: loops, fact: factAnim, fib: fibAnim, split: splitTree, masterBars: masterBars, master: master, quiz: quiz, h: h, pc: pc };
+  window.Sim = { tracer: tracer, arrayViz: arrayViz, sum: sumSim, guess: guess, race: race, raceBars: raceBars, growth: growth, times: times, halving: halving, handshake: handshake, subsets: subsets, contrib: contrib, simplify: simplify, bigO: bigO, cases: casesSim, loops: loops, hand: hand, mergeStep: mergeStep, mergeAnim: mergeAnim, fact: factAnim, fib: fibAnim, split: splitTree, masterBars: masterBars, master: master, quiz: quiz, h: h, pc: pc };
 })();

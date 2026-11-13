@@ -191,7 +191,12 @@
 <section class="slide" data-ch="1" data-chname="Choisir un algorithme">
   <h2 class="title">Jeu : deviner un nombre entre 1 et 100</h2>
   <p class="sub">Je pense à un nombre secret. Vous posez des questions « est-ce X ? » et je réponds « plus grand » ou « plus petit ». Deux stratégies s’affrontent.</p>
-  <div id="sim-guess"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comparer deux façons de poser les questions pour retrouver un nombre secret.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le <b>nombre de questions</b> posées par chaque stratégie (compteur en haut à droite) et les cases qui s’éliminent.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Choisissez un nombre secret, puis lancez A et B. Essayez 1, puis 100, puis un nombre au hasard.</div></div>
+  </div>
+  <div id="sim-guess" class="step gate"></div>
   <aside class="notes">Avant de lancer les simulations, faire jouer deux étudiants au tableau : le premier propose 1, 2, 3… le second propose toujours le milieu. Demander à la salle de prédire qui gagne et de combien de questions. Puis lancer les deux stratégies avec le même nombre secret (73 par défaut).</aside>
 </section>
 
@@ -223,7 +228,12 @@
 
 <section class="slide" data-ch="1" data-chname="Choisir un algorithme">
   <h2 class="title">Les deux méthodes sur un tableau trié</h2>
-  <div id="sim-race"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Appliquer les deux méthodes à un tableau trié de 16 cases.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nombre de comparaisons, et les cases écartées (grisées) par la méthode B.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cherchez 56, puis 3 (le premier !), puis 99 (absent). Quelle méthode gagne à chaque fois ?</div></div>
+  </div>
+  <div id="sim-race" class="step gate"></div>
   <aside class="notes">Choisir 56 : A demande 13 comparaisons, B seulement 4. Essayer 3 (premier élément : A gagne !) puis 99 (absent). Faire remarquer que B élimine la moitié des cases à chaque comparaison.</aside>
 </section>
 
@@ -269,7 +279,7 @@
   <div class="split">
     <div class="col">
       <p class="lead">Pour compter, on se met d’accord sur ce qu’est <b>une opération élémentaire</b>. Chacune coûte <b>1</b>.</p>
-      <div class="callout step">On exprime le coût total en fonction de la taille <b>n</b> de l’entrée. On le note <b>T(n)</b>.</div>
+      <div class="def step" data-t="Définition"><span class="kw">T(n)</span> est le nombre total d’opérations élémentaires exécutées par l’algorithme quand l’entrée a la taille <b>n</b>.<br><span class="small">Lecture : « T de n ». T est le nom de la fonction, n est la taille des données. Si n change, T(n) change.</span></div>
     </div>
     <div class="grid2" style="gap:22px">
       <div class="panel step" data-g="1"><span class="tag">Affectation</span><div class="mono" style="font-size:42px;color:var(--head)">s ← 0</div><div class="small">on range une valeur</div></div>
@@ -283,26 +293,51 @@
 <section class="slide" data-ch="2" data-chname="Compter les opérations">
   <h2 class="title">Compter pas à pas : la somme d’un tableau</h2>
   <p class="sub">Chaque ligne exécutée a un coût. Suivez le compteur d’opérations en bas à droite.</p>
-  <div id="sim-sum"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Compter les opérations d’un vrai programme, ligne après ligne.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La ligne surlignée à chaque étape, et le compteur qui augmente du coût de cette ligne.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Lancez n = 5, puis n = 3 et n = 8 : que devient le total ? Cherchez la formule.</div></div>
+  </div>
+  <div id="sim-sum" class="step gate"></div>
   <aside class="notes">Lancer avec n = 5 en mode Lent et faire annoncer le compteur à voix haute. Puis cliquer n = 3 et n = 8 : 13, 19, 28. Demander quelle formule relie n au total.</aside>
 </section>
 
 <section class="slide" data-ch="2" data-chname="Compter les opérations">
-  <h2 class="title">Du comptage à la formule : T(n) = 3n + 4</h2>
+  <h2 class="title">Construire T(n) : coût × nombre d’exécutions</h2>
+  <p class="sub">Pour chaque ligne du programme, on se demande : combien coûte-t-elle, et combien de fois est-elle exécutée ? Puis on additionne.</p>
+  <div class="split" style="grid-template-columns: 5fr 7fr; align-items: start;">
+    <pre class="code free" data-pc style="font-size:30px;line-height:1.75">fonction somme(t, n):
+    s ← 0
+    pour i de 0 à n-1 faire
+        s ← s + t[i]
+    retourner s</pre>
+    <table class="tbl" style="font-size:29px">
+      <tr class="step" data-g="1"><th>Opération</th><th class="num">Coût</th><th class="num">Exécutions</th><th class="num">Total</th></tr>
+      <tr class="step" data-g="1"><td class="mono">s ← 0</td><td class="num">1</td><td class="num">1 fois</td><td class="num"><b>1</b></td></tr>
+      <tr class="step" data-g="2"><td class="mono">i ← 0</td><td class="num">1</td><td class="num">1 fois</td><td class="num"><b>1</b></td></tr>
+      <tr class="step" data-g="3"><td class="mono">test i &lt; n</td><td class="num">1</td><td class="num">n + 1 fois</td><td class="num"><b>n + 1</b></td></tr>
+      <tr class="step" data-g="4"><td class="mono">i ← i + 1</td><td class="num">1</td><td class="num">n fois</td><td class="num"><b>n</b></td></tr>
+      <tr class="step" data-g="4"><td class="mono">s ← s + t[i]</td><td class="num">1</td><td class="num">n fois</td><td class="num"><b>n</b></td></tr>
+      <tr class="step" data-g="5"><td class="mono">retourner s</td><td class="num">1</td><td class="num">1 fois</td><td class="num"><b>1</b></td></tr>
+      <tr class="step me" data-g="6"><td colspan="3"><b>T(n) = 1 + 1 + (n + 1) + n + n + 1</b></td><td class="num"><b class="acc">3n + 4</b></td></tr>
+    </table>
+  </div>
+  <div class="callout step" data-g="3" style="font-size:30px">Pourquoi <b>n + 1</b> tests ? La boucle fait n tours, donc n tests réussis, <b>plus un dernier test raté</b> qui arrête la boucle.</div>
+  <aside class="notes">Faire retrouver à la classe le fait que le test est exécuté une fois de plus que le corps de la boucle. Relier à la simulation précédente : le dernier passage en 2 opérations.</aside>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Vérifions la formule avec la simulation</h2>
   <div class="split">
     <table class="tbl">
-      <tr><th>Taille n</th><th class="num">Opérations</th></tr>
-      <tr class="step" data-g="1"><td>n = 3</td><td class="num"><b>13</b></td></tr>
-      <tr class="step" data-g="1"><td>n = 5</td><td class="num"><b>19</b></td></tr>
-      <tr class="step" data-g="1"><td>n = 8</td><td class="num"><b>28</b></td></tr>
+      <tr class="step" data-g="1"><th>Taille n</th><th class="num">Formule 3n + 4</th><th class="num">Compteur de la simulation</th></tr>
+      <tr class="step" data-g="1"><td>n = 3</td><td class="num">3×3 + 4 = <b>13</b></td><td class="num"><b>13</b></td></tr>
+      <tr class="step" data-g="1"><td>n = 5</td><td class="num">3×5 + 4 = <b>19</b></td><td class="num"><b>19</b></td></tr>
+      <tr class="step" data-g="1"><td>n = 8</td><td class="num">3×8 + 4 = <b>28</b></td><td class="num"><b>28</b></td></tr>
     </table>
     <div class="col">
-      <div class="panel step" data-g="2" style="padding:26px 34px">
-        <div class="small" style="margin-bottom:10px">Exemple pour n = 5</div>
-        <div><span class="sq f"></span><span class="sq f"></span><span class="sq f"></span><span class="sq f"></span> <b class="small">4 opérations fixes</b></div>
-        <div style="margin-top:8px"><span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <b class="small">5 tours × 3</b></div>
-      </div>
-      <div class="callout step" data-g="3">Chaque tour de boucle coûte <b>3</b> (test, incrément, addition). Le reste coûte <b>4</b> en tout.<br><b class="mono">T(n) = 3n + 4</b></div>
+      <div class="callout good step" data-g="2">La formule donne <b>exactement</b> ce que le compteur affichait.</div>
+      <div class="def step" data-g="3" data-t="À quoi ça sert">On peut maintenant <b>prédire</b> le coût sans exécuter le programme.<br><span class="small">Pour n = 1 000 000 : T(n) = 3 000 004 opérations.</span></div>
     </div>
   </div>
 </section>
@@ -312,7 +347,7 @@
   <p class="sub">Comparons deux façons d’écrire la même somme : l’une coûte 3n + 4 opérations, l’autre 5n + 1.</p>
   <div class="split">
     <table class="tbl">
-      <tr><th>n</th><th class="num">3n + 4</th><th class="num">5n + 1</th></tr>
+      <tr class="step" data-g="1"><th>n</th><th class="num">3n + 4</th><th class="num">5n + 1</th></tr>
       <tr class="step" data-g="1"><td>1 000</td><td class="num">3 004</td><td class="num">5 001</td></tr>
       <tr class="step" data-g="1"><td>2 000</td><td class="num">6 004</td><td class="num">10 001</td></tr>
       <tr class="step" data-g="1"><td>4 000</td><td class="num">12 004</td><td class="num">20 001</td></tr>
@@ -369,26 +404,41 @@
 <section class="slide" data-ch="3" data-chname="Les familles de croissance">
   <h2 class="title">Couper en deux : la famille log n</h2>
   <div class="def" data-t="Définition" style="font-size:34px">Le <span class="kw">logarithme</span> en base 2, noté <b>log₂ n</b>, est le nombre de fois qu’on peut <b>diviser n par 2</b> avant d’arriver à 1.</div>
-  <div id="sim-halving"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre le logarithme : combien de fois peut-on couper n en deux avant d’arriver à 1 ?</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Chaque barre est la taille qui reste après une coupe. Comptez les coupes jusqu’à 1.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Déplacez le curseur. Quand n double, combien de coupes de plus faut-il ?</div></div>
+  </div>
+  <div id="sim-halving" class="step gate"></div>
   <aside class="notes">Déplacer le curseur : à chaque fois que n double, il y a exactement une coupe de plus. C’est pour cela que la recherche dichotomique est si rapide.</aside>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Les familles de croissance">
   <h2 class="title">Le carré : n × n, noté n²</h2>
   <p class="sub">« n² » se lit « n au carré » et signifie <b>n fois n</b>. Il apparaît quand chaque élément est mis en relation avec tous les autres.</p>
-  <div id="sim-hand"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir pourquoi n² apparaît quand chaque personne est reliée à toutes les autres.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nombre de traits (poignées de main) quand le nombre de personnes augmente.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Passez de 4 à 8 personnes : par combien le nombre de traits est-il à peu près multiplié ?</div></div>
+  </div>
+  <div id="sim-shake" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Les familles de croissance">
   <h2 class="title">L’exponentielle : 2ⁿ</h2>
   <p class="sub">« 2ⁿ » signifie 2 × 2 × … × 2, avec n facteurs. Exemple : lister tous les sous-ensembles d’un ensemble.</p>
-  <div id="sim-subsets"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir pourquoi le nombre de cas <b>double</b> à chaque élément ajouté : c’est 2ⁿ.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les sous-ensembles listés à l’écran et leur nombre total.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Ajoutez un élément à la fois et comparez le nombre de sous-ensembles avec le précédent.</div></div>
+  </div>
+  <div id="sim-subsets" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Les familles de croissance">
   <h2 class="title">Les familles, avec un exemple pour chacune</h2>
   <table class="tbl" style="font-size:33px">
-    <tr><th>Famille</th><th>Nom</th><th>Exemple d’algorithme</th></tr>
+    <tr class="step" data-g="a"><th>Famille</th><th>Nom</th><th>Exemple d’algorithme</th></tr>
     <tr class="step" data-g="a"><td class="mono">1</td><td>constante</td><td>Lire une case d’un tableau</td></tr>
     <tr class="step" data-g="a"><td class="mono">log n</td><td>logarithmique</td><td>Recherche dichotomique</td></tr>
     <tr class="step" data-g="b"><td class="mono">n</td><td>linéaire</td><td>Parcourir un tableau, recherche séquentielle</td></tr>
@@ -401,7 +451,12 @@
 
 <section class="slide" data-ch="3" data-chname="Les familles de croissance">
   <h2 class="title">Faites grandir n et regardez les courbes</h2>
-  <div id="sim-growth"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comparer visuellement toutes les familles de croissance sur un même graphique.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Quelle courbe grimpe le plus vite ? Laquelle reste presque plate ?</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Augmentez n jusqu’à 30, puis activez l’échelle logarithmique pour tout voir.</div></div>
+  </div>
+  <div id="sim-growth" class="step gate"></div>
   <aside class="notes">Augmenter n jusqu’à 30 : la courbe de 2ⁿ sort du cadre. Activer l’échelle logarithmique pour voir toutes les courbes à la fois.</aside>
 </section>
 
@@ -428,7 +483,12 @@
 <section class="slide" data-ch="4" data-chname="Écrire la complexité">
   <h2 class="title">Pourquoi simplifier ?</h2>
   <p class="sub">À petite taille, les constantes comptent. À grande taille, un seul terme gagne. Regardez la part de chaque terme.</p>
-  <div id="sim-contrib"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre pourquoi on peut oublier les petits termes d’un coût.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La part de chaque terme dans le total (barre colorée) pour plusieurs tailles.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cliquez sur 10, 100, 1 000 puis 10 000 : quel terme domine à chaque fois ?</div></div>
+  </div>
+  <div id="sim-contrib" class="step gate"></div>
   <aside class="notes">Cliquer 10 : la constante 1000 domine. Puis 100, 1000, 10 000 : le terme 2n² prend toute la place. C’est la justification de la simplification.</aside>
 </section>
 
@@ -465,8 +525,37 @@
 </section>
 
 <section class="slide" data-ch="4" data-chname="Écrire la complexité">
-  <h2 class="title">Trouver c et n₀ pour f(n) = 3n² + 5n + 2</h2>
-  <div id="sim-bigo"></div>
+  <h2 class="title">Un exemple à la main : f(n) = 3n² + 5n + 2</h2>
+  <p class="sub">Peut-on dire que ce coût est « de l’ordre de n² » ? On cherche un <b>plafond</b> de la forme c · n² que f ne dépasse plus à partir d’un certain n.</p>
+  <div class="split even top">
+    <table class="tbl" style="font-size:31px">
+      <tr class="step" data-g="1"><th>n</th><th class="num">f(n)</th><th class="num">4 · n²</th><th class="num">f ≤ 4n² ?</th></tr>
+      <tr class="step" data-g="1"><td>1</td><td class="num">10</td><td class="num">4</td><td class="num t-bad">non</td></tr>
+      <tr class="step" data-g="1"><td>2</td><td class="num">24</td><td class="num">16</td><td class="num t-bad">non</td></tr>
+      <tr class="step" data-g="1"><td>3</td><td class="num">44</td><td class="num">36</td><td class="num t-bad">non</td></tr>
+      <tr class="step" data-g="1"><td>4</td><td class="num">70</td><td class="num">64</td><td class="num t-bad">non</td></tr>
+      <tr class="step" data-g="1"><td>5</td><td class="num">102</td><td class="num">100</td><td class="num t-bad">non</td></tr>
+      <tr class="step" data-g="2"><td>6</td><td class="num">140</td><td class="num">144</td><td class="num t-ok">oui</td></tr>
+      <tr class="step" data-g="2"><td>7</td><td class="num">184</td><td class="num">196</td><td class="num t-ok">oui</td></tr>
+      <tr class="step" data-g="2"><td>8</td><td class="num">234</td><td class="num">256</td><td class="num t-ok">oui</td></tr>
+    </table>
+    <div class="col">
+      <div class="callout warn step" data-g="1">Pour n de 1 à 5, f dépasse 4n² : le plafond n’est pas encore valable.</div>
+      <div class="callout good step" data-g="2">À partir de <b>n = 6</b>, f reste sous 4n². Et cela ne change plus : l’écart 4n² − f(n) = n² − 5n − 2 ne fait que grandir.</div>
+      <div class="def step" data-g="3" data-t="Conclusion">On a trouvé <b>c = 4</b> et <b>n₀ = 6</b>. On écrit <b>f(n) = O(n²)</b>.<br><span class="small">Avant n₀, tout est permis. Après n₀, le plafond tient toujours.</span></div>
+    </div>
+  </div>
+  <aside class="notes">Laisser les étudiants constater que n = 5 est un échec de très peu (102 contre 100). Insister : on n’a pas besoin que ce soit vrai pour tout n, seulement à partir d’un seuil.</aside>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">À vous : trouver le plafond et le plancher</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Prouver que f(n) = 3n² + 5n + 2 est « de l’ordre de n² », comme à la main, mais avec des courbes.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La courbe <b>bleue</b> est le vrai coût. Elle doit rester sous la courbe <b>rouge</b> (plafond c₂·n²) et au-dessus de la <b>verte</b> (plancher c₁·n²), à partir d’un seuil n₀.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Baissez le plafond c₂ jusqu’à ce que la preuve échoue, puis remontez-le. Le tableau coche ✓ ou ✗ pour chaque n.</div></div>
+  </div>
+  <div id="sim-bigo" class="step gate"></div>
   <aside class="notes">Mettre le plafond à 3 : aucun seuil ne convient. Passer à 4, puis 5, puis 10 : n₀ diminue. Plus la constante est généreuse, plus le seuil arrive tôt. Puis montrer le plancher c₁ = 3.</aside>
 </section>
 
@@ -505,23 +594,37 @@
 
 <section class="slide" data-ch="5" data-chname="Meilleur, moyen, pire cas">
   <h2 class="title">Une même taille n, des coûts différents</h2>
-  <div id="sim-cases"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir qu’un même algorithme coûte plus ou moins cher selon la position de la valeur cherchée.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nombre de comparaisons dans chacun des trois scénarios.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez le meilleur cas, le cas moyen puis le pire cas, et notez le nombre de comparaisons.</div></div>
+  </div>
+  <div id="sim-cases" class="step gate"></div>
   <aside class="notes">Laisser les étudiants prédire le nombre de comparaisons avant chaque scénario : 1, 5, 8.</aside>
 </section>
 
 <section class="slide" data-ch="5" data-chname="Meilleur, moyen, pire cas">
   <h2 class="title">Quel cas annoncer ?</h2>
-  <div class="split even top">
-    <table class="tbl">
-      <tr><th>Cas</th><th class="num">Comparaisons</th><th class="num">Ordre</th></tr>
+  <p class="sub">Exemple : la recherche séquentielle dans un tableau de n = 8 cases.</p>
+  <div class="split even" style="align-items:center">
+    <table class="tbl" style="font-size:40px">
+      <tr class="step" data-g="1"><th>Cas</th><th class="num">Comparaisons</th><th class="num">Ordre</th></tr>
       <tr class="step" data-g="1"><td>Meilleur</td><td class="num">1</td><td class="num mono">1</td></tr>
       <tr class="step" data-g="2"><td>Moyen (clé équiprobable)</td><td class="num">(n + 1) ÷ 2</td><td class="num mono">n</td></tr>
       <tr class="step" data-g="3"><td>Pire</td><td class="num">n</td><td class="num mono">n</td></tr>
     </table>
-    <div class="col">
-      <div class="callout step" data-g="4">Par défaut, on annonce le <b>pire cas</b> : c’est une <b>garantie</b>, valable pour toutes les entrées.</div>
-      <div class="panel step" data-g="5">Le cas moyen exige une hypothèse sur la façon dont les données sont réparties. On l’utilisera pour le tri rapide (séance 4).</div>
+    <div class="panel step" data-g="4">
+      <div class="small" style="margin-bottom:8px;font-size:30px">Comparaisons pour n = 8</div>
+      <div class="bars big-bars">
+        <div class="brow" style="grid-template-columns:150px 1fr 90px"><span>Meilleur</span><div class="bar b2" style="width:12.5%"></div><span class="val">1</span></div>
+        <div class="brow" style="grid-template-columns:150px 1fr 90px"><span>Moyen</span><div class="bar" style="width:56%"></div><span class="val">4,5</span></div>
+        <div class="brow" style="grid-template-columns:150px 1fr 90px"><span>Pire</span><div class="bar" style="width:100%;background:var(--c-exp)"></div><span class="val">8</span></div>
+      </div>
     </div>
+  </div>
+  <div class="grid2" style="flex:none">
+    <div class="callout step" data-g="5">Par défaut, on annonce le <b>pire cas</b> : c’est une <b>garantie</b>, valable pour toutes les entrées.</div>
+    <div class="panel step" data-g="6" style="font-size:33px">Le cas moyen exige une hypothèse sur la façon dont les données sont réparties. On l’utilisera pour le tri rapide (séance 4).</div>
   </div>
 </section>
 
@@ -553,9 +656,14 @@
 </section>
 
 <section class="slide" data-ch="6" data-chname="Analyser des boucles">
-  <h2 class="title">Chaque case est une exécution de opération()</h2>
-  <div id="sim-loops"></div>
-  <aside class="notes">Double boucle avec n = 6 : grille 6 par 6, donc 36. Boucle bornée par i : demi-carré, n(n+1)/2, c’est encore quadratique. Variable doublée : 1, 2, 4, 8, la grille s’arrête vite, c’est le logarithme.</aside>
+  <h2 class="title">Du programme au nombre d’exécutions</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Relier la forme d’un programme (ses boucles) au nombre de fois que l’opération est exécutée.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>ligne de code</b> surlignée, les valeurs de <b>i</b> et <b>j</b>, et la case de la grille qui s’allume : tout avance ensemble.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Choisissez deux boucles imbriquées avec n = 4, puis n = 8 : comparez les totaux. Essayez aussi « Variable doublée ».</div></div>
+  </div>
+  <div id="sim-loops" class="step gate"></div>
+  <aside class="notes">Double boucle avec n = 4 : grille 4 par 4, donc 16. Boucle bornée par i : demi-carré, n(n+1)/2, c’est encore quadratique. Variable doublée : 1, 2, 4, 8, la grille s’arrête vite, c’est le logarithme.</aside>
 </section>
 
 <section class="slide" data-ch="6" data-chname="Analyser des boucles">
@@ -609,39 +717,38 @@
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
-  <h2 class="title">À la main : on descend, puis on remonte</h2>
-  <div class="split even top">
-    <div class="col" style="gap:14px">
-      <div class="small" style="font-weight:700;color:var(--accent);letter-spacing:.12em">① ON DESCEND : chaque appel attend le suivant</div>
-      <div class="panel mono step" data-g="1" style="padding:16px 28px;font-size:34px">fact(4) = 4 × <b class="acc">fact(3)</b></div>
-      <div class="panel mono step" data-g="2" style="padding:16px 28px;font-size:34px">fact(3) = 3 × <b class="acc">fact(2)</b></div>
-      <div class="panel mono step" data-g="3" style="padding:16px 28px;font-size:34px">fact(2) = 2 × <b class="acc">fact(1)</b></div>
-      <div class="panel mono step" data-g="4" style="padding:16px 28px;font-size:34px">fact(1) = 1 × <b class="acc">fact(0)</b></div>
-      <div class="panel mono step" data-g="5" style="padding:16px 28px;font-size:34px;border-color:var(--warn);background:var(--warn-soft)">fact(0) = <b>1</b> <span class="small">cas de base</span></div>
-    </div>
-    <div class="col" style="gap:14px">
-      <div class="small" style="font-weight:700;color:var(--ok);letter-spacing:.12em">② ON REMONTE : chaque réponse est rendue</div>
-      <div class="panel mono step" data-g="6" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(1) = 1 × <b>1</b> = <b class="ok">1</b></div>
-      <div class="panel mono step" data-g="7" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(2) = 2 × <b>1</b> = <b class="ok">2</b></div>
-      <div class="panel mono step" data-g="8" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(3) = 3 × <b>2</b> = <b class="ok">6</b></div>
-      <div class="panel mono step" data-g="9" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(4) = 4 × <b>6</b> = <b class="ok">24</b></div>
-      <div class="callout good step" data-g="10">Le résultat est <b>24</b>.</div>
-    </div>
+  <h2 class="title">À la main : calculons fact(4)</h2>
+  <p class="sub">Chaque appel est décalé vers la droite. Quand la descente s’arrête, la réponse remonte.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Calculer fact(4) comme le fait l’ordinateur : chaque appel attend la réponse de celui qu’il a lancé.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La colonne qui se construit vers le bas, puis la <b>valeur qui remonte</b> d’appel en appel, avec le calcul fait à chaque niveau.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas et prédisez la valeur que va recevoir chaque ligne avant qu’elle arrive.</div></div>
   </div>
-  <aside class="notes">Révéler une ligne à la fois. Marquer le « tournant » au cas de base : à cet instant, plus aucun appel n’est lancé, et les réponses commencent à remonter.</aside>
+  <div id="sim-hand" class="step gate"></div>
+  <aside class="notes">Marquer le tournant au cas de base : à cet instant plus aucun appel n’est lancé. Ensuite la réponse 1 monte, puis 1, 2, 6 et enfin 24. Chaque ligne en attente se remplit quand la valeur arrive.</aside>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">Le même calcul, vu de l’intérieur de l’ordinateur</h2>
   <p class="sub">Les flèches bleues descendent : ce sont les <b>appels</b>. Les flèches vertes remontent : ce sont les <b>réponses</b>.</p>
-  <div id="sim-fact"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir ce que fait l’ordinateur pendant le même calcul : une pile de fiches, une par appel en cours.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les fiches qui s’empilent, puis les réponses qui remontent. Le compteur indique la hauteur de la pile.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas, puis relancez en lecture continue.</div></div>
+  </div>
+  <div id="sim-fact" class="step gate"></div>
   <aside class="notes">Lancer en mode lecture, puis recommencer en pas à pas. Insister sur la phrase : « chaque fiche attend la réponse de celle du dessous ». Les réponses remontent dans l’ordre inverse des appels.</aside>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">La pile d’appels, et ce qui arrive sans cas de base</h2>
   <p class="sub">Chaque appel en cours est une fiche posée sur une <span class="kw">pile</span> en mémoire. Ici, le cas de base est retiré.</p>
-  <div id="sim-fact2"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir ce qui se passe quand le code ne contient <b>aucun cas de base</b>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le code n’a plus de ligne « si n = 0 ». Les fiches s’empilent sans fin jusqu’à l’erreur.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Lancez la lecture et regardez la pile grandir. Quelle ligne manque dans le code ?</div></div>
+  </div>
+  <div id="sim-fact2" class="step gate"></div>
   <aside class="notes">Lancer la lecture : les fiches s’empilent sans fin jusqu’au dépassement de pile (stack overflow). C’est l’erreur que les étudiants verront en C lorsqu’ils oublient le cas de base.</aside>
 </section>
 
@@ -682,14 +789,24 @@
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">fib(n) lance deux appels : l’arbre se construit</h2>
   <p class="sub">Chaque appel est un nœud. Quand il répond, il passe au vert et sa valeur remonte vers son parent.</p>
-  <div id="sim-fib1"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Construire l’arbre de tous les appels de fib(4).</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>L’ordre des appels (toujours le côté gauche d’abord) et la valeur qui remonte vers chaque parent.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas. Changez ensuite pour fib(3), puis fib(5).</div></div>
+  </div>
+  <div id="sim-fib1" class="step gate"></div>
   <aside class="notes">Jouer fib(4) pas à pas. Commenter chaque étape. Insister sur l’ordre : on termine tout le côté gauche avant de commencer le côté droit.</aside>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">Le même calcul refait plusieurs fois</h2>
   <p class="sub">Lancez la lecture jusqu’au bout. Les appels à fib(2) sont surlignés : comptez-les, puis essayez fib(3).</p>
-  <div id="sim-fib2"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Repérer les calculs refaits plusieurs fois dans l’arbre de fib(5).</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les nœuds surlignés : même appel, donc même travail refait.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Lancez la lecture jusqu’au bout, puis choisissez fib(2), fib(3) : combien de fois apparaissent-ils ?</div></div>
+  </div>
+  <div id="sim-fib2" class="step gate"></div>
   <aside class="notes">Laisser jouer jusqu’au bout, puis surligner fib(2) : il apparaît 3 fois. fib(3) apparaît 2 fois. Annoncer que la programmation dynamique (séance 5) supprime ces répétitions.</aside>
 </section>
 
@@ -697,7 +814,7 @@
   <h2 class="title">Quand les appels se répètent, le coût explose</h2>
   <div class="split even top">
     <table class="tbl">
-      <tr><th>n</th><th class="num">Appels</th><th class="num">Durée à 10⁹ appels/s</th></tr>
+      <tr class="step" data-g="1"><th>n</th><th class="num">Appels</th><th class="num">Durée à 10⁹ appels/s</th></tr>
       <tr class="step" data-g="1"><td>10</td><td class="num">177</td><td class="num t-ok">instantané</td></tr>
       <tr class="step" data-g="2"><td>30</td><td class="num">2 692 537</td><td class="num t-ok">3 ms</td></tr>
       <tr class="step" data-g="3"><td>40</td><td class="num">331 160 281</td><td class="num t-ok">0,3 s</td></tr>
@@ -713,37 +830,91 @@
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
-  <h2 class="title">Diviser pour régner : couper le problème en deux</h2>
-  <p class="sub">Exemple : trier un paquet de cartes avec l’aide d’un ami. C’est l’idée du tri fusion, que nous étudierons en séance 4.</p>
+  <h2 class="title">Diviser pour régner : une stratégie en trois temps</h2>
+  <p class="sub">Exemple : trier un paquet de cartes. C’est l’idée du <span class="kw">tri fusion</span>, que nous étudierons en séance 4.</p>
   <div class="grid3">
-    <div class="panel col step" data-g="1"><span class="tag">Étape 1 · Diviser</span><h3>Couper le paquet en deux moitiés</h3><div class="small">Chaque moitié est un problème de taille n/2.</div></div>
-    <div class="panel col step" data-g="2"><span class="tag">Étape 2 · Résoudre</span><h3>Faire trier chaque moitié</h3><div class="small">Par le même procédé, donc par récursivité.</div></div>
-    <div class="panel col step" data-g="3"><span class="tag">Étape 3 · Combiner</span><h3>Fusionner les deux moitiés triées</h3><div class="small">Cela demande environ n opérations.</div></div>
+    <div class="panel col step" data-g="1"><span class="tag">Temps 1 · Diviser</span><h3>Couper le paquet en deux moitiés</h3><div class="small">Un paquet de n cartes devient deux paquets de n/2 cartes.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Temps 2 · Résoudre</span><h3>Faire trier chaque moitié</h3><div class="small">Par le même procédé : c’est de la récursivité. Un paquet d’une seule carte est déjà trié (cas de base).</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Temps 3 · Combiner</span><h3>Fusionner les deux moitiés triées</h3><div class="small">On recolle deux paquets triés en un seul paquet trié. C’est la seule étape qui demande un vrai travail.</div></div>
   </div>
-  <div class="keep step" data-g="4">Le coût s’écrit : <b>deux sous-problèmes de taille n/2</b>, plus <b>n opérations</b> pour recoller.</div>
+  <div class="keep step" data-g="4">Trois questions pour la suite : <b>comment fusionner</b> deux paquets triés ? <b>Combien cela coûte-t-il</b> ? <b>Combien de niveaux</b> y a-t-il ?</div>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
-  <h2 class="title">Lire l’équation de récurrence</h2>
+  <h2 class="title">Temps 3 : fusionner deux paquets triés</h2>
+  <p class="sub">C’est le cœur de l’algorithme. Les deux paquets sont déjà triés : on veut un seul paquet trié.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre comment fusionner deux paquets triés, et combien cela coûte.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>On ne regarde que le <b>premier</b> nombre de chaque paquet. Le plus petit passe dans le résultat. Le compteur compte les comparaisons.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas. À la fin, comparez le nombre de nombres placés (8) avec le nombre de comparaisons.</div></div>
+  </div>
+  <div id="sim-mstep" class="step gate"></div>
+  <aside class="notes">Faire prédire à voix haute le prochain nombre placé. Conclusion : chaque nombre est déplacé une seule fois, donc fusionner n nombres coûte au plus n opérations. C’est le « + n » de l’équation.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Le tri fusion en entier : couper, puis recoller</h2>
+  <p class="sub">On coupe jusqu’à des paquets d’un seul nombre, puis on fusionne en remontant, avec la méthode de la diapositive précédente.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Suivre un tri fusion complet sur 8 nombres, des paquets désordonnés jusqu’au paquet trié.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les paquets se coupent en descendant (<b>diviser</b>), puis redeviennent <b>triés</b> (en vert) en remontant (<b>combiner</b>).</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas. À chaque fusion, regardez la colonne de droite : combien d’opérations ?</div></div>
+  </div>
+  <div id="sim-manim" class="step gate"></div>
+  <aside class="notes">Même schéma que pour la factorielle : on descend (diviser), on atteint le cas de base (un seul nombre), puis on remonte (combiner). Chaque niveau de fusion coûte au plus 8 opérations.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Traduire la stratégie en équation</h2>
+  <p class="sub">Notons T(n) le nombre d’opérations nécessaires pour trier n nombres avec le tri fusion.</p>
   <div class="eq">T(n) = <span style="color:var(--c-n)">2</span> · T(<span style="color:var(--c-nlog)">n/2</span>) + <span style="color:var(--c-n2)">n</span></div>
   <div class="eqc">
-    <div class="step" data-g="1"><b style="color:var(--c-n)">2</b><br>Deux sous-problèmes à résoudre</div>
-    <div class="step" data-g="2"><b style="color:var(--c-nlog)">n/2</b><br>Chacun est deux fois plus petit</div>
-    <div class="step" data-g="3"><b style="color:var(--c-n2)">+ n</b><br>Le travail pour recoller les morceaux</div>
+    <div class="step" data-g="1"><b style="color:var(--c-n)">2</b><br>Il y a <b>deux sous-problèmes</b> : les deux moitiés du paquet.</div>
+    <div class="step" data-g="2"><b style="color:var(--c-nlog)">T(n/2)</b><br>Chaque moitié contient n/2 nombres : trier une moitié coûte T(n/2).</div>
+    <div class="step" data-g="3"><b style="color:var(--c-n2)">+ n</b><br>La fusion des deux moitiés triées coûte au plus <b>n</b> opérations.</div>
   </div>
-  <div class="callout step" data-g="4" style="margin-top:12px">Comment résoudre cette équation ? On dessine <b>l’arbre des sous-problèmes</b>, niveau par niveau.</div>
+  <div class="callout warn step" data-g="4" style="margin-top:8px">Il faut aussi un <b>cas de base</b> : T(1) = 1, car un seul nombre est déjà trié.</div>
+  <div class="callout step" data-g="5">Comment résoudre cette équation ? On dessine <b>l’arbre des sous-problèmes</b> et on additionne le coût de chaque niveau.</div>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
-  <h2 class="title">L’arbre de récursion : couper, puis recoller</h2>
-  <div id="sim-split"></div>
-  <aside class="notes">Avancer étape par étape. À chaque niveau, le nombre de morceaux double et leur taille est divisée par 2 : le total reste n. Compter les niveaux : log₂ n.</aside>
+  <h2 class="title">Résoudre l’équation : l’arbre de récursion</h2>
+  <p class="sub">Chaque rangée est un niveau de l’arbre. Dans chaque boîte : un sous-problème.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Calculer T(n) en additionnant le coût de recollage de chaque niveau de l’arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>À chaque niveau, le nombre de morceaux <b>double</b> mais leur taille est <b>divisée par 2</b> : le coût du niveau reste égal à n.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez niveau par niveau, puis changez la taille du problème (n = 4, 8, 16) et comptez les niveaux.</div></div>
+  </div>
+  <div id="sim-split" class="step gate"></div>
+  <aside class="notes">Lire l’arbre niveau par niveau. Le coût de chaque niveau est n. Le nombre de niveaux est log₂ n. Le total est n log₂ n.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Trois nombres décrivent l’équation : a, b et d</h2>
+  <p class="sub">Toutes les équations de « diviser pour régner » ont la même forme : <b class="mono">T(n) = a · T(n/b) + nᵈ</b>.</p>
+  <div class="grid3" style="flex:none">
+    <div class="panel step" data-g="1" style="font-size:31px"><span class="tag">a</span><b>Le nombre de sous-problèmes</b><br>Tri fusion : a = 2, deux moitiés.</div>
+    <div class="panel step" data-g="2" style="font-size:31px"><span class="tag">b</span><b>Le facteur de réduction</b><br>Tri fusion : b = 2, chaque moitié est deux fois plus petite.</div>
+    <div class="panel step" data-g="3" style="font-size:31px"><span class="tag">d</span><b>L’exposant du recollage nᵈ</b><br>Tri fusion : d = 1, soit n opérations. d = 0 : travail constant. d = 2 : n² opérations.</div>
+  </div>
+  <table class="tbl" style="font-size:28px">
+    <tr class="step" data-g="4"><th>Algorithme</th><th class="num">a</th><th class="num">b</th><th class="num">d</th><th>Pourquoi</th></tr>
+    <tr class="step" data-g="4"><td>Recherche dichotomique</td><td class="num">1</td><td class="num">2</td><td class="num">0</td><td>une seule moitié à explorer, une comparaison</td></tr>
+    <tr class="step" data-g="5"><td>Tri fusion</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td>deux moitiés, fusion en n opérations</td></tr>
+    <tr class="step" data-g="6"><td>Maximum par division</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td>deux moitiés, un seul test pour comparer les deux maxima</td></tr>
+    <tr class="step" data-g="7"><td>Produit de matrices par blocs</td><td class="num">8</td><td class="num">2</td><td class="num">2</td><td>huit sous-produits, additions en n²</td></tr>
+  </table>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">Qui pèse le plus : la racine ou les feuilles ?</h2>
-  <p class="sub">La racine est le niveau du haut. Les feuilles sont le niveau du bas. Chaque barre montre le coût total d’un niveau.</p>
-  <div id="sim-mbars"></div>
+  <p class="sub">La <b>racine</b> est le niveau du haut, les <b>feuilles</b> sont le niveau du bas. Chaque barre est le coût total d’un niveau.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre pourquoi le résultat dépend de la comparaison entre d et log<sub>b</sub> a.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Selon l’équation, le coût des niveaux <b>augmente</b>, reste <b>égal</b> ou <b>diminue</b> quand on descend dans l’arbre.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cliquez sur les trois cas l’un après l’autre et regardez quelle barre est la plus longue.</div></div>
+  </div>
+  <div id="sim-mbars" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
@@ -759,7 +930,12 @@
 
 <section class="slide" data-ch="7" data-chname="La récursivité">
   <h2 class="title">Essayez-le sur de vrais algorithmes</h2>
-  <div id="sim-master"></div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Appliquer le théorème maître sans calcul à la main.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le calculateur compare d avec log<sub>b</sub> a, nomme le cas et donne le résultat en Θ.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Entrez (a, b, d) = (2, 2, 1) pour le tri fusion, puis changez d et observez le changement de cas.</div></div>
+  </div>
+  <div id="sim-master" class="step gate"></div>
   <aside class="notes">Parcourir les préréglages : la recherche dichotomique donne log n, le tri fusion n log n. Karatsuba et Strassen sont donnés pour la culture : ils montrent que l’exposant peut ne pas être un entier.</aside>
 </section>
 
@@ -886,7 +1062,7 @@ tant que i ≥ 1 faire
   Sim.raceBars('#sim-bars');
   Sim.sum('#sim-sum');
   Sim.halving('#sim-halving');
-  Sim.handshake('#sim-hand');
+  Sim.handshake('#sim-shake');
   Sim.subsets('#sim-subsets');
   Sim.growth('#sim-growth');
   Sim.times('#sim-times');
@@ -895,6 +1071,9 @@ tant que i ≥ 1 faire
   Sim.bigO('#sim-bigo');
   Sim.cases('#sim-cases');
   Sim.loops('#sim-loops');
+  Sim.hand('#sim-hand');
+  Sim.mergeStep('#sim-mstep');
+  Sim.mergeAnim('#sim-manim');
   Sim.fact('#sim-fact');
   Sim.fact('#sim-fact2', { mode: 'nobase' });
   Sim.fib('#sim-fib1', 4);

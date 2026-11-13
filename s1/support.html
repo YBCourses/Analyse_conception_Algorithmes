@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support de cours · Séance 1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/doc.css">
+</head>
+<body>
+<header class="top"><div class="gut">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 1</div>
+  <h1>Complexité des algorithmes</h1>
+  <div class="meta"><span>Support de cours</span><span>Yassine Ben-Aboud</span><span>INPT · 2026–2027</span></div>
+  <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a class="cur" href="support.html">Support de cours</a><a href="tp.html">Sujet du TP 1</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
+</div></header>
+
+<div class="gut layout">
+<aside class="toc"><h4>Sommaire</h4>
+  <a href="#algo">1 · Algorithme et complexité</a>
+  <a href="#compter">2 · Compter les opérations</a>
+  <a href="#familles">3 · Familles de croissance</a>
+  <a href="#notations">4 · Notations O, Ω, Θ</a>
+  <a href="#cas">5 · Meilleur, moyen, pire cas</a>
+  <a href="#boucles">6 · Analyser des boucles</a>
+  <a href="#recursivite">7 · La récursivité</a>
+  <a href="#diviser">8 · Diviser pour régner</a>
+  <a href="#code">9 · Code de référence</a>
+  <a href="#exercices">10 · Exercices corrigés</a>
+  <a href="#glossaire">11 · Glossaire</a>
+</aside>
+<article>
+
+<h2 id="algo"><span class="n">1</span>Algorithme et complexité</h2>
+<div class="def" data-t="Définition">Un <span class="kw">algorithme</span> est une suite finie d’instructions précises qui transforme des <b>données d’entrée</b> en un <b>résultat</b>. Un même problème peut être résolu par plusieurs algorithmes, tous corrects mais pas tous aussi coûteux.</div>
+<div class="exemple"><b>Exemple</b>Calculer 1 + 2 + … + 100. Additionner un par un demande 99 additions. La formule n(n+1)/2 = 100 × 101 ÷ 2 = 5 050 demande 3 opérations. Même résultat, travail très différent.</div>
+<h3>Trois qualités d’un algorithme</h3>
+<ul>
+  <li><b>Correct</b> : il donne le bon résultat pour toutes les entrées, y compris les cas limites.</li>
+  <li><b>Rapide</b> : il demande peu d’opérations. On parle de <i>complexité en temps</i>.</li>
+  <li><b>Économe</b> : il demande peu de mémoire en plus de l’entrée. On parle de <i>complexité en espace</i>.</li>
+</ul>
+<h3>Le jeu du nombre secret</h3>
+<p>Je pense à un nombre entre 1 et 100. Deux stratégies : demander 1, puis 2, puis 3… (jusqu’à <b>100 questions</b>), ou demander toujours le <b>milieu</b> de ce qui reste (au plus <b>7 questions</b>, car 2⁷ = 128 ≥ 100). La seconde est la <span class="kw">recherche dichotomique</span> (du grec <i>dicha</i>, en deux, et <i>tomê</i>, coupe). Elle exige une liste <b>triée</b> : en regardant le milieu, on sait de quel côté se trouve la réponse. La première est la <span class="kw">recherche séquentielle</span>.</p>
+<h3>Vocabulaire</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Terme</th><th>Sens</th><th>Dans le jeu</th></tr>
+  <tr><td><b>Taille n</b></td><td>La quantité de données à traiter</td><td>n = 100 nombres possibles</td></tr>
+  <tr><td><b>Opération élémentaire</b></td><td>Une action simple, comptée pour 1</td><td>Une question, c’est-à-dire une comparaison</td></tr>
+  <tr><td><b>Complexité</b></td><td>Le nombre d’opérations, en fonction de n</td><td>Jusqu’à 100 (A) contre au plus 7 (B)</td></tr>
+  <tr><td><b>T(n)</b></td><td>Le nombre total d’opérations élémentaires exécutées pour une entrée de taille n (lire « T de n »)</td><td>T(n) = n pour A</td></tr>
+</table></div>
+<div class="keep">On compte des <b>opérations</b>, pas des secondes : le nombre d’opérations ne dépend ni de la machine, ni du langage, ni du compilateur. C’est une propriété de l’algorithme.</div>
+
+<h2 id="compter"><span class="n">2</span>Compter les opérations</h2>
+<h3>Le modèle de coût</h3>
+<p>On se met d’accord sur ce qui coûte <b>1</b> : une affectation (<code>s ← 0</code>), une comparaison (<code>i &lt; n</code>), un calcul simple (<code>s + t[i]</code>), un accès à une case (<code>t[i]</code>).</p>
+<h3>Exemple : la somme d’un tableau</h3>
+<pre class="code" data-lang="pseudo-code">fonction somme(t, n):
+    s ← 0
+    pour i de 0 à n-1 faire
+        s ← s + t[i]
+    retourner s</pre>
+<p>Pour chaque ligne, on multiplie son coût par le nombre de fois qu’elle est exécutée.</p>
+<div class="tw"><table class="tbl">
+  <tr><th>Opération</th><th class="num">Coût</th><th class="num">Exécutions</th><th class="num">Total</th></tr>
+  <tr><td><code>s ← 0</code></td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+  <tr><td><code>i ← 0</code></td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+  <tr><td><code>test i &lt; n</code></td><td class="num">1</td><td class="num">n + 1</td><td class="num">n + 1</td></tr>
+  <tr><td><code>i ← i + 1</code></td><td class="num">1</td><td class="num">n</td><td class="num">n</td></tr>
+  <tr><td><code>s ← s + t[i]</code></td><td class="num">1</td><td class="num">n</td><td class="num">n</td></tr>
+  <tr><td><code>retourner s</code></td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+  <tr class="me"><td colspan="3">T(n) = 1 + 1 + (n + 1) + n + n + 1</td><td class="num">3n + 4</td></tr>
+</table></div>
+<p>Il y a <b>n + 1</b> tests : n tests réussis, plus un dernier test raté qui arrête la boucle. Vérification : pour n = 3, 5 et 8, la formule donne 13, 19 et 28, exactement ce que compte la simulation du cours.</p>
+<div class="callout">Un autre codage donnerait par exemple 5n + 1. Dans les deux cas, <b>quand n double, le travail double aussi</b> : le coût est <span class="kw">linéaire</span>. La constante exacte importe peu, la façon dont le coût grandit importe beaucoup.</div>
+
+<h2 id="familles"><span class="n">3</span>Les familles de croissance</h2>
+<h3>Le test du doublement</h3>
+<p>On double n et on regarde ce que devient le nombre d’opérations.</p>
+<div class="tw"><table class="tbl">
+  <tr><th>Quand n double…</th><th>Famille</th><th>Exemple</th></tr>
+  <tr><td>rien ne change</td><td><b>constante</b> · 1</td><td>lire <code>t[i]</code></td></tr>
+  <tr><td>une seule opération de plus</td><td><b>logarithmique</b> · log n</td><td>recherche dichotomique</td></tr>
+  <tr><td>le travail double</td><td><b>linéaire</b> · n</td><td>parcourir un tableau</td></tr>
+  <tr><td>un peu plus que le double</td><td><b>quasi-linéaire</b> · n log n</td><td>tri fusion (séance 4)</td></tr>
+  <tr><td>le travail est multiplié par 4</td><td><b>quadratique</b> · n²</td><td>deux boucles imbriquées</td></tr>
+  <tr><td>le travail est multiplié par 8</td><td><b>cubique</b> · n³</td><td>trois boucles imbriquées</td></tr>
+  <tr><td>le travail est élevé à une puissance énorme</td><td><b>exponentielle</b> · 2ⁿ</td><td>tous les sous-ensembles</td></tr>
+</table></div>
+<h3>Trois notions à bien comprendre</h3>
+<div class="def" data-t="Logarithme">log₂ n est le nombre de fois qu’on peut <b>diviser n par 2</b> avant d’arriver à 1. Par exemple log₂ 1 024 = 10, car 1 024 → 512 → … → 1 en 10 divisions. Quand n double, il n’y a qu’<b>une</b> division de plus.</div>
+<div class="def" data-t="Le carré n²">n² se lit « n au carré » et vaut <b>n × n</b>. Il apparaît quand chaque élément est mis en relation avec tous les autres. Exemple : dans un groupe de n personnes, chacune serre la main des n − 1 autres ; une poignée de main comptant pour deux, il y en a n(n − 1)/2, soit environ n²/2. Si n double, c’est environ 4 fois plus.</div>
+<div class="def" data-t="L’exponentielle 2ⁿ">2ⁿ vaut 2 × 2 × … × 2, avec n facteurs. Un ensemble de n éléments possède 2ⁿ sous-ensembles, car chaque élément est « pris ou laissé ». Chaque élément ajouté <b>double</b> le nombre de cas : 10 éléments donnent 1 024 cas, 30 éléments plus d’un milliard.</div>
+<h3>Durées réelles (machine à 10⁹ opérations par seconde)</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Complexité</th><th class="num">n = 10</th><th class="num">n = 100</th><th class="num">n = 1 000</th><th class="num">n = 10⁶</th></tr>
+  <tr><td>1</td><td class="num t-ok">1 ns</td><td class="num t-ok">1 ns</td><td class="num t-ok">1 ns</td><td class="num t-ok">1 ns</td></tr>
+  <tr><td>log n</td><td class="num t-ok">3 ns</td><td class="num t-ok">7 ns</td><td class="num t-ok">10 ns</td><td class="num t-ok">20 ns</td></tr>
+  <tr><td>n</td><td class="num t-ok">10 ns</td><td class="num t-ok">100 ns</td><td class="num t-ok">1 µs</td><td class="num t-ok">1 ms</td></tr>
+  <tr><td>n log n</td><td class="num t-ok">33 ns</td><td class="num t-ok">664 ns</td><td class="num t-ok">10 µs</td><td class="num t-ok">20 ms</td></tr>
+  <tr><td>n²</td><td class="num t-ok">100 ns</td><td class="num t-ok">10 µs</td><td class="num t-ok">1 ms</td><td class="num t-warn">17 min</td></tr>
+  <tr><td>n³</td><td class="num t-ok">1 µs</td><td class="num t-ok">1 ms</td><td class="num t-ok">1 s</td><td class="num t-bad">32 ans</td></tr>
+  <tr><td>2ⁿ</td><td class="num t-ok">1 µs</td><td class="num t-bad">≈ 4×10¹³ ans</td><td class="num t-bad">impossible</td><td class="num t-bad">impossible</td></tr>
+</table></div>
+<div class="keep">Un algorithme exponentiel devient inutilisable dès n = 100, même sur le meilleur ordinateur.</div>
+
+<h2 id="notations"><span class="n">4</span>Écrire la complexité : O, Ω, Θ</h2>
+<h3>Pourquoi simplifier ?</h3>
+<p>Prenons T(n) = 2n² + 50n + 1 000. Pour n = 10, la constante 1 000 domine. Pour n = 100, c’est 2n² (20 000 contre 5 000 et 1 000). Pour n = 1 000, 2n² vaut 2 000 000 et écrase le reste. À grande taille, <b>un seul terme gagne</b>.</p>
+<h3>Deux gestes pour simplifier</h3>
+<ol>
+  <li><b>Garder le terme dominant</b> et jeter les autres : 7n³ + 100n² + 3n log n + 9 → 7n³.</li>
+  <li><b>Supprimer la constante multiplicative</b> : 7n³ → n³. Résultat : T(n) = Θ(n³).</li>
+</ol>
+<p>Pour composer des étapes : instructions qui s’enchaînent, on garde le plus grand ; boucles imbriquées, on multiplie.</p>
+<h3>Trois façons d’encadrer une croissance</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Notation</th><th>Idée</th><th>Définition</th></tr>
+  <tr><td><b>f = O(g)</b></td><td>Le plafond : « pas plus que… »</td><td>il existe c &gt; 0 et n₀ tels que, pour tout n ≥ n₀, f(n) ≤ c · g(n)</td></tr>
+  <tr><td><b>f = Ω(g)</b></td><td>Le plancher : « au moins… »</td><td>il existe c &gt; 0 et n₀ tels que, pour tout n ≥ n₀, f(n) ≥ c · g(n)</td></tr>
+  <tr><td><b>f = Θ(g)</b></td><td>Le couloir : « de l’ordre de… »</td><td>f = O(g) et f = Ω(g)</td></tr>
+</table></div>
+<div class="exemple"><b>Exemple à la main : f(n) = 3n² + 5n + 2</b>Avec c = 4 : f(n) ≤ 4n² est faux pour n de 1 à 5 (à n = 5, 102 contre 100) mais vrai dès <b>n = 6</b> (140 ≤ 144), et cela ne change plus, car 4n² − f(n) = n² − 5n − 2 ne fait que croître. On a trouvé c = 4 et n₀ = 6, donc f(n) = O(n²). Avec c = 3, f(n) ≥ 3n² pour tout n, donc f(n) = Ω(n²). Conclusion : f(n) = Θ(n²).</div>
+<h3>Trois pièges</h3>
+<ul>
+  <li>Le signe « = » n’est pas une égalité : n = O(n²) est vrai, mais n n’est pas égal à n².</li>
+  <li>O est une borne, pas un temps exact. Un algorithme linéaire est aussi O(n²), mais c’est peu informatif : préférez Θ quand vous le pouvez.</li>
+  <li>Pour de petites tailles, un algorithme en n² peut battre un algorithme en n log n. La notation décrit le comportement à grande échelle.</li>
+</ul>
+
+<h2 id="cas"><span class="n">5</span>Meilleur, moyen et pire cas</h2>
+<p>Un même algorithme peut coûter plus ou moins cher selon les données. Pour la recherche séquentielle d’une valeur dans un tableau de n cases :</p>
+<div class="tw"><table class="tbl">
+  <tr><th>Cas</th><th>Situation</th><th class="num">Comparaisons</th><th class="num">Ordre</th></tr>
+  <tr><td>Meilleur</td><td>la valeur est dans la 1ʳᵉ case</td><td class="num">1</td><td class="num">1</td></tr>
+  <tr><td>Moyen</td><td>la valeur est équiprobablement n’importe où</td><td class="num">(n + 1) ÷ 2</td><td class="num">n</td></tr>
+  <tr><td>Pire</td><td>la valeur est dans la dernière case ou absente</td><td class="num">n</td><td class="num">n</td></tr>
+</table></div>
+<div class="keep">Par défaut, on annonce le <b>pire cas</b> : c’est une garantie valable pour toutes les entrées. Le cas moyen exige une hypothèse sur la répartition des données.</div>
+
+<h2 id="boucles"><span class="n">6</span>Analyser des boucles</h2>
+<div class="tw"><table class="tbl">
+  <tr><th>Structure</th><th>Règle</th><th>Exemple</th></tr>
+  <tr><td>Séquence A puis B</td><td>on <b>additionne</b>, le plus grand domine</td><td>n² + n → n²</td></tr>
+  <tr><td>Boucle de k tours</td><td>k × coût du corps</td><td>n × 1 = n</td></tr>
+  <tr><td>Boucles imbriquées</td><td>on <b>multiplie</b> les nombres de tours</td><td>n × n = n²</td></tr>
+  <tr><td>si … sinon …</td><td>au pire, le <b>maximum</b> des branches</td><td>max(n, n²) = n²</td></tr>
+</table></div>
+<pre class="code" data-lang="pseudo-code">pour i de 1 à n faire              // n tours
+  pour j de 1 à n faire            // n tours
+    opération()                    // n × n = n² exécutions
+
+pour i de 1 à n faire
+  pour j de 1 à i faire            // 1 + 2 + … + n = n(n+1)/2 → Θ(n²)
+    opération()
+
+i ← 1
+tant que i ≤ n faire               // i = 1, 2, 4, 8, … : ⌊log₂ n⌋ + 1 tours
+    opération()
+    i ← 2 × i</pre>
+<div class="keep">Diviser (ou multiplier) la variable par 2 à chaque tour donne un <b>logarithme</b>.</div>
+
+<h2 id="recursivite"><span class="n">7</span>La récursivité</h2>
+<div class="def" data-t="Définition">Une fonction est <span class="kw">récursive</span> quand elle s’appelle elle-même, sur un problème <b>plus petit</b>. Elle a besoin de deux ingrédients : un <b>cas de base</b> (le problème est si petit qu’on connaît la réponse) et un <b>appel récursif</b> qui rapproche du cas de base.</div>
+<h3>Exemple : la factorielle</h3>
+<pre class="code" data-lang="pseudo-code">fonction fact(n):
+    si n = 0 alors retourner 1
+    retourner n × fact(n-1)</pre>
+<p>Pour calculer <code>fact(4)</code>, on <b>descend</b> : fact(4) attend fact(3), qui attend fact(2), qui attend fact(1), qui attend fact(0). Le cas de base répond <b>1</b>. Puis on <b>remonte</b> : la réponse est rendue à l’appel qui attendait, qui calcule et rend la sienne à son tour.</p>
+<pre class="code" data-lang="descente puis remontée">fact(4) = 4 × fact(3)
+  fact(3) = 3 × fact(2)
+    fact(2) = 2 × fact(1)
+      fact(1) = 1 × fact(0)
+        fact(0) = 1                  ← cas de base : la descente s'arrête
+      fact(1) = 1 × 1 = 1            ← la réponse remonte
+    fact(2) = 2 × 1 = 2
+  fact(3) = 3 × 2 = 6
+fact(4) = 4 × 6 = 24</pre>
+<h3>La pile d’appels</h3>
+<p>Chaque appel en cours occupe une place en mémoire : une « fiche » posée sur une <span class="kw">pile</span>. Elle est retirée quand l’appel rend sa réponse. <b>Sans cas de base</b>, la fonction s’appelle indéfiniment : les fiches s’empilent jusqu’à saturer la mémoire (erreur de <i>dépassement de pile</i>, ou <i>stack overflow</i>).</p>
+<pre class="code" data-lang="une récursivité sans cas de base">fonction fact(n):
+    retourner n × fact(n-1)         // jamais d'arrêt !</pre>
+<h3>Coût de la factorielle</h3>
+<p>Chaque appel fait une multiplication puis appelle fact(n−1) : <b>T(n) = T(n−1) + 1</b>. En déroulant : T(n) = T(n−2) + 2 = T(n−3) + 3 = … = T(0) + n. Il y a <b>n + 1 appels</b> : le coût est linéaire.</p>
+<h3>Fibonacci : quand les appels se répètent</h3>
+<p>La suite 0, 1, 1, 2, 3, 5, 8, 13… : chaque nombre est la somme des deux précédents.</p>
+<pre class="code" data-lang="pseudo-code">fonction fib(n):
+    si n ≤ 1 alors retourner n          // deux cas de base : fib(0) = 0 et fib(1) = 1
+    retourner fib(n-1) + fib(n-2)</pre>
+<p>Chaque appel en lance deux : on obtient un <b>arbre d’appels</b>. Dans l’arbre de fib(5), fib(3) apparaît 2 fois, fib(2) 3 fois : <b>le même travail est refait</b>. Le nombre d’appels croît presque comme 2ⁿ.</p>
+<div class="tw"><table class="tbl">
+  <tr><th class="num">n</th><th class="num">Appels</th><th class="num">Durée à 10⁹ appels/s</th></tr>
+  <tr><td class="num">10</td><td class="num">177</td><td class="num t-ok">instantané</td></tr>
+  <tr><td class="num">30</td><td class="num">2 692 537</td><td class="num t-ok">3 ms</td></tr>
+  <tr><td class="num">40</td><td class="num">331 160 281</td><td class="num t-ok">0,3 s</td></tr>
+  <tr><td class="num">50</td><td class="num">40 730 022 147</td><td class="num t-warn">41 s</td></tr>
+  <tr><td class="num">60</td><td class="num">5,0 × 10¹²</td><td class="num t-warn">83 min</td></tr>
+  <tr><td class="num">100</td><td class="num">1,1 × 10²¹</td><td class="num t-bad">36 000 ans</td></tr>
+</table></div>
+<div class="keep">Remède : calculer chaque sous-problème <b>une seule fois</b> et mémoriser la réponse. C’est la programmation dynamique (séance 5).</div>
+
+<h2 id="diviser"><span class="n">8</span>Diviser pour régner</h2>
+<h3>Une stratégie en trois temps</h3>
+<ol>
+  <li><b>Diviser</b> : couper le problème en sous-problèmes plus petits (par exemple deux moitiés).</li>
+  <li><b>Résoudre</b> chaque sous-problème, par le même procédé (récursivité). Un problème trivial est le cas de base.</li>
+  <li><b>Combiner</b> les réponses en une réponse au problème de départ.</li>
+</ol>
+<h3>Exemple : le tri fusion</h3>
+<p>Pour trier un paquet de n nombres : on le coupe en deux moitiés, on fait trier chaque moitié, puis on <b>fusionne</b> les deux moitiés triées.</p>
+<p><b>Fusionner deux paquets triés</b> : on regarde le premier nombre de chaque paquet, le plus petit passe dans le résultat, et on recommence. Chaque nombre n’est déplacé qu’une fois : fusionner n nombres coûte <b>au plus n opérations</b>.</p>
+<pre class="code" data-lang="tri fusion de 8 nombres">[5 2 8 1 9 3 7 4]                         ← diviser
+[5 2 8 1]   [9 3 7 4]
+[5 2] [8 1]   [9 3] [7 4]
+[5] [2] [8] [1]   [9] [3] [7] [4]         ← un seul nombre : déjà trié (cas de base)
+[2 5] [1 8]   [3 9] [4 7]                 ← combiner : 4 fusions, ≤ 8 opérations
+[1 2 5 8]   [3 4 7 9]                     ← 2 fusions, ≤ 8 opérations
+[1 2 3 4 5 7 8 9]                         ← 1 fusion, ≤ 8 opérations</pre>
+<h3>L’équation de récurrence</h3>
+<div class="eq">T(n) = 2 · T(n/2) + n</div>
+<ul>
+  <li><b>2</b> : il y a deux sous-problèmes (les deux moitiés) ;</li>
+  <li><b>T(n/2)</b> : chaque moitié a n/2 nombres, la trier coûte T(n/2) ;</li>
+  <li><b>+ n</b> : la fusion coûte au plus n opérations.</li>
+</ul>
+<p>Cas de base : T(1) = 1.</p>
+<h3>Résoudre : l’arbre de récursion</h3>
+<p>À chaque niveau de l’arbre, le nombre de morceaux double mais leur taille est divisée par 2 : le coût de recollage du niveau reste égal à <b>n</b>. Il y a log₂ n niveaux, donc <b>T(n) = n × log₂ n</b>, soit <b>Θ(n log n)</b>. Pour n = 8 : 3 niveaux × 8 = 24.</p>
+<h3>Le théorème maître</h3>
+<p>Les équations de « diviser pour régner » ont la forme <b>T(n) = a · T(n/b) + nᵈ</b> où :</p>
+<ul>
+  <li><b>a</b> est le nombre de sous-problèmes ;</li>
+  <li><b>b</b> est le facteur de réduction de la taille ;</li>
+  <li><b>d</b> est l’exposant du travail de recollage nᵈ (d = 0 : constant ; d = 1 : n ; d = 2 : n²).</li>
+</ul>
+<p>On compare <b>d</b> avec <b>log<sub>b</sub> a</b> :</p>
+<div class="tw"><table class="tbl">
+  <tr><th>Cas</th><th>Condition</th><th>Qui domine ?</th><th>Résultat</th></tr>
+  <tr><td>1</td><td>d &lt; log<sub>b</sub> a</td><td>les feuilles (le dernier niveau)</td><td><b>Θ(n<sup>log<sub>b</sub> a</sup>)</b></td></tr>
+  <tr><td>2</td><td>d = log<sub>b</sub> a</td><td>tous les niveaux autant</td><td><b>Θ(nᵈ log n)</b></td></tr>
+  <tr><td>3</td><td>d &gt; log<sub>b</sub> a</td><td>la racine (le premier niveau)</td><td><b>Θ(nᵈ)</b></td></tr>
+</table></div>
+<div class="tw"><table class="tbl">
+  <tr><th>Algorithme</th><th class="num">a</th><th class="num">b</th><th class="num">d</th><th>Cas</th><th>Résultat</th></tr>
+  <tr><td>Recherche dichotomique</td><td class="num">1</td><td class="num">2</td><td class="num">0</td><td>2 (0 = log₂ 1)</td><td>Θ(log n)</td></tr>
+  <tr><td>Tri fusion</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td>2 (1 = log₂ 2)</td><td>Θ(n log n)</td></tr>
+  <tr><td>Maximum par division</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td>1 (0 &lt; 1)</td><td>Θ(n)</td></tr>
+  <tr><td>Produit de matrices par blocs</td><td class="num">8</td><td class="num">2</td><td class="num">2</td><td>1 (2 &lt; 3)</td><td>Θ(n³)</td></tr>
+  <tr><td>Strassen</td><td class="num">7</td><td class="num">2</td><td class="num">2</td><td>1 (2 &lt; 2,81)</td><td>Θ(n<sup>2,81</sup>)</td></tr>
+</table></div>
+
+<h2 id="code"><span class="n">9</span>Code de référence</h2>
+<p>Pour chaque algorithme du cours : la version C, puis la version Python simplifiée. Vous les exécuterez en TP, pas à pas, en affichant les valeurs et les adresses.</p>
+<h3>Somme d’un tableau et recherche séquentielle</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">int somme(int t[], int n) {
+    int s = 0, i;
+    for (i = 0; i &lt; n; i++)
+        s = s + t[i];
+    return s;
+}
+
+int recherche_sequentielle(int t[], int n, int x) {
+    int i;
+    for (i = 0; i &lt; n; i++)
+        if (t[i] == x) return i;
+    return -1;          /* absent */
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def somme(t):
+    s = 0
+    for v in t:
+        s = s + v
+    return s
+
+
+def recherche_sequentielle(t, x):
+    for i in range(len(t)):
+        if t[i] == x:
+            return i
+    return -1           # absent</pre></div>
+</div>
+<h3>Recherche dichotomique (tableau trié)</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">int recherche_dichotomique(int t[], int n, int x) {
+    int debut = 0, fin = n - 1, milieu;
+    while (debut &lt;= fin) {
+        milieu = (debut + fin) / 2;
+        if (t[milieu] == x) return milieu;
+        else if (t[milieu] &lt; x) debut = milieu + 1;
+        else fin = milieu - 1;
+    }
+    return -1;
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def recherche_dichotomique(t, x):
+    debut, fin = 0, len(t) - 1
+    while debut &lt;= fin:
+        milieu = (debut + fin) // 2
+        if t[milieu] == x:
+            return milieu
+        elif t[milieu] &lt; x:
+            debut = milieu + 1
+        else:
+            fin = milieu - 1
+    return -1</pre></div>
+</div>
+<h3>Factorielle et Fibonacci récursifs</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">long fact(int n) {
+    if (n == 0) return 1;          /* cas de base */
+    return n * fact(n - 1);        /* appel récursif */
+}
+
+long fib(int n) {
+    if (n &lt;= 1) return n;          /* deux cas de base */
+    return fib(n - 1) + fib(n - 2);
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def fact(n):
+    if n == 0:                     # cas de base
+        return 1
+    return n * fact(n - 1)         # appel récursif
+
+
+def fib(n):
+    if n &lt;= 1:                     # deux cas de base
+        return n
+    return fib(n - 1) + fib(n - 2)</pre></div>
+</div>
+<h3>Tri par insertion (utilisé en TP)</h3>
+<p>On parcourt le tableau ; pour chaque élément, on le met de côté, on décale vers la droite les éléments plus grands, puis on le pose dans le trou. Coût au pire (tableau trié à l’envers) : 1 + 2 + … + (n−1) décalages, soit <b>Θ(n²)</b>. Au mieux (déjà trié) : <b>Θ(n)</b>.</p>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">void tri_insertion(int t[], int n) {
+    int i, j, cle;
+    for (i = 1; i &lt; n; i++) {
+        cle = t[i];
+        j = i - 1;
+        while (j &gt;= 0 &amp;&amp; t[j] &gt; cle) {
+            t[j + 1] = t[j];
+            j--;
+        }
+        t[j + 1] = cle;
+    }
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def tri_insertion(t):
+    for i in range(1, len(t)):
+        cle = t[i]
+        j = i - 1
+        while j &gt;= 0 and t[j] &gt; cle:
+            t[j + 1] = t[j]
+            j -= 1
+        t[j + 1] = cle</pre></div>
+</div>
+
+<h2 id="exercices"><span class="n">10</span>Exercices corrigés</h2>
+<p>Cherchez d’abord seul, puis ouvrez la solution.</p>
+<h3>Boucles</h3>
+<div class="card"><h4>Exercice 1</h4><pre class="code" data-lang="pseudo-code">s ← 0
+pour i de 1 à n faire
+  pour j de 1 à n faire
+    s ← s + 1</pre><details><summary>Solution</summary><div>n × n itérations : <b>Θ(n²)</b>.</div></details></div>
+<div class="card"><h4>Exercice 2</h4><pre class="code" data-lang="pseudo-code">pour i de 1 à n faire
+  pour j de 1 à 100 faire
+    opération()</pre><details><summary>Solution</summary><div>100 est une constante : 100 × n exécutions, donc <b>Θ(n)</b>.</div></details></div>
+<div class="card"><h4>Exercice 3</h4><pre class="code" data-lang="pseudo-code">i ← n
+tant que i ≥ 1 faire
+  opération()
+  i ← i / 2</pre><details><summary>Solution</summary><div>i est divisé par 2 à chaque tour : ⌊log₂ n⌋ + 1 passages, donc <b>Θ(log n)</b>.</div></details></div>
+<div class="card"><h4>Exercice 4 (supplémentaire)</h4><pre class="code" data-lang="pseudo-code">pour i de 1 à n faire
+  pour j de 1 à n faire
+    pour k de 1 à n faire
+      opération()</pre><details><summary>Solution</summary><div>Trois boucles imbriquées de n tours : n × n × n, donc <b>Θ(n³)</b>.</div></details></div>
+<div class="card"><h4>Exercice 5 (supplémentaire)</h4><pre class="code" data-lang="pseudo-code">i ← 1
+tant que i &lt; n faire
+  opération()
+  i ← i + 2</pre><details><summary>Solution</summary><div>i prend les valeurs 1, 3, 5, … : environ n/2 passages. La constante ½ disparaît : <b>Θ(n)</b>. (Ce n’est pas un logarithme : on <em>ajoute</em> 2, on ne multiplie pas.)</div></details></div>
+<h3>Récurrences</h3>
+<div class="card"><h4>Exercice 6</h4><div class="eq" style="font-size:22px;margin:6px 0">T(n) = T(n/2) + 1</div><details><summary>Solution</summary><div>a = 1, b = 2, d = 0. log₂ 1 = 0 = d : cas 2, <b>Θ(log n)</b>.</div></details></div>
+<div class="card"><h4>Exercice 7</h4><div class="eq" style="font-size:22px;margin:6px 0">T(n) = 2T(n/2) + n²</div><details><summary>Solution</summary><div>a = 2, b = 2, d = 2. log₂ 2 = 1 &lt; d : cas 3, <b>Θ(n²)</b>.</div></details></div>
+<div class="card"><h4>Exercice 8 (sans théorème maître)</h4><div class="eq" style="font-size:22px;margin:6px 0">T(n) = T(n−1) + n</div><details><summary>Solution</summary><div>On déroule : T(n) = n + (n−1) + … + 1 = n(n+1)/2, donc <b>Θ(n²)</b>. Le théorème maître ne s’applique pas : on ne divise pas n par b.</div></details></div>
+<div class="card"><h4>Exercice 9 (supplémentaire)</h4><div class="eq" style="font-size:22px;margin:6px 0">T(n) = 3T(n/3) + n</div><details><summary>Solution</summary><div>a = 3, b = 3, d = 1. log₃ 3 = 1 = d : cas 2, <b>Θ(n log n)</b>.</div></details></div>
+<div class="card"><h4>Exercice 10 (supplémentaire)</h4><div class="eq" style="font-size:22px;margin:6px 0">T(n) = T(n/2) + n</div><details><summary>Solution</summary><div>a = 1, b = 2, d = 1. log₂ 1 = 0 &lt; d : cas 3, <b>Θ(n)</b>. La racine domine : n + n/2 + n/4 + … ≈ 2n.</div></details></div>
+<h3>Classer des expressions</h3>
+<div class="card"><h4>Exercice 11</h4>Donnez la complexité (en Θ) de : <b>a)</b> 5n³ + 2n² + 7 · <b>b)</b> 5n log n + 100n + 7 · <b>c)</b> n² + 2ⁿ · <b>d)</b> 4 000 000.<details><summary>Solution</summary><div>a) Θ(n³) · b) Θ(n log n) · c) Θ(2ⁿ) · d) Θ(1) : une constante, aussi grande soit-elle, ne dépend pas de n.</div></details></div>
+
+<h2 id="glossaire"><span class="n">11</span>Glossaire</h2>
+<div class="tw"><table class="tbl">
+  <tr><th>Terme</th><th>Définition</th></tr>
+  <tr><td>Algorithme</td><td>Suite finie d’instructions précises transformant une entrée en un résultat.</td></tr>
+  <tr><td>Taille n</td><td>Quantité de données à traiter.</td></tr>
+  <tr><td>Opération élémentaire</td><td>Action simple comptée pour 1 (affectation, comparaison, calcul simple, accès).</td></tr>
+  <tr><td>Complexité</td><td>Nombre d’opérations exécutées, exprimé en fonction de n.</td></tr>
+  <tr><td>T(n)</td><td>Nombre total d’opérations pour une entrée de taille n.</td></tr>
+  <tr><td>Linéaire</td><td>Coût proportionnel à n : si n double, le travail double.</td></tr>
+  <tr><td>Logarithme (log₂ n)</td><td>Nombre de divisions par 2 de n pour arriver à 1.</td></tr>
+  <tr><td>Quadratique (n²)</td><td>Coût en n × n : si n double, le travail est multiplié par 4.</td></tr>
+  <tr><td>Exponentiel (2ⁿ)</td><td>Le coût double à chaque unité de n en plus.</td></tr>
+  <tr><td>O, Ω, Θ</td><td>Plafond, plancher et couloir d’une croissance.</td></tr>
+  <tr><td>Pire cas</td><td>Données qui demandent le plus de travail ; c’est le cas annoncé par défaut.</td></tr>
+  <tr><td>Récursivité</td><td>Une fonction qui s’appelle elle-même sur un problème plus petit.</td></tr>
+  <tr><td>Cas de base</td><td>Problème assez petit pour que la réponse soit connue sans appel récursif.</td></tr>
+  <tr><td>Pile d’appels</td><td>Mémoire qui garde une fiche par appel en cours.</td></tr>
+  <tr><td>Équation de récurrence</td><td>Équation qui exprime T(n) à l’aide de T pour des tailles plus petites.</td></tr>
+  <tr><td>Diviser pour régner</td><td>Diviser, résoudre chaque morceau, combiner les réponses.</td></tr>
+  <tr><td>Théorème maître</td><td>Recette qui donne Θ pour T(n) = a·T(n/b) + nᵈ.</td></tr>
+</table></div>
+<div class="keep">Séance suivante : structures linéaires. Revoyez les pointeurs en C (adresses, <code>malloc</code>, <code>free</code>) avant le cours.</div>
+</article>
+</div>
+<script src="../assets/doc.js"></script>
+</body>
+</html>

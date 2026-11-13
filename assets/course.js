@@ -2,6 +2,7 @@
    puis republier. Les chemins sont relatifs à la racine du site.
    - diaporama : page du diaporama de la séance
    - support   : page HTML « support de cours » (null tant qu'elle n'existe pas)
+   - tp        : page HTML du sujet de TP (null tant qu'elle n'existe pas)
    - fichiers  : fichiers téléchargeables { nom, chemin, type }  (ex. { nom: "Énoncé du TP 1", chemin: "files/s1/tp1.pdf", type: "PDF" })
    - statut    : "disponible" | "bientot" */
 window.COURSE = {
@@ -14,7 +15,11 @@ window.COURSE = {
     {
       n: 1, titre: "Complexité des algorithmes", duree: "3 h · cours, TD et TP", statut: "disponible",
       resume: "Compter les opérations, familles de croissance, notations O, Ω, Θ, analyse de boucles, récursivité et théorème maître.",
-      diaporama: "s1/slides.html", support: null, fichiers: []
+      diaporama: "s1/slides.html", support: "s1/support.html", tp: "s1/tp.html",
+      fichiers: [
+        { nom: "TP 1 · code de départ en C", chemin: "files/s1/tp1.c", type: "C" },
+        { nom: "TP 1 · code de départ en Python", chemin: "files/s1/tp1.py", type: "Python" }
+      ]
     },
     {
       n: 2, titre: "Structures linéaires", duree: "3 h", statut: "bientot",
