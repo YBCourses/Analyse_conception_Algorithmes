@@ -1,0 +1,126 @@
+<title>Conception et Analyse des Algorithmes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* Page d'accueil du cours : en-tête bleu institutionnel, séances en grille. */
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 17px; line-height: 1.5; }
+  .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header.top { background: var(--cover-bg); color: var(--cover-fg); }
+  header.top .wrap { padding-block: 44px 48px; display: grid; gap: 14px; }
+  .plate { background: #fff; border-radius: 12px; padding: 8px 16px; display: inline-flex; justify-self: start; box-shadow: 0 8px 24px rgba(0,0,0,.25); margin-bottom: 8px; }
+  .plate img { height: 52px; width: auto; display: block; }
+  .eyebrow { font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--cover-accent); }
+  h1 { margin: 0; font-size: clamp(32px, 5.4vw, 56px); line-height: 1.06; font-weight: 800; text-wrap: balance; max-width: 24ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 16px; opacity: .88; }
+  .meta b { font-weight: 700; }
+  .toolbar { display: flex; justify-content: flex-end; padding-top: 14px; }
+  .tbtn { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 6px 14px; font: 600 14px var(--font); cursor: pointer; }
+  main .wrap { padding-block: 8px 56px; }
+  h2 { font-size: 22px; margin: 28px 0 16px; color: var(--head); }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .card.soon { background: transparent; border-style: dashed; }
+  .card .num { font: 800 15px var(--font); color: var(--accent); letter-spacing: .1em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .card h3 { margin: 0; font-size: 21px; line-height: 1.25; color: var(--head); }
+  .card p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .dur { font-size: 14px; color: var(--muted); }
+  .pill { display: inline-block; padding: 2px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: none; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.soon { background: var(--surface-2); color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 6px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border-radius: 10px; padding: 10px 16px; font: 700 15px var(--font); border: 1px solid var(--line); color: var(--fg); background: var(--surface); cursor: pointer; }
+  .btn:hover { border-color: var(--blue); }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn.pri { color: #06121f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.pri { color: #06121f; } }
+  .btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+  .files { display: grid; gap: 6px; }
+  .file { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 15px; background: var(--bg); }
+  .file small { color: var(--muted); font-weight: 600; }
+  .file button { border: 0; background: transparent; color: var(--accent); font: 700 14px var(--font); cursor: pointer; padding: 4px 8px; }
+  .empty { color: var(--muted); font-size: 15px; border: 1px dashed var(--line); border-radius: 12px; padding: 16px 18px; }
+  .help { font-size: 14px; color: var(--muted); margin-top: 24px; }
+  kbd { background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 7px; font: 600 12px ui-monospace, Consolas, monospace; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  #toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--head); color: var(--bg); padding: 10px 18px; border-radius: 10px; font-size: 15px; display: none; }
+  #toast.show { display: block; }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="plate"><img src="assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+    <div class="eyebrow" id="h-ecole"></div>
+    <h1 id="h-titre"></h1>
+    <div class="meta"><span id="h-module"></span><span id="h-ens"></span><span id="h-annee"></span></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="toolbar"><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></div>
+    <h2>Séances</h2>
+    <div class="grid" id="grid"></div>
+    <h2>Ressources du cours</h2>
+    <div id="res"></div>
+    <p class="help">Dans un diaporama : <kbd>→</kbd> avancer, <kbd>←</kbd> reculer, <kbd>O</kbd> aperçu, <kbd>F</kbd> plein écran, <kbd>?</kbd> aide.</p>
+  </div>
+</main>
+<div id="toast" role="status"></div>
+
+<script src="assets/course.js"></script>
+<script>
+(function () {
+  var C = window.COURSE, $ = function (id) { return document.getElementById(id); };
+  $('h-ecole').textContent = C.ecole + ' · ' + C.annee;
+  $('h-titre').textContent = C.titre;
+  $('h-module').textContent = C.module;
+  $('h-ens').innerHTML = 'Enseignant : <b></b>'; $('h-ens').querySelector('b').textContent = C.enseignant;
+  $('h-annee').textContent = '';
+
+  function toast(t) { var e = $('toast'); e.textContent = t; e.className = 'show'; clearTimeout(toast.t); toast.t = setTimeout(function () { e.className = ''; }, 3200); }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+  var dl = null;
+  function getDl() {
+    if (dl !== null || !window.claude || !window.claude.use) return Promise.resolve(dl);
+    return window.claude.use('downloads').then(function (d) { dl = d || false; return dl; }, function () { dl = false; return dl; });
+  }
+  function download(f) {
+    getDl().then(function (d) {
+      if (!d) { window.open(f.chemin, '_blank'); return; }
+      return fetch(f.chemin).then(function (r) { if (!r.ok) throw new Error('http'); return r.blob(); })
+        .then(function (b) { return d.save({ filename: f.chemin.split('/').pop(), data: b }); })
+        .then(function () { toast('Fichier enregistré.'); }, function (e) { if (!e || e.code !== 'declined') toast('Téléchargement impossible pour le moment.'); });
+    });
+  }
+  function fileRow(f) {
+    var r = el('div', 'file'); var l = el('span', null, f.nom); var t = el('small', null, ' ' + (f.type || '')); l.appendChild(t);
+    var b = el('button', null, 'Télécharger'); b.type = 'button'; b.addEventListener('click', function () { download(f); });
+    r.append(l, b); return r;
+  }
+  var g = $('grid');
+  C.seances.forEach(function (s) {
+    var ok = s.statut === 'disponible';
+    var c = el('article', 'card' + (ok ? '' : ' soon'));
+    var n = el('div', 'num'); n.append(el('span', null, 'Séance ' + s.n), el('span', 'pill ' + (ok ? 'ok' : 'soon'), ok ? 'Disponible' : 'À venir'));
+    c.append(n, el('h3', null, s.titre), el('p', null, s.resume), el('div', 'dur', s.duree));
+    if (s.fichiers && s.fichiers.length) { var fl = el('div', 'files'); s.fichiers.forEach(function (f) { fl.appendChild(fileRow(f)); }); c.appendChild(fl); }
+    var a = el('div', 'actions');
+    if (s.diaporama) { var d = el('a', 'btn pri', 'Ouvrir le diaporama'); d.href = s.diaporama; a.appendChild(d); }
+    if (s.support) { var p = el('a', 'btn', 'Support de cours'); p.href = s.support; a.appendChild(p); }
+    else if (ok) { var q = el('a', 'btn', 'Support de cours bientôt'); q.setAttribute('aria-disabled', 'true'); q.href = '#'; a.appendChild(q); }
+    if (a.children.length) c.appendChild(a);
+    g.appendChild(c);
+  });
+  var res = $('res'), all = (C.ressources || []);
+  if (all.length) { var fl2 = el('div', 'files'); all.forEach(function (f) { fl2.appendChild(fileRow(f)); }); res.appendChild(fl2); }
+  else res.appendChild(el('div', 'empty', 'Les fichiers à télécharger (sujets de TP, supports, corrigés) apparaîtront ici au fil des séances.'));
+
+  $('theme').addEventListener('click', function () {
+    var r = document.documentElement, dark = r.getAttribute('data-theme') === 'dark' || (!r.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    var nt = dark ? 'light' : 'dark'; r.setAttribute('data-theme', nt);
+    try { localStorage.setItem('inpt-theme', nt); } catch (e) {}
+  });
+  try { var t0 = localStorage.getItem('inpt-theme'); if (t0) document.documentElement.setAttribute('data-theme', t0); } catch (e) {}
+})();
+</script>

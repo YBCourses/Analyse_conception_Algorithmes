@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Séance 1 · Complexité des algorithmes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/deck.css">
+<style>
+  /* Éléments propres à cette séance */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 26px; }
+  .fbox { background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 34px; text-align: center; font-size: 34px; line-height: 1.35; box-shadow: 0 14px 36px rgba(15,53,87,.08); }
+  .fbox.algo { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); min-width: 320px; font-size: 30px; }
+  .fbox .mono { white-space: nowrap; }
+  .fbox { padding: 24px 28px; font-size: 32px; }
+  .flow { gap: 16px; }
+  .fbox.algo small { color: #BCD3E8; font-size: 26px; }
+  .fbox .mono { font-size: 38px; color: var(--accent); font-weight: 700; }
+  .fbox b.l { display: block; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .fbox.algo b.l { color: var(--cover-accent); }
+  .farrow { font-size: 64px; color: var(--blue); line-height: 1; }
+  .tl { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; padding-top: 40px; flex: 1; align-content: start; }
+  .tl::before { content: ""; position: absolute; left: 4%; right: 4%; top: 62px; height: 6px; background: var(--line); border-radius: 3px; }
+  .tl .nd { position: relative; display: flex; flex-direction: column; gap: 16px; align-items: stretch; }
+  .tl .dot { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 6px solid var(--line); margin: 0 auto; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: var(--muted); z-index: 1; }
+  .tl .nd.now .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tl .nd .panel { padding: 26px 24px; font-size: 27px; flex: 1; }
+  .tl .nd.now .panel { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .tl .nd.now .panel h3 { color: #fff; }
+  .tl .nd.now .small { color: #A9C2DB; }
+  .tl h3 { font-size: 34px; }
+  .cyc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; align-items: stretch; }
+  .cyc .c { position: relative; background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 20px; text-align: center; font-size: 29px; line-height: 1.3; margin-right: 38px; box-shadow: 0 14px 36px rgba(15,53,87,.07); }
+  .cyc .c:last-child { margin-right: 0; }
+  .cyc .c::after { content: "›"; position: absolute; right: -37px; top: 50%; transform: translateY(-58%); font-size: 64px; color: var(--blue); }
+  .cyc .c:last-child::after { display: none; }
+  .cyc .c b.n { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 32px; margin: 0 auto 14px; }
+  .cyc .c.hot { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .cyc .c.hot b.n { background: var(--cover-accent); color: #06121f; }
+  .mach { text-align: center; }
+  .mach .ic { font-size: 74px; line-height: 1; margin-bottom: 8px; }
+  .mach .sec { font: 800 78px var(--mono); color: var(--head); }
+  .mach .opsb { display: inline-block; margin-top: 12px; background: var(--ok-soft); color: var(--ok); font: 700 28px var(--mono); border-radius: 12px; padding: 8px 18px; }
+  .dbl { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 22px; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 28px 38px; font-size: 38px; box-shadow: 0 8px 22px rgba(15,53,87,.06); }
+  .dbl .nm { font: 700 36px var(--mono); color: var(--accent); text-align: right; }
+  .dbl .ef b { color: var(--head); }
+  .dbl .ar { font-size: 44px; text-align: center; color: var(--blue); }
+  .sq { display: inline-block; width: 46px; height: 46px; border-radius: 10px; margin: 5px; }
+  .sq.f { background: var(--c-one); } .sq.l { background: var(--blue); } .sq.l2 { background: var(--c-n2); }
+  .doll { border: 5px solid var(--blue); border-radius: 34px; padding: 22px 26px; background: color-mix(in srgb, var(--accent-soft) 80%, transparent); font: 700 28px var(--serif); color: var(--head); }
+  .doll.d2 { border-color: var(--c-nlog); } .doll.d3 { border-color: var(--c-n2); } .doll.d4 { border-color: var(--c-exp); }
+  .fibchips { display: flex; gap: 18px; align-items: center; flex-wrap: nowrap; }
+  .fibchips .ch { width: 118px; height: 118px; border-radius: 22px; border: 4px solid var(--blue); background: var(--accent-soft); display: grid; place-items: center; font: 800 52px var(--mono); color: var(--head); }
+  .fibchips .ch.s { border-color: var(--ok); background: var(--ok-soft); }
+  .fibchips .pl { font-size: 38px; color: var(--muted); }
+  .rl { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .blk { background: var(--accent); color: #fff; border-radius: 14px; padding: 12px 30px; font: 700 30px var(--mono); }
+  :root[data-theme="dark"] .blk { color: #06121f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .blk { color: #06121f; } }
+  .blk.b2 { background: var(--c-n2); color: #fff; }
+  .gridmini { display: grid; gap: 6px; }
+  .gridmini i { width: 34px; height: 34px; border-radius: 7px; background: var(--accent); }
+  .eq { font: 700 78px var(--serif); color: var(--head); text-align: center; line-height: 1.2; }
+  .eqc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; text-align: center; font-size: 30px; margin-top: 14px; }
+  .eqc div { background: var(--accent-soft); border-radius: 16px; padding: 16px 20px; color: var(--head); }
+  .fm { font: 700 66px var(--serif); text-align: center; color: var(--head); }
+  .ann { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 8px; font-size: 31px; }
+  .ann div { background: var(--panel); border-radius: 18px; padding: 20px 26px; }
+  .ann b { display: block; font: 800 40px var(--mono); color: var(--accent); margin-bottom: 4px; }
+  .mini { width: 100%; height: auto; }
+  .mini text { fill: var(--muted); font-size: 22px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+<div id="bar"></div>
+<header id="head">
+  <div class="brand"><img class="logo" src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"><span class="sep"></span><span class="course">Conception et Analyse des Algorithmes</span></div>
+  <div id="chip"></div>
+</header>
+
+<!-- ============ Ouverture ============ -->
+<section class="slide cover">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Module M111 · Algorithmique et Programmation · AP 3</div>
+  <h1>Conception et Analyse des Algorithmes</h1>
+  <div class="sub2">Séance 1 · Complexité des algorithmes</div>
+  <div class="who"><b>Yassine Ben-Aboud</b><br><span>INPT · Année universitaire 2026–2027</span></div>
+  <aside class="notes">Accueillir les étudiants. Présenter l’AP 3 : six séances de trois heures. Chaque séance alterne cours, TD et un TP d’une heure où l’on exécute le code. Dire que le diaporama et le support de cours restent disponibles sur la page du cours.</aside>
+</section>
+
+<section class="slide">
+  <h2 class="title">Six séances pour apprendre à concevoir et à comparer des algorithmes</h2>
+  <div class="tl">
+    <div class="nd now"><div class="dot">1</div><div class="panel"><h3>Complexité</h3><div class="small">Mesurer, comparer, prévoir le coût d’un algorithme</div></div></div>
+    <div class="nd"><div class="dot">2</div><div class="panel"><h3>Structures linéaires</h3><div class="small">Mémoire en C, listes, piles, files</div></div></div>
+    <div class="nd"><div class="dot">3</div><div class="panel"><h3>Arbres et tas</h3><div class="small">Arbres de recherche, tas, file de priorité</div></div></div>
+    <div class="nd"><div class="dot">4</div><div class="panel"><h3>Hachage et diviser pour régner</h3><div class="small">Tables de hachage, tri fusion</div></div></div>
+    <div class="nd"><div class="dot">5</div><div class="panel"><h3>Glouton et prog. dynamique</h3><div class="small">Choix local, mémoïsation</div></div></div>
+    <div class="nd"><div class="dot">6</div><div class="panel"><h3>Graphes</h3><div class="small">Parcours, plus courts chemins</div></div></div>
+  </div>
+  <div class="keep step">Chaque séance suit le même rythme : du cours et du TD avec des simulations, puis <b>une heure de TP</b> où vous exécutez le code en C et en Python.</div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Au programme aujourd’hui</h2>
+  <div class="split">
+    <ol class="num">
+      <li class="step"><span><b>Choisir un algorithme</b><br><span class="small">deux méthodes, un même problème</span></span></li>
+      <li class="step"><span><b>Compter les opérations</b><br><span class="small">le coût d’un programme, pas à pas</span></span></li>
+      <li class="step"><span><b>Les familles de croissance</b><br><span class="small">de log n à 2ⁿ</span></span></li>
+      <li class="step"><span><b>Écrire la complexité</b><br><span class="small">les notations O, Ω, Θ</span></span></li>
+      <li class="step"><span><b>Meilleur, moyen et pire cas</b></span></li>
+      <li class="step"><span><b>Analyser des boucles</b></span></li>
+      <li class="step"><span><b>La récursivité</b><br><span class="small">appels, pile, Fibonacci, théorème maître</span></span></li>
+    </ol>
+    <div class="panel navy col" style="gap:20px">
+      <span class="tag" style="color:var(--cover-accent)">Objectifs</span>
+      <h3>À la fin de la séance, vous saurez :</h3>
+      <ul class="lst sm" style="color:#E6F0FA">
+        <li>compter les opérations d’un algorithme</li>
+        <li>reconnaître sa famille de croissance</li>
+        <li>écrire sa complexité avec O, Ω et Θ</li>
+        <li>analyser une boucle et une fonction récursive</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Comment nous allons travailler</h2>
+  <div class="cyc step" style="margin-top:20px">
+    <div class="c"><b class="n">1</b>Un <b>problème</b> concret</div>
+    <div class="c"><b class="n">2</b>On le fait <b>à la main</b></div>
+    <div class="c"><b class="n">3</b>On regarde la <b>simulation</b></div>
+    <div class="c"><b class="n">4</b>On <b>formalise</b></div>
+    <div class="c"><b class="n">5</b>On <b>vérifie</b> avec une question</div>
+    <div class="c hot"><b class="n">6</b>On <b>code</b> en TP</div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="panel step"><span class="tag">Votre rôle</span><h3>Prédire avant de regarder</h3>À chaque simulation, dites ce que vous attendez avant d’appuyer sur « Suivant ». Se tromper est utile : c’est là que l’on comprend.</div>
+    <div class="panel step"><span class="tag">Pas de panique</span><h3>Chaque mot est expliqué</h3>Aucun terme technique n’est utilisé avant d’avoir été défini. Si un mot manque, levez la main.</div>
+  </div>
+</section>
+
+<!-- ============ Chapitre 1 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">1</div>
+  <div class="eyebrow">Chapitre 1</div>
+  <h2>Choisir un algorithme</h2>
+  <div class="q">Deux manières de résoudre <b>le même problème</b>. Laquelle est la meilleure, et comment le savoir ?</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Qu’est-ce qu’un algorithme ?</h2>
+  <div class="split">
+    <div class="col" style="gap:34px">
+      <div class="def" data-t="Définition">Un <span class="kw">algorithme</span> est une suite finie d’instructions précises qui transforme des <b>données d’entrée</b> en un <b>résultat</b>.</div>
+      <div class="txt step">Une recette de cuisine est un algorithme : des ingrédients (entrée), des étapes, un plat (sortie).</div>
+    </div>
+    <div class="col" style="gap:30px">
+      <div class="flow">
+        <div class="fbox step" data-g="1"><b class="l">Entrée</b><span class="mono">[4, 9, 2, 7]</span></div>
+        <div class="farrow step" data-g="2">→</div>
+        <div class="fbox algo step" data-g="2"><b class="l">Algorithme</b>Garder le plus grand nombre vu jusqu’ici<br><small>4 → 9 → 9 → 9</small></div>
+        <div class="farrow step" data-g="3">→</div>
+        <div class="fbox step" data-g="3"><b class="l">Sortie</b><span class="mono">9</span></div>
+      </div>
+      <div class="callout step">Problème : <b>trouver le plus grand nombre d’une liste</b>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Un même problème peut avoir plusieurs algorithmes</h2>
+  <p class="sub">Exemple : calculer 1 + 2 + 3 + … + 100.</p>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">Algorithme 1</span><h3>Additionner un par un</h3>
+      <div class="mono" style="font-size:34px;color:var(--head)">1 + 2 = 3<br>3 + 3 = 6<br>6 + 4 = 10<br>…</div>
+      <div class="callout bad step" style="margin-top:auto"><b>99 additions</b></div></div>
+    <div class="panel col"><span class="tag">Algorithme 2</span><h3>Utiliser une formule</h3>
+      <div class="mono" style="font-size:34px;color:var(--head)">n × (n + 1) ÷ 2<br>= 100 × 101 ÷ 2<br>= 5 050</div>
+      <div class="callout good step" style="margin-top:auto"><b>3 opérations</b></div></div>
+  </div>
+  <div class="keep step">Les deux donnent <b>5 050</b>. Ils sont tous les deux <b>corrects</b>, mais ils ne demandent pas le même travail.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Jeu : deviner un nombre entre 1 et 100</h2>
+  <p class="sub">Je pense à un nombre secret. Vous posez des questions « est-ce X ? » et je réponds « plus grand » ou « plus petit ». Deux stratégies s’affrontent.</p>
+  <div id="sim-guess"></div>
+  <aside class="notes">Avant de lancer les simulations, faire jouer deux étudiants au tableau : le premier propose 1, 2, 3… le second propose toujours le milieu. Demander à la salle de prédire qui gagne et de combien de questions. Puis lancer les deux stratégies avec le même nombre secret (73 par défaut).</aside>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Ce que nous venons de mesurer</h2>
+  <p class="sub">Trois mots à retenir. Ils serviront pendant toute la séance.</p>
+  <div class="grid3">
+    <div class="def step" data-g="1" data-t="Vocabulaire 1"><b class="acc">La taille n</b><br>La quantité de données à traiter.<br><span class="small">Ici : 100 nombres possibles, donc n = 100.</span></div>
+    <div class="def step" data-g="2" data-t="Vocabulaire 2"><b class="acc">Une opération élémentaire</b><br>Une action simple, comptée pour 1.<br><span class="small">Ici : une question, c’est-à-dire une comparaison.</span></div>
+    <div class="def step" data-g="3" data-t="Vocabulaire 3"><b class="acc">La complexité</b><br>Le nombre d’opérations nécessaires, en fonction de n.<br><span class="small">C’est la mesure du « travail » d’un algorithme.</span></div>
+  </div>
+  <div class="grid2" style="flex:0 0 auto">
+    <div class="callout bad step" data-g="4"><b>Stratégie A :</b> jusqu’à <b>100</b> questions. Le travail est <b>proportionnel à n</b>.</div>
+    <div class="callout good step" data-g="4"><b>Stratégie B :</b> au plus <b>7</b> questions, car on peut couper 100 en deux 7 fois (2⁷ = 128).</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">La stratégie B a un nom : la recherche dichotomique</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">Stratégie A</span><h3>Recherche séquentielle</h3>
+      On examine les éléments <b>un par un</b>, dans l’ordre, jusqu’à trouver.<br><span class="small">Elle marche sur n’importe quelle liste.</span></div>
+    <div class="panel col"><span class="tag">Stratégie B</span><h3>Recherche dichotomique</h3>
+      On examine l’élément du <b>milieu</b> et on <b>jette la moitié</b> qui ne peut pas contenir la réponse, puis on recommence.<br><span class="small">« Dichotomie » vient du grec : <i>dicha</i>, en deux, et <i>tomê</i>, coupe. Elle exige une liste <b>triée</b>.</span></div>
+  </div>
+  <div class="callout step" data-g="1">Pourquoi faut-il une liste triée ? Parce qu’en regardant le milieu, on sait <b>de quel côté</b> se trouve la réponse.</div>
+  <div class="def step" data-g="2" data-t="Vocabulaire">Un <span class="kw">tableau</span> est une suite de cases numérotées à partir de 0. À la prochaine diapositive, nos deux méthodes s’appliquent à un tableau trié de 16 cases.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Les deux méthodes sur un tableau trié</h2>
+  <div id="sim-race"></div>
+  <aside class="notes">Choisir 56 : A demande 13 comparaisons, B seulement 4. Essayer 3 (premier élément : A gagne !) puis 99 (absent). Faire remarquer que B élimine la moitié des cases à chaque comparaison.</aside>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Et avec un milliard de cases ?</h2>
+  <div class="split" style="grid-template-columns: 7fr 5fr;">
+    <div id="sim-bars"></div>
+    <div class="col">
+      <div class="callout">Pour un milliard de cases, la méthode B fait <b>30 comparaisons</b>. La méthode A peut en faire <b>un milliard</b>.</div>
+      <div class="panel step">Doubler la taille du tableau ajoute <b>une seule</b> comparaison à la méthode B.</div>
+      <div class="keep step">La différence vient <b>de l’algorithme</b>, pas de la machine.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Pourquoi compter des opérations et non des secondes ?</h2>
+  <p class="sub">Le même programme, la même recherche, sur trois machines différentes.</p>
+  <div class="grid3">
+    <div class="panel mach step" data-g="1"><div class="ic">💻</div><b>Ordinateur portable</b><div class="sec">2,1 s</div><div class="opsb">1 000 000 comparaisons</div></div>
+    <div class="panel mach step" data-g="1"><div class="ic">📱</div><b>Téléphone</b><div class="sec">4,8 s</div><div class="opsb">1 000 000 comparaisons</div></div>
+    <div class="panel mach step" data-g="1"><div class="ic">🖥️</div><b>Serveur puissant</b><div class="sec">0,3 s</div><div class="opsb">1 000 000 comparaisons</div></div>
+  </div>
+  <div class="keep step">Les secondes changent avec la machine. <b>Le nombre d’opérations ne change pas</b> : c’est une propriété de l’algorithme.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="Choisir un algorithme">
+  <h2 class="title">Question 1</h2>
+  <div id="q1" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ Chapitre 2 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">2</div>
+  <div class="eyebrow">Chapitre 2</div>
+  <h2>Compter les opérations</h2>
+  <div class="q">Pour mesurer le travail d’un algorithme, on <b>compte</b>. On ne chronomètre pas.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Le modèle de coût : tout ce qui est simple coûte 1</h2>
+  <div class="split">
+    <div class="col">
+      <p class="lead">Pour compter, on se met d’accord sur ce qu’est <b>une opération élémentaire</b>. Chacune coûte <b>1</b>.</p>
+      <div class="callout step">On exprime le coût total en fonction de la taille <b>n</b> de l’entrée. On le note <b>T(n)</b>.</div>
+    </div>
+    <div class="grid2" style="gap:22px">
+      <div class="panel step" data-g="1"><span class="tag">Affectation</span><div class="mono" style="font-size:42px;color:var(--head)">s ← 0</div><div class="small">on range une valeur</div></div>
+      <div class="panel step" data-g="1"><span class="tag">Comparaison</span><div class="mono" style="font-size:42px;color:var(--head)">i &lt; n</div><div class="small">on teste une condition</div></div>
+      <div class="panel step" data-g="2"><span class="tag">Calcul</span><div class="mono" style="font-size:42px;color:var(--head)">s + t[i]</div><div class="small">une addition</div></div>
+      <div class="panel step" data-g="2"><span class="tag">Accès</span><div class="mono" style="font-size:42px;color:var(--head)">t[i]</div><div class="small">on lit une case du tableau</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Compter pas à pas : la somme d’un tableau</h2>
+  <p class="sub">Chaque ligne exécutée a un coût. Suivez le compteur d’opérations en bas à droite.</p>
+  <div id="sim-sum"></div>
+  <aside class="notes">Lancer avec n = 5 en mode Lent et faire annoncer le compteur à voix haute. Puis cliquer n = 3 et n = 8 : 13, 19, 28. Demander quelle formule relie n au total.</aside>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Du comptage à la formule : T(n) = 3n + 4</h2>
+  <div class="split">
+    <table class="tbl">
+      <tr><th>Taille n</th><th class="num">Opérations</th></tr>
+      <tr class="step" data-g="1"><td>n = 3</td><td class="num"><b>13</b></td></tr>
+      <tr class="step" data-g="1"><td>n = 5</td><td class="num"><b>19</b></td></tr>
+      <tr class="step" data-g="1"><td>n = 8</td><td class="num"><b>28</b></td></tr>
+    </table>
+    <div class="col">
+      <div class="panel step" data-g="2" style="padding:26px 34px">
+        <div class="small" style="margin-bottom:10px">Exemple pour n = 5</div>
+        <div><span class="sq f"></span><span class="sq f"></span><span class="sq f"></span><span class="sq f"></span> <b class="small">4 opérations fixes</b></div>
+        <div style="margin-top:8px"><span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <span class="sq l"></span><span class="sq l"></span><span class="sq l"></span> <b class="small">5 tours × 3</b></div>
+      </div>
+      <div class="callout step" data-g="3">Chaque tour de boucle coûte <b>3</b> (test, incrément, addition). Le reste coûte <b>4</b> en tout.<br><b class="mono">T(n) = 3n + 4</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Doubler n double le travail</h2>
+  <p class="sub">Comparons deux façons d’écrire la même somme : l’une coûte 3n + 4 opérations, l’autre 5n + 1.</p>
+  <div class="split">
+    <table class="tbl">
+      <tr><th>n</th><th class="num">3n + 4</th><th class="num">5n + 1</th></tr>
+      <tr class="step" data-g="1"><td>1 000</td><td class="num">3 004</td><td class="num">5 001</td></tr>
+      <tr class="step" data-g="1"><td>2 000</td><td class="num">6 004</td><td class="num">10 001</td></tr>
+      <tr class="step" data-g="1"><td>4 000</td><td class="num">12 004</td><td class="num">20 001</td></tr>
+    </table>
+    <div class="col">
+      <div class="callout step" data-g="2">Dans les deux cas, quand <b>n double</b>, le travail <b>double aussi</b> (ou presque).</div>
+      <div class="def step" data-g="3" data-t="Vocabulaire">On dit que le coût est <span class="kw">linéaire</span> : il croît proportionnellement à n.</div>
+    </div>
+  </div>
+  <div class="keep step" data-g="4">Ce qui compte n’est pas la constante exacte, mais la <b>façon dont le coût grandit</b> avec n.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Compter les opérations">
+  <h2 class="title">Question 2</h2>
+  <div id="q2" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ Chapitre 3 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">3</div>
+  <div class="eyebrow">Chapitre 3</div>
+  <h2>Les familles de croissance</h2>
+  <div class="q">Quand la taille des données <b>double</b>, que devient le travail ?</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Le test du doublement</h2>
+  <p class="sub">On double n. Combien d’opérations de plus ? La réponse classe les algorithmes en familles.</p>
+  <div class="col" style="gap:14px;margin-top:6px">
+    <div class="dbl step"><div class="ef"><b>Rien ne change</b></div><div class="ar">→</div><div class="nm" style="text-align:left">constante · 1</div></div>
+    <div class="dbl step"><div class="ef"><b>Une seule opération de plus</b></div><div class="ar">→</div><div class="nm" style="text-align:left">logarithmique · log n</div></div>
+    <div class="dbl step"><div class="ef">Le travail <b>double</b></div><div class="ar">→</div><div class="nm" style="text-align:left">linéaire · n</div></div>
+    <div class="dbl step"><div class="ef">Le travail est <b>multiplié par 4</b></div><div class="ar">→</div><div class="nm" style="text-align:left">quadratique · n²</div></div>
+    <div class="dbl step"><div class="ef">Le travail est <b>multiplié par une quantité énorme</b></div><div class="ar">→</div><div class="nm" style="text-align:left">exponentielle · 2ⁿ</div></div>
+  </div>
+  <aside class="notes">Annoncer qu’on va voir chaque famille avec une image. Ne pas expliquer n² ici : cela vient dans quelques diapositives.</aside>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Constante et linéaire : 1 et n</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">Famille constante · 1</span><h3>Lire une case</h3>
+      <div class="txt">Lire <span class="mono">t[5]</span> coûte <b>1 opération</b>, que le tableau ait 10 cases ou un million.</div>
+      <div data-arr="7,3,9,4,8,2,6,5" data-cls="5:found" data-cw="70" data-p="i:5"></div>
+      <div class="callout good" style="margin-top:auto">Le travail <b>ne dépend pas de n</b>.</div></div>
+    <div class="panel col"><span class="tag">Famille linéaire · n</span><h3>Parcourir le tableau</h3>
+      <div class="txt">Pour trouver le maximum, on regarde <b>chaque case une fois</b> : n cases, n opérations.</div>
+      <div data-arr="7,3,9,4,8,2,6,5" data-cls="0:done,1:done,2:done,3:done,4:cur" data-cw="70" data-p="i:4"></div>
+      <div class="callout" style="margin-top:auto">Si n double, le travail <b>double</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Couper en deux : la famille log n</h2>
+  <div class="def" data-t="Définition" style="font-size:34px">Le <span class="kw">logarithme</span> en base 2, noté <b>log₂ n</b>, est le nombre de fois qu’on peut <b>diviser n par 2</b> avant d’arriver à 1.</div>
+  <div id="sim-halving"></div>
+  <aside class="notes">Déplacer le curseur : à chaque fois que n double, il y a exactement une coupe de plus. C’est pour cela que la recherche dichotomique est si rapide.</aside>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Le carré : n × n, noté n²</h2>
+  <p class="sub">« n² » se lit « n au carré » et signifie <b>n fois n</b>. Il apparaît quand chaque élément est mis en relation avec tous les autres.</p>
+  <div id="sim-hand"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">L’exponentielle : 2ⁿ</h2>
+  <p class="sub">« 2ⁿ » signifie 2 × 2 × … × 2, avec n facteurs. Exemple : lister tous les sous-ensembles d’un ensemble.</p>
+  <div id="sim-subsets"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Les familles, avec un exemple pour chacune</h2>
+  <table class="tbl" style="font-size:33px">
+    <tr><th>Famille</th><th>Nom</th><th>Exemple d’algorithme</th></tr>
+    <tr class="step" data-g="a"><td class="mono">1</td><td>constante</td><td>Lire une case d’un tableau</td></tr>
+    <tr class="step" data-g="a"><td class="mono">log n</td><td>logarithmique</td><td>Recherche dichotomique</td></tr>
+    <tr class="step" data-g="b"><td class="mono">n</td><td>linéaire</td><td>Parcourir un tableau, recherche séquentielle</td></tr>
+    <tr class="step" data-g="b"><td class="mono">n log n</td><td>quasi-linéaire</td><td>Les bons tris, comme le tri fusion (séance 4)</td></tr>
+    <tr class="step" data-g="c"><td class="mono">n²</td><td>quadratique</td><td>Deux boucles imbriquées, tris simples</td></tr>
+    <tr class="step" data-g="c"><td class="mono">n³</td><td>cubique</td><td>Trois boucles imbriquées, produit de matrices</td></tr>
+    <tr class="step" data-g="d"><td class="mono">2ⁿ</td><td>exponentielle</td><td>Tous les sous-ensembles d’un ensemble</td></tr>
+  </table>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Faites grandir n et regardez les courbes</h2>
+  <div id="sim-growth"></div>
+  <aside class="notes">Augmenter n jusqu’à 30 : la courbe de 2ⁿ sort du cadre. Activer l’échelle logarithmique pour voir toutes les courbes à la fois.</aside>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Et en vrai, cela fait combien de temps ?</h2>
+  <div id="sim-times"></div>
+  <div class="keep step" style="margin-top:6px">Un algorithme exponentiel devient <b>inutilisable</b> dès n = 100, même sur le meilleur ordinateur.</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Les familles de croissance">
+  <h2 class="title">Question 3</h2>
+  <div id="q3" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ Chapitre 4 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">4</div>
+  <div class="eyebrow">Chapitre 4</div>
+  <h2>Écrire la complexité</h2>
+  <div class="q">Comment <b>résumer</b> un coût comme 7n³ + 100n² + 9 en une seule expression ?</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Pourquoi simplifier ?</h2>
+  <p class="sub">À petite taille, les constantes comptent. À grande taille, un seul terme gagne. Regardez la part de chaque terme.</p>
+  <div id="sim-contrib"></div>
+  <aside class="notes">Cliquer 10 : la constante 1000 domine. Puis 100, 1000, 10 000 : le terme 2n² prend toute la place. C’est la justification de la simplification.</aside>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Deux gestes pour simplifier</h2>
+  <div id="sim-simplify"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Trois façons d’encadrer une croissance</h2>
+  <p class="sub">Image : le temps d’un trajet. « Au plus 1 heure », « au moins 20 minutes », « environ 40 minutes ».</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="pill bad">O · le plafond</span>
+      <svg class="mini" viewBox="0 0 300 170"><path d="M10 160 C100 150 200 90 290 20" fill="none" stroke="var(--c-exp)" stroke-width="5" stroke-dasharray="10 7"/><path d="M10 160 C100 155 200 125 290 70" fill="none" stroke="var(--c-n)" stroke-width="6"/><text x="200" y="22">c·g(n)</text><text x="205" y="110">f(n)</text></svg>
+      <h3>« Pas plus que… »</h3>f = O(g) : f reste <b>sous</b> la courbe c·g.<div class="small">Une garantie : ce ne sera jamais pire.</div></div>
+    <div class="panel col step" data-g="1"><span class="pill ok">Ω · le plancher</span>
+      <svg class="mini" viewBox="0 0 300 170"><path d="M10 160 C100 155 200 125 290 70" fill="none" stroke="var(--c-n)" stroke-width="6"/><path d="M10 160 C100 158 200 150 290 125" fill="none" stroke="var(--c-log)" stroke-width="5" stroke-dasharray="10 7"/><text x="200" y="100">f(n)</text><text x="190" y="158">c·g(n)</text></svg>
+      <h3>« Au moins… »</h3>f = Ω(g) : f reste <b>au-dessus</b> de la courbe c·g.<div class="small">Une garantie : ce ne sera jamais mieux.</div></div>
+    <div class="panel col step" data-g="1"><span class="pill">Θ · le couloir</span>
+      <svg class="mini" viewBox="0 0 300 170"><path d="M10 160 C100 150 200 90 290 20 L290 125 C200 150 100 158 10 160Z" fill="var(--accent-soft)"/><path d="M10 160 C100 150 200 90 290 20" fill="none" stroke="var(--c-exp)" stroke-width="4" stroke-dasharray="10 7"/><path d="M10 160 C100 158 200 150 290 125" fill="none" stroke="var(--c-log)" stroke-width="4" stroke-dasharray="10 7"/><path d="M10 160 C100 155 200 125 290 70" fill="none" stroke="var(--c-n)" stroke-width="6"/><text x="205" y="108">f(n)</text></svg>
+      <h3>« Exactement de l’ordre de… »</h3>f = Θ(g) : f est à la fois O(g) et Ω(g).<div class="small">La description la plus précise.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">La définition, phrase par phrase</h2>
+  <div class="fm">f(n) = O(g(n))</div>
+  <div class="def" data-t="Définition" style="text-align:center;font-size:40px">il existe <b class="acc">c &gt; 0</b> et <b class="acc">n₀</b> tels que, pour tout <b class="acc">n ≥ n₀</b>,<br><b>f(n) ≤ c · g(n)</b></div>
+  <div class="ann">
+    <div class="step" data-g="1"><b>c</b>Une constante à votre choix : elle représente le facteur que l’on accepte d’ignorer.</div>
+    <div class="step" data-g="2"><b>n₀</b>Un seuil. Avant lui, tout est permis. Après lui, la règle est toujours vraie.</div>
+    <div class="step" data-g="3"><b>f ≤ c·g</b>La courbe de f reste sous celle de g, multipliée par c : g est un plafond.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Trouver c et n₀ pour f(n) = 3n² + 5n + 2</h2>
+  <div id="sim-bigo"></div>
+  <aside class="notes">Mettre le plafond à 3 : aucun seuil ne convient. Passer à 4, puis 5, puis 10 : n₀ diminue. Plus la constante est généreuse, plus le seuil arrive tôt. Puis montrer le plancher c₁ = 3.</aside>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Trois pièges à éviter</h2>
+  <div class="grid3">
+    <div class="panel step" data-g="1"><span class="pill bad">Piège 1</span><h3 style="margin-top:14px">Le signe « = » n’est pas une égalité</h3>On écrit n = O(n²). C’est vrai, mais n n’est pas égal à n² : c’est une <b>borne</b>.</div>
+    <div class="panel step" data-g="2"><span class="pill bad">Piège 2</span><h3 style="margin-top:14px">O n’est pas un temps exact</h3>Un algorithme linéaire est aussi O(n²). C’est vrai mais peu informatif : préférez <b>Θ</b> quand vous le pouvez.</div>
+    <div class="panel step" data-g="3"><span class="pill bad">Piège 3</span><h3 style="margin-top:14px">Les petites tailles</h3>Pour n = 10, un algorithme en n² peut battre un algorithme en n log n. La notation décrit le comportement <b>à grande échelle</b>.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Écrire la complexité">
+  <h2 class="title">Question 4</h2>
+  <div id="q4" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ Chapitre 5 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">5</div>
+  <div class="eyebrow">Chapitre 5</div>
+  <h2>Meilleur, moyen, pire cas</h2>
+  <div class="q">Un même algorithme peut être <b>rapide ou lent</b>, selon les données qu’on lui donne.</div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="Meilleur, moyen, pire cas">
+  <h2 class="title">Chercher une clé dans une rangée de tiroirs</h2>
+  <p class="sub">On ouvre les tiroirs un par un, de gauche à droite, jusqu’à trouver la clé.</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="pill ok">Meilleur cas</span><h3 style="margin-top:12px">La clé est dans le 1ᵉʳ tiroir</h3><div class="txt">1 tiroir ouvert.</div><div class="callout good" style="margin-top:auto">Le moins de travail possible.</div></div>
+    <div class="panel col step" data-g="2"><span class="pill warn">Cas moyen</span><h3 style="margin-top:12px">La clé est quelque part au milieu</h3><div class="txt">En moyenne, la moitié des tiroirs.</div><div class="callout warn" style="margin-top:auto">Un travail typique.</div></div>
+    <div class="panel col step" data-g="3"><span class="pill bad">Pire cas</span><h3 style="margin-top:12px">La clé est dans le dernier, ou absente</h3><div class="txt">Tous les tiroirs sont ouverts.</div><div class="callout bad" style="margin-top:auto">Le plus de travail possible.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="Meilleur, moyen, pire cas">
+  <h2 class="title">Une même taille n, des coûts différents</h2>
+  <div id="sim-cases"></div>
+  <aside class="notes">Laisser les étudiants prédire le nombre de comparaisons avant chaque scénario : 1, 5, 8.</aside>
+</section>
+
+<section class="slide" data-ch="5" data-chname="Meilleur, moyen, pire cas">
+  <h2 class="title">Quel cas annoncer ?</h2>
+  <div class="split even top">
+    <table class="tbl">
+      <tr><th>Cas</th><th class="num">Comparaisons</th><th class="num">Ordre</th></tr>
+      <tr class="step" data-g="1"><td>Meilleur</td><td class="num">1</td><td class="num mono">1</td></tr>
+      <tr class="step" data-g="2"><td>Moyen (clé équiprobable)</td><td class="num">(n + 1) ÷ 2</td><td class="num mono">n</td></tr>
+      <tr class="step" data-g="3"><td>Pire</td><td class="num">n</td><td class="num mono">n</td></tr>
+    </table>
+    <div class="col">
+      <div class="callout step" data-g="4">Par défaut, on annonce le <b>pire cas</b> : c’est une <b>garantie</b>, valable pour toutes les entrées.</div>
+      <div class="panel step" data-g="5">Le cas moyen exige une hypothèse sur la façon dont les données sont réparties. On l’utilisera pour le tri rapide (séance 4).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Chapitre 6 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">6</div>
+  <div class="eyebrow">Chapitre 6</div>
+  <h2>Analyser des boucles</h2>
+  <div class="q">Comment <b>lire un programme</b> et en déduire sa complexité ?</div>
+</section>
+
+<section class="slide" data-ch="6" data-chname="Analyser des boucles">
+  <h2 class="title">Quatre règles pour lire un algorithme</h2>
+  <div class="grid4">
+    <div class="panel col step" data-g="1" style="align-items:center;text-align:center"><span class="tag">Séquence</span>
+      <div class="rl"><div class="blk">A : n</div><div class="blk b2">B : n²</div></div>
+      <div class="small">Instructions l’une après l’autre</div><div class="callout" style="font-size:28px;margin-top:auto">On <b>additionne</b>. Le plus grand domine : n² + n → <b>n²</b></div></div>
+    <div class="panel col step" data-g="2" style="align-items:center;text-align:center"><span class="tag">Boucle</span>
+      <div class="rl"><div class="blk">↻ n fois</div><div class="blk b2" style="font-size:26px">corps : 1 opération</div></div>
+      <div class="small">Un corps répété</div><div class="callout" style="font-size:28px;margin-top:auto">Nombre de tours <b>×</b> coût du corps : n × 1 = <b>n</b></div></div>
+    <div class="panel col step" data-g="3" style="align-items:center;text-align:center"><span class="tag">Imbrication</span>
+      <div class="gridmini" style="grid-template-columns:repeat(5,34px)"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="small">Boucle dans une boucle</div><div class="callout" style="font-size:28px;margin-top:auto">On <b>multiplie</b> : n × n = <b>n²</b></div></div>
+    <div class="panel col step" data-g="4" style="align-items:center;text-align:center"><span class="tag">Condition</span>
+      <div class="rl"><div class="blk" style="background:var(--c-n)">si … : n</div><div class="blk b2">sinon : n²</div></div>
+      <div class="small">Deux branches possibles</div><div class="callout" style="font-size:28px;margin-top:auto">Au pire : le <b>maximum</b> des deux → <b>n²</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-chname="Analyser des boucles">
+  <h2 class="title">Chaque case est une exécution de opération()</h2>
+  <div id="sim-loops"></div>
+  <aside class="notes">Double boucle avec n = 6 : grille 6 par 6, donc 36. Boucle bornée par i : demi-carré, n(n+1)/2, c’est encore quadratique. Variable doublée : 1, 2, 4, 8, la grille s’arrête vite, c’est le logarithme.</aside>
+</section>
+
+<section class="slide" data-ch="6" data-chname="Analyser des boucles">
+  <h2 class="title">Question 5</h2>
+  <div id="q5" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ Chapitre 7 ============ -->
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">7</div>
+  <div class="eyebrow">Chapitre 7</div>
+  <h2>La récursivité</h2>
+  <div class="q">Une fonction qui <b>s’appelle elle-même</b>. Comment cela marche-t-il, et combien cela coûte-t-il ?</div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Une idée simple : les poupées russes</h2>
+  <p class="sub">Combien y a-t-il de poupées dans cette série ? Vous ne pouvez ouvrir qu’une poupée à la fois.</p>
+  <div class="split">
+    <div class="col">
+      <ol class="num" style="font-size:34px">
+        <li class="step" data-g="1"><span>J’ouvre la poupée. <b>Si elle est vide</b>, je sais répondre : il y en a <b>1</b>.</span></li>
+        <li class="step" data-g="2"><span>Sinon, je pose la même question à la poupée qu’elle contient, puis j’ajoute <b>1</b>.</span></li>
+      </ol>
+      <div class="callout step" data-g="3">On résout un problème en le ramenant à <b>un problème plus petit du même genre</b>. C’est la <b>récursivité</b>.</div>
+    </div>
+    <div class="doll step" data-g="1" style="padding:26px 30px">Poupée 1
+      <div class="doll d2 step" data-g="1" style="margin-top:14px">Poupée 2
+        <div class="doll d3 step" data-g="1" style="margin-top:12px">Poupée 3
+          <div class="doll d4 step" data-g="1" style="margin-top:10px">Poupée 4 <span class="small">(vide)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Deux ingrédients obligatoires</h2>
+  <div class="split">
+    <pre class="code free" data-pc style="font-size:36px;line-height:1.9">fonction fact(n):
+    si n = 0 alors retourner 1
+    retourner n × fact(n-1)</pre>
+    <div class="col" style="gap:26px">
+      <div class="def step" data-g="1" data-t="Ingrédient 1"><b class="acc">Le cas de base</b><br>Le problème est si petit qu’on connaît la réponse sans calcul.<br><span class="small">Ici : fact(0) = 1.</span></div>
+      <div class="def step" data-g="2" data-t="Ingrédient 2"><b class="acc">L’appel récursif</b><br>On se ramène à un problème <b>plus petit</b> : fact(n-1).<br><span class="small">Ici : n × fact(n-1).</span></div>
+      <div class="callout warn step" data-g="3">Sans cas de base, la fonction s’appelle <b>sans jamais s’arrêter</b>.</div>
+    </div>
+  </div>
+  <aside class="notes">Rappeler que n! = n × (n−1) × … × 1 et que 0! = 1. On calcule fact(4) à la main à la diapositive suivante.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">À la main : on descend, puis on remonte</h2>
+  <div class="split even top">
+    <div class="col" style="gap:14px">
+      <div class="small" style="font-weight:700;color:var(--accent);letter-spacing:.12em">① ON DESCEND : chaque appel attend le suivant</div>
+      <div class="panel mono step" data-g="1" style="padding:16px 28px;font-size:34px">fact(4) = 4 × <b class="acc">fact(3)</b></div>
+      <div class="panel mono step" data-g="2" style="padding:16px 28px;font-size:34px">fact(3) = 3 × <b class="acc">fact(2)</b></div>
+      <div class="panel mono step" data-g="3" style="padding:16px 28px;font-size:34px">fact(2) = 2 × <b class="acc">fact(1)</b></div>
+      <div class="panel mono step" data-g="4" style="padding:16px 28px;font-size:34px">fact(1) = 1 × <b class="acc">fact(0)</b></div>
+      <div class="panel mono step" data-g="5" style="padding:16px 28px;font-size:34px;border-color:var(--warn);background:var(--warn-soft)">fact(0) = <b>1</b> <span class="small">cas de base</span></div>
+    </div>
+    <div class="col" style="gap:14px">
+      <div class="small" style="font-weight:700;color:var(--ok);letter-spacing:.12em">② ON REMONTE : chaque réponse est rendue</div>
+      <div class="panel mono step" data-g="6" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(1) = 1 × <b>1</b> = <b class="ok">1</b></div>
+      <div class="panel mono step" data-g="7" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(2) = 2 × <b>1</b> = <b class="ok">2</b></div>
+      <div class="panel mono step" data-g="8" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(3) = 3 × <b>2</b> = <b class="ok">6</b></div>
+      <div class="panel mono step" data-g="9" style="padding:16px 28px;font-size:34px;border-color:var(--ok)">fact(4) = 4 × <b>6</b> = <b class="ok">24</b></div>
+      <div class="callout good step" data-g="10">Le résultat est <b>24</b>.</div>
+    </div>
+  </div>
+  <aside class="notes">Révéler une ligne à la fois. Marquer le « tournant » au cas de base : à cet instant, plus aucun appel n’est lancé, et les réponses commencent à remonter.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Le même calcul, vu de l’intérieur de l’ordinateur</h2>
+  <p class="sub">Les flèches bleues descendent : ce sont les <b>appels</b>. Les flèches vertes remontent : ce sont les <b>réponses</b>.</p>
+  <div id="sim-fact"></div>
+  <aside class="notes">Lancer en mode lecture, puis recommencer en pas à pas. Insister sur la phrase : « chaque fiche attend la réponse de celle du dessous ». Les réponses remontent dans l’ordre inverse des appels.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">La pile d’appels, et ce qui arrive sans cas de base</h2>
+  <p class="sub">Chaque appel en cours est une fiche posée sur une <span class="kw">pile</span> en mémoire. Ici, le cas de base est retiré.</p>
+  <div id="sim-fact2"></div>
+  <aside class="notes">Lancer la lecture : les fiches s’empilent sans fin jusqu’au dépassement de pile (stack overflow). C’est l’erreur que les étudiants verront en C lorsqu’ils oublient le cas de base.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Combien coûte fact(n) ?</h2>
+  <div class="split">
+    <div class="col">
+      <div class="panel step" data-g="1"><b>Chaque appel</b> fait un petit travail (une multiplication), puis appelle fact(n-1).</div>
+      <div class="def step" data-g="2" data-t="Équation de récurrence"><span class="mono" style="font-size:42px;color:var(--head)">T(n) = T(n-1) + 1</span><br><span class="small">Le coût de fact(n) = le coût de fact(n-1), plus 1 opération.</span></div>
+    </div>
+    <div class="panel step" data-g="3" style="font-size:36px"><b>On déroule l’équation :</b>
+      <div class="mono" style="line-height:1.9;margin-top:10px">T(n) = T(n-1) + 1<br><span class="step" data-g="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= T(n-2) + 1 + 1</span><br><span class="step" data-g="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= T(n-3) + 1 + 1 + 1</span><br><span class="step" data-g="6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= …</span><br><span class="step" data-g="7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= T(0) + <b class="acc">n</b></span></div>
+    </div>
+  </div>
+  <div class="keep step" data-g="8">fact(n) fait <b>n + 1 appels</b> : son coût est <b>linéaire</b>, de l’ordre de n.</div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Un autre exemple : la suite de Fibonacci</h2>
+  <p class="sub">Chaque nombre est la <b>somme des deux précédents</b>. On démarre avec 0 et 1.</p>
+  <div class="fibchips" style="justify-content:center;margin:20px 0">
+    <div class="ch step" data-g="1">0</div><span class="pl step" data-g="1">,</span>
+    <div class="ch step" data-g="1">1</div><span class="pl step" data-g="2">,</span>
+    <div class="ch s step" data-g="2">1</div><span class="pl step" data-g="3">,</span>
+    <div class="ch s step" data-g="3">2</div><span class="pl step" data-g="4">,</span>
+    <div class="ch s step" data-g="4">3</div><span class="pl step" data-g="5">,</span>
+    <div class="ch s step" data-g="5">5</div><span class="pl step" data-g="6">,</span>
+    <div class="ch s step" data-g="6">8</div>
+  </div>
+  <div class="split even">
+    <div class="def step" data-g="7" data-t="Définition"><span class="mono" style="font-size:40px;color:var(--head)">fib(n) = fib(n-1) + fib(n-2)</span><br><span class="small">avec fib(0) = 0 et fib(1) = 1 : ce sont les <b>deux cas de base</b>.</span></div>
+    <pre class="code free step" data-g="8" data-pc style="font-size:32px;line-height:1.8">fonction fib(n):
+    si n ≤ 1 alors retourner n
+    retourner fib(n-1) + fib(n-2)</pre>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">fib(n) lance deux appels : l’arbre se construit</h2>
+  <p class="sub">Chaque appel est un nœud. Quand il répond, il passe au vert et sa valeur remonte vers son parent.</p>
+  <div id="sim-fib1"></div>
+  <aside class="notes">Jouer fib(4) pas à pas. Commenter chaque étape. Insister sur l’ordre : on termine tout le côté gauche avant de commencer le côté droit.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Le même calcul refait plusieurs fois</h2>
+  <p class="sub">Lancez la lecture jusqu’au bout. Les appels à fib(2) sont surlignés : comptez-les, puis essayez fib(3).</p>
+  <div id="sim-fib2"></div>
+  <aside class="notes">Laisser jouer jusqu’au bout, puis surligner fib(2) : il apparaît 3 fois. fib(3) apparaît 2 fois. Annoncer que la programmation dynamique (séance 5) supprime ces répétitions.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Quand les appels se répètent, le coût explose</h2>
+  <div class="split even top">
+    <table class="tbl">
+      <tr><th>n</th><th class="num">Appels</th><th class="num">Durée à 10⁹ appels/s</th></tr>
+      <tr class="step" data-g="1"><td>10</td><td class="num">177</td><td class="num t-ok">instantané</td></tr>
+      <tr class="step" data-g="2"><td>30</td><td class="num">2 692 537</td><td class="num t-ok">3 ms</td></tr>
+      <tr class="step" data-g="3"><td>40</td><td class="num">331 160 281</td><td class="num t-ok">0,3 s</td></tr>
+      <tr class="step" data-g="4"><td>50</td><td class="num">40 730 022 147</td><td class="num t-warn">41 s</td></tr>
+      <tr class="step" data-g="5"><td>60</td><td class="num">5,0 × 10¹²</td><td class="num t-warn">83 min</td></tr>
+      <tr class="step" data-g="6"><td>100</td><td class="num">1,1 × 10²¹</td><td class="num t-bad">36 000 ans</td></tr>
+    </table>
+    <div class="col">
+      <div class="callout warn step" data-g="7">Le nombre d’appels de fib(n) croît presque comme <b>2ⁿ</b> : à chaque niveau, on double ou presque.</div>
+      <div class="panel step" data-g="8">Le défaut : <b>le même sous-problème est recalculé</b> des milliers de fois. Il suffirait de le calculer une seule fois et de <b>mémoriser</b> la réponse.<br><span class="small">C’est la programmation dynamique, en séance 5.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Diviser pour régner : couper le problème en deux</h2>
+  <p class="sub">Exemple : trier un paquet de cartes avec l’aide d’un ami. C’est l’idée du tri fusion, que nous étudierons en séance 4.</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Étape 1 · Diviser</span><h3>Couper le paquet en deux moitiés</h3><div class="small">Chaque moitié est un problème de taille n/2.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Étape 2 · Résoudre</span><h3>Faire trier chaque moitié</h3><div class="small">Par le même procédé, donc par récursivité.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Étape 3 · Combiner</span><h3>Fusionner les deux moitiés triées</h3><div class="small">Cela demande environ n opérations.</div></div>
+  </div>
+  <div class="keep step" data-g="4">Le coût s’écrit : <b>deux sous-problèmes de taille n/2</b>, plus <b>n opérations</b> pour recoller.</div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Lire l’équation de récurrence</h2>
+  <div class="eq">T(n) = <span style="color:var(--c-n)">2</span> · T(<span style="color:var(--c-nlog)">n/2</span>) + <span style="color:var(--c-n2)">n</span></div>
+  <div class="eqc">
+    <div class="step" data-g="1"><b style="color:var(--c-n)">2</b><br>Deux sous-problèmes à résoudre</div>
+    <div class="step" data-g="2"><b style="color:var(--c-nlog)">n/2</b><br>Chacun est deux fois plus petit</div>
+    <div class="step" data-g="3"><b style="color:var(--c-n2)">+ n</b><br>Le travail pour recoller les morceaux</div>
+  </div>
+  <div class="callout step" data-g="4" style="margin-top:12px">Comment résoudre cette équation ? On dessine <b>l’arbre des sous-problèmes</b>, niveau par niveau.</div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">L’arbre de récursion : couper, puis recoller</h2>
+  <div id="sim-split"></div>
+  <aside class="notes">Avancer étape par étape. À chaque niveau, le nombre de morceaux double et leur taille est divisée par 2 : le total reste n. Compter les niveaux : log₂ n.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Qui pèse le plus : la racine ou les feuilles ?</h2>
+  <p class="sub">La racine est le niveau du haut. Les feuilles sont le niveau du bas. Chaque barre montre le coût total d’un niveau.</p>
+  <div id="sim-mbars"></div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Le théorème maître : une recette pour les trois cas</h2>
+  <p class="sub">Pour une équation de la forme <b class="mono">T(n) = a · T(n/b) + nᵈ</b>, on compare <b>d</b> avec <b>log<sub>b</sub> a</b>.</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="pill bad">Cas 1</span><h3 style="margin-top:12px">d &lt; log<sub>b</sub> a</h3>Les feuilles dominent.<div class="big-res" style="margin-top:auto;font-size:44px">n<sup>log<sub>b</sub> a</sup></div></div>
+    <div class="panel col step" data-g="2"><span class="pill warn">Cas 2</span><h3 style="margin-top:12px">d = log<sub>b</sub> a</h3>Tous les niveaux se valent.<div class="big-res" style="margin-top:auto;font-size:44px">nᵈ · log n</div></div>
+    <div class="panel col step" data-g="3"><span class="pill ok">Cas 3</span><h3 style="margin-top:12px">d &gt; log<sub>b</sub> a</h3>La racine domine.<div class="big-res" style="margin-top:auto;font-size:44px">nᵈ</div></div>
+  </div>
+  <div class="keep step" data-g="4">Résultat à écrire en Θ : par exemple <b>T(n) = Θ(n log n)</b> pour le tri fusion (a = 2, b = 2, d = 1).</div>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Essayez-le sur de vrais algorithmes</h2>
+  <div id="sim-master"></div>
+  <aside class="notes">Parcourir les préréglages : la recherche dichotomique donne log n, le tri fusion n log n. Karatsuba et Strassen sont donnés pour la culture : ils montrent que l’exposant peut ne pas être un entier.</aside>
+</section>
+
+<section class="slide" data-ch="7" data-chname="La récursivité">
+  <h2 class="title">Question 6</h2>
+  <div id="q6" style="max-width:1560px"></div>
+</section>
+
+<!-- ============ TD et synthèse ============ -->
+<section class="slide" data-ch="TD" data-chname="Travaux dirigés">
+  <h2 class="title">TD · Exercices 1 à 3 : analyser des boucles</h2>
+  <p class="sub">Cherchez seul pendant quelques minutes, puis révélez la solution.</p>
+  <div class="grid3">
+    <div class="col"><b class="acc">Exercice 1</b>
+      <pre class="code free" style="font-size:30px" data-pc>s ← 0
+pour i de 1 à n faire
+  pour j de 1 à n faire
+    s ← s + 1</pre>
+      <div class="callout good step" style="font-size:30px">n × n itérations : <b>Θ(n²)</b></div></div>
+    <div class="col"><b class="acc">Exercice 2</b>
+      <pre class="code free" style="font-size:30px" data-pc>pour i de 1 à n faire
+  pour j de 1 à 100 faire
+    opération()</pre>
+      <div class="callout good step" style="font-size:30px">100 est une constante : 100 × n, donc <b>Θ(n)</b></div></div>
+    <div class="col"><b class="acc">Exercice 3</b>
+      <pre class="code free" style="font-size:30px" data-pc>i ← n
+tant que i ≥ 1 faire
+  opération()
+  i ← i / 2</pre>
+      <div class="callout good step" style="font-size:30px">i est divisé par 2 : <b>Θ(log n)</b> passages</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="Travaux dirigés">
+  <h2 class="title">TD · Exercices 4 à 6 : récurrences</h2>
+  <p class="sub">Les exercices 4 et 5 se résolvent avec le théorème maître. Le 6 demande de dérouler l’équation.</p>
+  <div class="grid3">
+    <div class="col"><b class="acc">Exercice 4</b>
+      <div class="panel mono" style="font-size:36px">T(n) = T(n/2) + 1</div>
+      <div class="callout good step" style="font-size:30px">a = 1, b = 2, d = 0. log₂ 1 = 0 = d : cas 2, <b>Θ(log n)</b></div></div>
+    <div class="col"><b class="acc">Exercice 5</b>
+      <div class="panel mono" style="font-size:36px">T(n) = 2T(n/2) + n²</div>
+      <div class="callout good step" style="font-size:30px">log₂ 2 = 1 &lt; d = 2 : cas 3, <b>Θ(n²)</b></div></div>
+    <div class="col"><b class="acc">Exercice 6</b>
+      <div class="panel mono" style="font-size:36px">T(n) = T(n-1) + n</div>
+      <div class="callout good step" style="font-size:30px">On déroule : n + (n-1) + … + 1 = n(n+1)/2 : <b>Θ(n²)</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Bilan" data-chname="Synthèse">
+  <h2 class="title">À retenir</h2>
+  <div class="col" style="gap:18px;flex:1;justify-content:center">
+    <div class="panel step" style="padding:22px 36px">On mesure un algorithme par son <b>nombre d’opérations</b> T(n), pas par des secondes.</div>
+    <div class="panel step" style="padding:22px 36px">Seule la <b>croissance</b> compte : on garde le terme dominant et on oublie les constantes.</div>
+    <div class="panel step" style="padding:22px 36px"><b>O</b> borne par le haut, <b>Ω</b> par le bas, <b>Θ</b> serre les deux. Par défaut, on annonce le <b>pire cas</b>.</div>
+    <div class="panel step" style="padding:22px 36px">Boucles : <b>séquence = somme</b>, <b>imbrication = produit</b>, <b>diviser par 2 à chaque tour = log n</b>.</div>
+    <div class="panel step" style="padding:22px 36px">Récursivité : un <b>cas de base</b> et un appel plus petit. On écrit la <b>récurrence</b>, puis on la résout (déroulement, arbre, théorème maître).</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Suite" data-chname="Et maintenant">
+  <h2 class="title">TP d’aujourd’hui et prochaine séance</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">TP 1 · une heure</span><h3>Mesurer la complexité</h3>
+      <ul class="lst sm"><li>Recherche séquentielle contre recherche dichotomique</li><li>Tri par insertion sur des tailles croissantes</li><li>Mesure des temps en C et en Python</li><li>Tracé du temps en fonction de n</li></ul>
+      <div class="small" style="margin-top:auto">Le code et le sujet sont sur la page du cours.</div></div>
+    <div class="panel navy col"><span class="tag" style="color:var(--cover-accent)">Séance 2</span><h3>Structures linéaires</h3>
+      <ul class="lst sm" style="color:#E6F0FA"><li>Rappel de la mémoire en C : pointeurs, malloc, free</li><li>Listes chaînées</li><li>Piles</li></ul>
+      <div class="small" style="margin-top:auto">Revoyez les pointeurs en C avant la séance.</div></div>
+  </div>
+  <div class="keep">Merci de votre attention. Des questions ?</div>
+</section>
+
+<div id="foot"><span><b>Yassine Ben-Aboud</b> · Séance 1 · Complexité des algorithmes</span></div>
+<div id="nav">
+  <button id="b-prev" aria-label="Précédent" title="Précédent">◀</button>
+  <button id="b-next" aria-label="Suivant" title="Suivant">▶</button>
+  <button id="b-ov" aria-label="Aperçu" title="Aperçu (O)">▦</button>
+  <button id="b-theme" aria-label="Thème" title="Thème (T)">◐</button>
+  <button id="b-full" aria-label="Plein écran" title="Plein écran (F)">⛶</button>
+  <button id="b-help" aria-label="Aide" title="Aide (?)">?</button>
+  <span id="count"></span>
+</div>
+<div id="notes"></div>
+<div id="overview" class="ov"><h4>Plan de la séance</h4><div class="grid"></div></div>
+<div id="help" class="ov"><h4>Raccourcis</h4>
+  <table>
+    <tr><td><kbd>→</kbd> <kbd>Espace</kbd></td><td>Suivant (révèle d’abord les éléments cachés)</td></tr>
+    <tr><td><kbd>←</kbd></td><td>Précédent</td></tr>
+    <tr><td><kbd>O</kbd></td><td>Aperçu de toutes les diapositives</td></tr>
+    <tr><td><kbd>N</kbd></td><td>Notes de l’enseignant</td></tr>
+    <tr><td><kbd>T</kbd></td><td>Thème clair ou sombre</td></tr>
+    <tr><td><kbd>F</kbd></td><td>Plein écran</td></tr>
+    <tr><td><kbd>Échap</kbd></td><td>Fermer un panneau</td></tr>
+  </table>
+  <p class="small" style="margin-top:20px">Astuce : ajoutez <span class="mono">?all</span> à l’adresse pour tout afficher d’un coup.</p>
+</div>
+</div>
+</div>
+
+<script src="../assets/sim.js"></script>
+<script>
+(function () {
+  [].forEach.call(document.querySelectorAll('[data-pc]'), function (e) { e.innerHTML = Sim.pc(e.textContent); });
+  /* Dans une colonne flex, le texte mêlé à du gras doit rester dans un seul bloc. */
+  var INL = { B: 1, I: 1, EM: 1, STRONG: 1, BR: 1, SUB: 1, SUP: 1, A: 1 };
+  [].forEach.call(document.querySelectorAll('.panel.col'), function (p) {
+    var kids = [].slice.call(p.childNodes), run = [];
+    function flush() { if (!run.length) return; var d = document.createElement('div'); p.insertBefore(d, run[0]); run.forEach(function (n) { d.appendChild(n); }); run = []; }
+    kids.forEach(function (n) {
+      var inline = (n.nodeType === 3 && n.textContent.trim() !== '') || (n.nodeType === 1 && (INL[n.tagName] || (n.tagName === 'SPAN' && n.className.indexOf('kw') >= 0)));
+      if (inline) run.push(n); else flush();
+    });
+    flush();
+  });
+  [].forEach.call(document.querySelectorAll('[data-arr]'), function (e) {
+    var cls = {}, ptrs = {};
+    (e.getAttribute('data-cls') || '').split(',').forEach(function (p) { if (p) { var a = p.split(':'); cls[a[0]] = a[1]; } });
+    (e.getAttribute('data-p') || '').split(',').forEach(function (p) { if (p) { var a = p.split(':'); ptrs[a[0]] = +a[1]; } });
+    Sim.arrayViz(e, { values: e.getAttribute('data-arr').split(','), cls: cls, ptrs: ptrs, cw: +e.getAttribute('data-cw') || 72 });
+  });
+  Sim.guess('#sim-guess');
+  Sim.race('#sim-race');
+  Sim.raceBars('#sim-bars');
+  Sim.sum('#sim-sum');
+  Sim.halving('#sim-halving');
+  Sim.handshake('#sim-hand');
+  Sim.subsets('#sim-subsets');
+  Sim.growth('#sim-growth');
+  Sim.times('#sim-times');
+  Sim.contrib('#sim-contrib');
+  Sim.simplify('#sim-simplify');
+  Sim.bigO('#sim-bigo');
+  Sim.cases('#sim-cases');
+  Sim.loops('#sim-loops');
+  Sim.fact('#sim-fact');
+  Sim.fact('#sim-fact2', { mode: 'nobase' });
+  Sim.fib('#sim-fib1', 4);
+  Sim.fib('#sim-fib2', 5, 2);
+  Sim.split('#sim-split');
+  Sim.masterBars('#sim-mbars');
+  Sim.master('#sim-master');
+  Sim.quiz('#q1', { q: 'Pourquoi compte-t-on des opérations plutôt que des secondes ?', opts: ['Parce que les secondes sont difficiles à mesurer avec un chronomètre', 'Parce que le nombre d’opérations ne dépend ni de la machine ni du langage', 'Parce que les ordinateurs récents sont tous aussi rapides', 'Parce que le temps ne dépend pas de la taille de l’entrée'], ans: 1, why: 'Le nombre d’opérations est une propriété de l’algorithme. Les secondes changent avec la machine, le compilateur et la charge du moment.' });
+  Sim.quiz('#q2', { q: 'Un algorithme coûte T(n) = 3n + 4. Pour n = 1 000, il fait 3 004 opérations. Environ combien pour n = 2 000 ?', opts: ['environ 3 004', 'environ 6 000', 'environ 9 000', 'environ 12 000'], ans: 1, why: 'Le coût est linéaire : quand n double, le travail double aussi. 3 × 2 000 + 4 = 6 004.' });
+  Sim.quiz('#q3', { q: 'Un algorithme dont le coût est proportionnel à n² met 1 seconde pour n = 1 000. Combien de temps pour n = 10 000 ?', opts: ['environ 10 secondes', 'environ 100 secondes', 'environ 1 000 secondes', 'environ 2 secondes'], ans: 1, why: 'n est multiplié par 10, donc n × n est multiplié par 10 × 10 = 100. Le temps passe de 1 s à environ 100 s.' });
+  Sim.quiz('#q4', { q: 'Quelle est la complexité de T(n) = 5n³ + 2n² + 7 ?', opts: ['Θ(n²)', 'Θ(n³)', 'Θ(5n³)', 'Θ(n⁵)'], ans: 1, why: 'On garde le terme dominant n³ et on supprime la constante 5. Θ(5n³) n’est pas une forme simplifiée.' });
+  Sim.quiz('#q5', { q: 'Que vaut la complexité de : pour i de 1 à n faire, pour j de 1 à i faire, opération() ?', opts: ['Θ(n)', 'Θ(n log n)', 'Θ(n²)', 'Θ(n³)'], ans: 2, why: 'Le nombre d’exécutions est 1 + 2 + … + n = n(n+1)/2. On supprime la constante ½ et le terme n : Θ(n²).' });
+  Sim.quiz('#q6', { q: 'Résolvez T(n) = 4·T(n/2) + n avec le théorème maître.', opts: ['Θ(n)', 'Θ(n log n)', 'Θ(n²)', 'Θ(n⁴)'], ans: 2, why: 'a = 4, b = 2, d = 1. log₂ 4 = 2 est plus grand que d = 1 : cas 1, les feuilles dominent, donc Θ(n²).' });
+})();
+</script>
+<script src="../assets/deck.js"></script>
+</body>
+</html>

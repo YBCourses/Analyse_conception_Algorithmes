@@ -1,0 +1,96 @@
+/* Charte inspirée de l'INPT : bleu institutionnel, ardoise, blanc. Police Open Sans.
+   Les couleurs sont des jetons ; clair et sombre sont définis ici pour tout le site. */
+:root {
+  --blue: #3D8FD4;
+  --accent: #1F6FB5;
+  --accent-soft: #E1EFFB;
+  --head: #0F3557;
+  --bg: #F4F7FA;
+  --surface: #FFFFFF;
+  --surface-2: #E9F0F7;
+  --panel: #EEF3F8;
+  --fg: #1B1D1E;
+  --muted: #536071;
+  --line: #D3DDE8;
+  --code-bg: #0E1C2B;
+  --code-fg: #E6EEF7;
+  --code-dim: #8398AE;
+  --code-kw: #7CC0FF;
+  --code-hl: rgba(61, 143, 212, .32);
+  --ok: #17794B;
+  --ok-soft: #DCF2E6;
+  --warn: #9A5B00;
+  --warn-soft: #FCEBC8;
+  --bad: #B3321F;
+  --bad-soft: #F8DCD7;
+  --letter: #DAE3ED;
+  --cover-bg: #0B2A47;
+  --cover-fg: #F3F8FD;
+  --cover-accent: #6DB3EE;
+  --c-one: #7B8A9A;
+  --c-log: #13896A;
+  --c-n: #1F6FB5;
+  --c-nlog: #7A4FC2;
+  --c-n2: #C98200;
+  --c-n3: #CF5220;
+  --c-exp: #BE3030;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font: 'Open Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --accent: #6DB3EE;
+    --accent-soft: #14304B;
+    --head: #E9F3FD;
+    --bg: #0C1621;
+    --surface: #132131;
+    --surface-2: #1A2D42;
+    --panel: #172A3E;
+    --fg: #E8EEF5;
+    --muted: #9DAFC1;
+    --line: #25384C;
+    --ok: #4CC58A;
+    --ok-soft: #123626;
+    --warn: #F0B34D;
+    --warn-soft: #3D2C0B;
+    --bad: #FF8E7D;
+    --bad-soft: #43201B;
+    --letter: #060C13;
+    --c-one: #9AAABA;
+    --c-log: #3CCBA0;
+    --c-n: #6DB3EE;
+    --c-nlog: #B293F0;
+    --c-n2: #F0B34D;
+    --c-n3: #FF9A6B;
+    --c-exp: #FF7D7D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --accent: #6DB3EE;
+  --accent-soft: #14304B;
+  --head: #E9F3FD;
+  --bg: #0C1621;
+  --surface: #132131;
+  --surface-2: #1A2D42;
+  --panel: #172A3E;
+  --fg: #E8EEF5;
+  --muted: #9DAFC1;
+  --line: #25384C;
+  --ok: #4CC58A;
+  --ok-soft: #123626;
+  --warn: #F0B34D;
+  --warn-soft: #3D2C0B;
+  --bad: #FF8E7D;
+  --bad-soft: #43201B;
+  --letter: #060C13;
+  --c-one: #9AAABA;
+  --c-log: #3CCBA0;
+  --c-n: #6DB3EE;
+  --c-nlog: #B293F0;
+  --c-n2: #F0B34D;
+  --c-n3: #FF9A6B;
+  --c-exp: #FF7D7D;
+  color-scheme: dark;
+}
