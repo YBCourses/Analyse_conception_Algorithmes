@@ -8,82 +8,99 @@
 <link rel="stylesheet" href="../assets/theme.css">
 <link rel="stylesheet" href="../assets/doc.css">
 </head>
-<body>
+<body data-tp="tp1" data-seance="1" data-titre="TP 1 · Mesurer la complexité" data-fichiers="tp1.c et tp1.py">
 <header class="top"><div class="gut">
   <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
   <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 1</div>
   <h1>TP 1 · Mesurer la complexité</h1>
-  <div class="meta"><span>Durée : 1 heure</span><span>Langage : C ou Python (au choix)</span><span>Yassine Ben-Aboud</span></div>
+  <div class="meta"><span>Durée : 1 heure</span><span>Langages : C et Python</span><span>Yassine Ben-Aboud</span></div>
   <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a href="support.html">Support de cours</a><a class="cur" href="tp.html">Sujet du TP 1</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
 </div></header>
 
 <div class="gut layout">
 <aside class="toc"><h4>Sommaire</h4>
-  <a href="#but">Objectifs</a>
+  <a href="#identite">Vos informations</a>
+  <a href="#mode">Mode d’emploi</a>
   <a href="#demarrer">Pour démarrer</a>
   <a href="#p1">Partie 1 · Compter</a>
   <a href="#p2">Partie 2 · Chronométrer</a>
   <a href="#p3">Partie 3 · Un tri</a>
   <a href="#p4">Partie 4 · Bonus</a>
-  <a href="#rendu">À rendre</a>
+  <a href="#envoi">Envoyer le compte rendu</a>
   <a href="#aide">Aide</a>
 </aside>
 <article>
 
-<h2 id="but">Objectifs</h2>
-<p>Vous allez vérifier par l’expérience ce que le cours a prédit : le nombre d’opérations d’un algorithme, et son temps d’exécution, dépendent de la <b>taille n</b> selon sa <b>famille de croissance</b>.</p>
-<ul>
-  <li>compter les comparaisons de la recherche séquentielle et de la recherche dichotomique ;</li>
-  <li>chronométrer ces recherches et un tri, et lire les <b>rapports</b> entre les temps quand n grandit ;</li>
-  <li>reconnaître une complexité linéaire, logarithmique et quadratique à partir de mesures.</li>
-</ul>
+<h2 id="identite">Vos informations</h2>
+<div class="ident">
+  <label>Nom<input id="f-nom" data-k="nom" autocomplete="family-name" placeholder="Nom de famille"></label>
+  <label>Prénom<input id="f-prenom" data-k="prenom" autocomplete="given-name" placeholder="Prénom"></label>
+  <label>Groupe ou filière<input id="f-groupe" data-k="groupe" placeholder="Par exemple : 1A, groupe 2"></label>
+  <label>Binôme (facultatif)<input id="f-binome" data-k="binome" placeholder="Nom et prénom de votre binôme"></label>
+</div>
+<p class="small" style="font-size:14px;color:var(--muted);margin-top:10px">Ces informations figureront dans votre fichier de compte rendu. Tout ce que vous saisissez dans cette page est enregistré automatiquement dans votre navigateur : vous pouvez fermer la page et reprendre plus tard, sur le même ordinateur.</p>
+
+<h2 id="mode">Mode d’emploi du TP</h2>
+<div class="stepline"><b class="num">1</b><div><b>Renseignez vos informations</b> ci-dessus.</div></div>
+<div class="stepline"><b class="num">2</b><div><b>Téléchargez</b> <code>tp1.c</code> et <code>tp1.py</code>, puis <b>complétez</b> les deux fichiers (deux petits TODO dans chacun) et <b>testez-les</b>.</div></div>
+<div class="stepline"><b class="num">3</b><div><b>Remplissez les tableaux</b> de cette page avec ce que vos programmes affichent, et <b>répondez aux questions</b>.</div></div>
+<div class="stepline"><b class="num">4</b><div><b>Exportez</b> votre compte rendu en JSON (section « Envoyer le compte rendu »), puis envoyez à l’enseignant <b>trois fichiers</b> : le JSON, votre <code>tp1.c</code> complété et votre <code>tp1.py</code> complété.</div></div>
 <div class="callout">Les temps dépendent de votre machine. Ce qui compte, ce sont les <b>rapports</b> : « quand n est multiplié par 10, le temps est multiplié par… ».</div>
 
 <h2 id="demarrer">Pour démarrer</h2>
-<p>Téléchargez le code de départ dans le langage de votre choix (si vous finissez tôt, refaites le TP dans l’autre).</p>
+<p>Vous allez vérifier par l’expérience ce que le cours a prédit : le nombre d’opérations d’un algorithme, et son temps d’exécution, dépendent de la <b>taille n</b> selon sa <b>famille de croissance</b>. Faites le TP <b>d’abord en C, puis en Python</b>. Les deux fichiers sont identiques dans leur structure.</p>
 <p><a class="btn" href="../files/s1/tp1.c" download>Télécharger tp1.c</a><a class="btn" href="../files/s1/tp1.py" download>Télécharger tp1.py</a></p>
 <div class="tabs">
 <div><div class="cap">C</div><pre class="code" data-lang="terminal">gcc tp1.c -o tp1 -O0
 ./tp1            # sous Windows : tp1.exe</pre></div>
 <div><div class="cap">Python</div><pre class="code" data-lang="terminal">python tp1.py    # ou python3 tp1.py</pre></div>
 </div>
-<p>Le fichier contient les fonctions du cours : <code>recherche_sequentielle</code>, <code>recherche_dichotomique</code> et <code>tri_insertion</code>, plus des fonctions <code>partie1()</code> à <code>partie4()</code> qui font les mesures. Deux endroits sont à compléter, marqués <code>TODO 1</code> et <code>TODO 2</code>. Au départ, seule la partie 1 est active.</p>
+<p>Chaque fichier contient <code>recherche_sequentielle</code>, <code>recherche_dichotomique</code> et <code>tri_insertion</code>, plus des fonctions <code>partie1()</code> à <code>partie4()</code> qui font les mesures. Deux endroits sont à compléter : <code>TODO 1</code> et <code>TODO 2</code>. Au départ, seule la partie 1 est active.</p>
 <div class="callout">Un tableau trié de n nombres est construit pour vous : <code>0, 2, 4, 6, …</code>. On cherche la valeur <b>2n + 1</b>. Elle est <b>absente</b> et plus grande que tous les éléments : c’est le <b>pire cas</b> pour les deux méthodes.</div>
 
 <h2 id="p1">Partie 1 · Compter les comparaisons <span class="dur">15 min</span></h2>
 <div class="step-tp"><b>1.1</b> Lisez <code>recherche_sequentielle</code> : repérez la ligne qui incrémente <code>compteur</code>. C’est la <b>comparaison</b> que l’on compte, l’opération élémentaire du chapitre 1.</div>
-<div class="step-tp"><b>1.2 · TODO 1</b> Dans <code>recherche_dichotomique</code>, ajoutez <b>une seule ligne</b> qui compte une comparaison. Indice : une comparaison a lieu à chaque passage dans la boucle, juste avant de tester <code>t[milieu] == x</code>.</div>
-<div class="step-tp"><b>1.3</b> Compilez et exécutez. Recopiez les résultats et complétez les colonnes de prédiction avec les formules du cours.</div>
-<div class="tw"><table class="tbl">
-  <tr><th class="num">n</th><th class="num">Séquentielle (mesuré)</th><th class="num">Prédit : n</th><th class="num">Dichotomique (mesuré)</th><th class="num">Prédit : ⌊log₂ n⌋ + 1</th></tr>
-  <tr><td class="num">16</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">1 024</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">1 000 000</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+<div class="step-tp"><b>1.2 · TODO 1</b> Dans <code>recherche_dichotomique</code>, ajoutez <b>une seule ligne</b> qui compte une comparaison. Indice : une comparaison a lieu à chaque passage dans la boucle, juste avant de tester <code>t[milieu] == x</code>. Faites-le dans <b>les deux fichiers</b>.</div>
+<div class="step-tp"><b>1.3</b> Exécutez. Recopiez les résultats dans le tableau et complétez les colonnes de prédiction avec les formules du cours.</div>
+<div class="tw"><table class="tbl" data-table="p1" data-title="Partie 1 · comparaisons au pire cas">
+  <tr><th class="num">n</th><th>Séquentielle (C)</th><th>Séquentielle (Python)</th><th>Prédit : n</th><th>Dichotomique (C)</th><th>Dichotomique (Python)</th><th>Prédit : ⌊log₂ n⌋ + 1</th></tr>
+  <tr><td class="num">16</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">1 024</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">1 000 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
 </table></div>
 <p><b>Questions</b></p>
 <ol>
-  <li>Les mesures coïncident-elles avec les prédictions ? Si ce n’est pas le cas, cherchez pourquoi.</li>
-  <li>Quand n passe de 1 024 à 1 000 000 (environ × 1 000), par combien le nombre de comparaisons est-il multiplié pour chaque méthode ?</li>
-  <li>Sans exécuter, prédisez le nombre de comparaisons de la dichotomique pour n = 2 000 000. (Aide : log₂ 1 000 000 ≈ 19,9.) Vérifiez en modifiant la liste des tailles.</li>
+  <li data-q="p1_q1">Les mesures coïncident-elles avec les prédictions ? Si ce n’est pas le cas, cherchez pourquoi.</li>
+  <li data-q="p1_q2">Quand n passe de 1 024 à 1 000 000 (environ × 1 000), par combien le nombre de comparaisons est-il multiplié pour chaque méthode ?</li>
+  <li data-q="p1_q3">Sans exécuter, prédisez le nombre de comparaisons de la dichotomique pour n = 2 000 000. (Aide : log₂ 1 000 000 ≈ 19,9.) Vérifiez en modifiant la liste des tailles.</li>
 </ol>
 
 <h2 id="p2">Partie 2 · Chronométrer <span class="dur">15 min</span></h2>
-<p>Dans <code>main</code> (C) ou en bas du fichier (Python), <b>activez <code>partie2()</code></b> en supprimant les marques de commentaire. Elle mesure le temps moyen d’une recherche, en millisecondes. Chaque recherche est répétée plusieurs fois, puis on divise : un seul passage serait trop court pour être mesuré.</p>
-<div class="tw"><table class="tbl">
-  <tr><th class="num">n</th><th class="num">Séquentielle (ms)</th><th class="num">Rapport avec la ligne précédente</th><th class="num">Dichotomique (ms)</th><th class="num">Rapport avec la ligne précédente</th></tr>
-  <tr><td class="num">100 000</td><td class="fill"></td><td class="num">—</td><td class="fill"></td><td class="num">—</td></tr>
-  <tr><td class="num">1 000 000 (C) · 1 000 000 (Python)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">10 000 000 (C) · 5 000 000 (Python)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+<p><b>Activez <code>partie2()</code></b> dans <code>main</code> (C) ou en bas du fichier (Python) en supprimant les marques de commentaire. Elle mesure le temps moyen d’une recherche, en millisecondes. Chaque recherche est répétée plusieurs fois, puis on divise : un seul passage serait trop court pour être mesuré.</p>
+<p><b>En C</b></p>
+<div class="tw"><table class="tbl" data-table="p2c" data-title="Partie 2 · temps par recherche (C)">
+  <tr><th class="num">n</th><th>Séquentielle (ms)</th><th>Rapport avec la ligne précédente</th><th>Dichotomique (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">100 000</td><td data-in></td><td class="num">—</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">1 000 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">10 000 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>En Python</b></p>
+<div class="tw"><table class="tbl" data-table="p2py" data-title="Partie 2 · temps par recherche (Python)">
+  <tr><th class="num">n</th><th>Séquentielle (ms)</th><th>Rapport avec la ligne précédente</th><th>Dichotomique (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">100 000</td><td data-in></td><td class="num">—</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">1 000 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">5 000 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
 </table></div>
 <p><b>Questions</b></p>
 <ol>
-  <li>Quand n est multiplié par 10 (en C), par combien le temps de la recherche séquentielle est-il multiplié ? Et celui de la dichotomique ?</li>
-  <li>Ces rapports sont-ils cohérents avec la partie 1 ? Que dit le test du doublement du cours sur la famille <i>n</i> et la famille <i>log n</i> ?</li>
-  <li>Pourquoi répète-t-on chaque recherche avant de diviser le temps total ?</li>
+  <li data-q="p2_q1">Quand n est multiplié par 10 (en C), par combien le temps de la recherche séquentielle est-il multiplié ? Et celui de la dichotomique ?</li>
+  <li data-q="p2_q2">Ces rapports sont-ils cohérents avec la partie 1 ? Que dit le test du doublement du cours sur la famille <i>n</i> et la famille <i>log n</i> ?</li>
+  <li data-q="p2_q3">Pourquoi répète-t-on chaque recherche avant de diviser le temps total ?</li>
+  <li data-q="p2_q4">Comparez le temps de la recherche séquentielle en C et en Python pour le même n. Que remarquez-vous, et cela change-t-il les rapports entre les lignes ?</li>
 </ol>
 
 <h2 id="p3">Partie 3 · Un tri quadratique <span class="dur">15 min</span></h2>
-<div class="step-tp"><b>3.1 · TODO 2</b> Complétez <code>tri_insertion</code>. Le principe, en pseudo-code :</div>
+<div class="step-tp"><b>3.1 · TODO 2</b> Complétez <code>tri_insertion</code> dans les deux fichiers. Le principe, en pseudo-code :</div>
 <pre class="code" data-lang="pseudo-code">pour i de 1 à n-1 faire
     cle ← t[i]                         // on met t[i] de côté
     j ← i - 1
@@ -92,51 +109,76 @@
         j ← j - 1
     t[j+1] ← cle                       // on pose cle dans le trou</pre>
 <div class="step-tp"><b>3.2</b> Testez votre tri sur un petit tableau (par exemple 5, 2, 8, 1, 9) en affichant avant et après. <b>Ne passez à la suite que lorsqu’il trie correctement.</b></div>
-<div class="step-tp"><b>3.3</b> Activez <code>partie3()</code> : elle chronomètre le tri sur des tableaux aléatoires de taille n, puis 2n, 4n, 8n.</div>
-<div class="tw"><table class="tbl">
-  <tr><th class="num">n</th><th class="num">Temps (ms)</th><th class="num">Rapport avec la ligne précédente</th></tr>
-  <tr><td class="num">n₀ (4 000 en C · 1 000 en Python)</td><td class="fill"></td><td class="num">—</td></tr>
-  <tr><td class="num">2 n₀</td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">4 n₀</td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">8 n₀</td><td class="fill"></td><td class="fill"></td></tr>
+<div class="step-tp"><b>3.3</b> Activez <code>partie3()</code> : elle chronomètre le tri sur des tableaux aléatoires dont la taille double à chaque ligne.</div>
+<p><b>En C</b></p>
+<div class="tw"><table class="tbl" data-table="p3c" data-title="Partie 3 · tri par insertion (C)">
+  <tr><th class="num">n</th><th>Temps (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">4 000</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">8 000</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">16 000</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">32 000</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>En Python</b></p>
+<div class="tw"><table class="tbl" data-table="p3py" data-title="Partie 3 · tri par insertion (Python)">
+  <tr><th class="num">n</th><th>Temps (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">1 000</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">2 000</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">4 000</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">8 000</td><td data-in></td><td data-in></td></tr>
 </table></div>
 <p><b>Questions</b></p>
 <ol>
-  <li>Quand n double, par combien le temps est-il multiplié ? Quelle famille de croissance reconnaissez-vous ?</li>
-  <li>Si le tri met 1 seconde pour n = 10 000, estimez le temps pour n = 100 000, puis pour n = 1 000 000. Exprimez le dernier en minutes.</li>
-  <li>Dans quel cas le tri par insertion serait-il très rapide (de l’ordre de n) ? Pourquoi ?</li>
+  <li data-q="p3_q1">Quand n double, par combien le temps est-il multiplié ? Quelle famille de croissance reconnaissez-vous ?</li>
+  <li data-q="p3_q2">Si le tri met 1 seconde pour n = 10 000, estimez le temps pour n = 100 000, puis pour n = 1 000 000. Exprimez le dernier en minutes.</li>
+  <li data-q="p3_q3">Dans quel cas le tri par insertion serait-il très rapide (de l’ordre de n) ? Pourquoi ?</li>
 </ol>
 
 <h2 id="p4">Partie 4 · Bonus : Fibonacci récursif <span class="dur">10 min</span></h2>
-<p>Activez <code>partie4()</code> : elle chronomètre <code>fib(n)</code> pour plusieurs valeurs de n, par pas de 2.</p>
-<div class="tw"><table class="tbl">
-  <tr><th class="num">n</th><th class="num">Temps (ms)</th><th class="num">Rapport avec la ligne précédente</th></tr>
-  <tr><td class="num">n₁</td><td class="fill"></td><td class="num">—</td></tr>
-  <tr><td class="num">n₁ + 2</td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">n₁ + 4</td><td class="fill"></td><td class="fill"></td></tr>
-  <tr><td class="num">n₁ + 6</td><td class="fill"></td><td class="fill"></td></tr>
+<p>Activez <code>partie4()</code> : elle chronomètre <code>fib(n)</code> pour plusieurs valeurs de n, par pas de 2. Recopiez les quatre premières lignes.</p>
+<p><b>En C</b></p>
+<div class="tw"><table class="tbl" data-table="p4c" data-title="Partie 4 · fib récursif (C)">
+  <tr><th class="num">n</th><th>Temps (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">30</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">32</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">34</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">36</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>En Python</b></p>
+<div class="tw"><table class="tbl" data-table="p4py" data-title="Partie 4 · fib récursif (Python)">
+  <tr><th class="num">n</th><th>Temps (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">20</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">22</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">24</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">26</td><td data-in></td><td data-in></td></tr>
 </table></div>
 <ol>
-  <li>Par quel facteur le temps est-il multiplié quand n augmente de <b>2</b> ? Et quand n augmente de 1 ?</li>
-  <li>Estimez le temps de fib(50) à partir de vos mesures. Est-ce réaliste d’attendre ce résultat ?</li>
-  <li>Expliquez ce résultat avec l’arbre d’appels vu en cours : que fait l’ordinateur de pénible ?</li>
+  <li data-q="p4_q1">Par quel facteur le temps est-il multiplié quand n augmente de <b>2</b> ? Et quand n augmente de 1 ?</li>
+  <li data-q="p4_q2">Estimez le temps de fib(50) à partir de vos mesures. Est-ce réaliste d’attendre ce résultat ?</li>
+  <li data-q="p4_q3">Expliquez ce résultat avec l’arbre d’appels vu en cours : que fait l’ordinateur de pénible ?</li>
 </ol>
 
-<h2 id="rendu">À rendre</h2>
-<ul>
-  <li>Les trois tableaux remplis (quatre avec le bonus), avec le langage et la machine utilisés ;</li>
-  <li>vos réponses aux questions, en une ou deux phrases chacune ;</li>
-  <li>votre fichier de code complété (<code>tp1.c</code> ou <code>tp1.py</code>).</li>
-</ul>
+<h2 id="envoi">Envoyer le compte rendu</h2>
+<div class="callout">Votre compte rendu se compose de <b>trois fichiers</b> : l’export JSON de cette page, votre <code>tp1.c</code> complété et votre <code>tp1.py</code> complété.</div>
+<div class="stepline"><b class="num">1</b><div><b>Vérifiez</b> que vos deux programmes compilent ou s’exécutent et qu’ils donnent les bonnes valeurs dans la partie 1. Cochez ensuite :
+  <label class="chk"><input type="checkbox" data-k="code_c_ok"> J’ai complété et testé <code>tp1.c</code> (TODO 1 et TODO 2)</label>
+  <label class="chk"><input type="checkbox" data-k="code_py_ok"> J’ai complété et testé <code>tp1.py</code> (TODO 1 et TODO 2)</label></div></div>
+<div class="stepline"><b class="num">2</b><div><b>Exportez</b> votre compte rendu. Le fichier <code>TP1_NOM_Prenom.json</code> contient vos informations, les tableaux, vos réponses et l’état des cases à cocher.
+  <div class="btns"><button class="btn" id="btn-export" type="button">Exporter mon compte rendu (JSON)</button><button class="btn sec" id="btn-copy" type="button">Copier le JSON</button></div>
+  <div id="export-msg" class="msg" role="status"></div></div></div>
+<div class="stepline"><b class="num">3</b><div><b>Envoyez</b> à l’enseignant, dans <b>un seul message</b>, les trois fichiers : <code>TP1_NOM_Prenom.json</code>, <code>tp1.c</code> et <code>tp1.py</code>. Renommez les deux fichiers de code avec votre nom (par exemple <code>tp1_NOM.c</code>). L’adresse ou la plateforme d’envoi est communiquée en séance.</div></div>
+<div class="warn" style="margin-top:16px"><b>Reprendre un travail plus tard</b><br>Sur le même ordinateur, la page se souvient de tout. Sur un autre ordinateur, importez votre JSON : <label class="btn sec" style="cursor:pointer;margin-left:6px">Importer un JSON<input id="file-import" type="file" accept=".json,application/json" style="display:none"></label> <button class="btn sec" id="btn-reset" type="button" style="margin-left:6px">Tout effacer</button></div>
+<div class="savebar"><span id="save-status">Brouillon enregistré dans ce navigateur.</span><b id="progress"></b></div>
 
 <h2 id="aide">Aide</h2>
 <details><summary>Le compilateur affiche une erreur</summary><div>Vérifiez que vous avez bien ajouté un point-virgule à la fin de la ligne du TODO 1. En C, <code>compteur</code> est de type <code>long</code> : on l’affiche avec <code>%ld</code>.</div></details>
 <details><summary>La dichotomique affiche 0 comparaison</summary><div>C’est normal tant que le TODO 1 n’est pas fait : la ligne qui compte manque.</div></details>
-<details><summary>Mes temps sont tous égaux à 0</summary><div>Le chronomètre n’est pas assez précis pour une opération très courte. Augmentez le nombre de répétitions (<code>reps_dic</code> en C, <code>reps_dic</code> en Python).</div></details>
-<details><summary>Le tri ne trie pas</summary><div>Testez à la main avec 5, 2, 8, 1, 9. Les erreurs classiques : oublier de déplacer <code>cle</code> après la boucle, ou partir de <code>i = 0</code> au lieu de <code>i = 1</code>. En Python, retirez le mot <code>pass</code> une fois la boucle écrite.</div></details>
+<details><summary>Mes temps sont tous égaux à 0</summary><div>Le chronomètre n’est pas assez précis pour une opération très courte. Augmentez le nombre de répétitions (<code>reps_dic</code> dans les deux fichiers).</div></details>
+<details><summary>Le tri ne trie pas</summary><div>Testez à la main avec 5, 2, 8, 1, 9. Les erreurs classiques : oublier de poser <code>cle</code> après la boucle, ou partir de <code>i = 0</code> au lieu de <code>i = 1</code>. En Python, retirez le mot <code>pass</code> une fois la boucle écrite.</div></details>
 <details><summary>Mon ordinateur est lent ou très rapide</summary><div>Aucun souci : seuls les <b>rapports</b> comptent. Si une mesure dure plus de 30 secondes, diminuez la taille la plus grande dans la fonction concernée.</div></details>
+<details><summary>Le bouton d’export ne télécharge rien</summary><div>Utilisez « Copier le JSON », collez le contenu dans un fichier texte nommé <code>TP1_NOM_Prenom.json</code>, puis envoyez ce fichier.</div></details>
 </article>
 </div>
 <script src="../assets/doc.js"></script>
+<script src="../assets/tp.js"></script>
 </body>
 </html>
