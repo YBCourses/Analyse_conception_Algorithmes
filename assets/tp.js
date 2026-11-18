@@ -90,7 +90,7 @@
     if (!check()) return;
     var p = payload(), name = ID.toUpperCase() + '_' + slug(p.etudiant.nom).toUpperCase() + '_' + slug(p.etudiant.prenom) + '.json', c = counts();
     download(name, JSON.stringify(p, null, 2));
-    say('Fichier « ' + name + ' » exporté (' + c.cellsDone + '/' + c.cells + ' cases, ' + c.qDone + '/' + c.q + ' réponses). Envoyez-le avec vos fichiers de code' + (body.dataset.fichiers ? ' (' + body.dataset.fichiers + ')' : '') + '.', false);
+    say('Fichier « ' + name + ' » exporté (' + c.cellsDone + '/' + c.cells + ' cases, ' + c.qDone + '/' + c.q + ' réponses). Déposez-le sur Classroom avec vos fichiers de code' + (body.dataset.fichiers ? ' (' + body.dataset.fichiers + ')' : '') + '.', false);
   });
   var bc = document.getElementById('btn-copy');
   if (bc) bc.addEventListener('click', function () {
