@@ -1078,5 +1078,5 @@
     root.append(h('div', { class: 'q', html: cfg.q }), opts, why);
   }
 
-  window.Sim = { tracer: tracer, arrayViz: arrayViz, sum: sumSim, guess: guess, race: race, raceBars: raceBars, growth: growth, times: times, halving: halving, handshake: handshake, subsets: subsets, contrib: contrib, simplify: simplify, bigO: bigO, cases: casesSim, loops: loops, hand: hand, mergeStep: mergeStep, mergeAnim: mergeAnim, fact: factAnim, fib: fibAnim, split: splitTree, masterBars: masterBars, master: master, quiz: quiz, h: h, pc: pc };
+  window.Sim = { tracer: tracer, arrayViz: arrayViz, sum: sumSim, guess: guess, race: race, raceBars: raceBars, growth: growth, times: times, halving: halving, handshake: handshake, subsets: subsets, contrib: contrib, simplify: simplify, bigO: bigO, cases: casesSim, loops: loops, hand: hand, mergeStep: mergeStep, mergeAnim: mergeAnim, fact: factAnim, fib: fibAnim, split: splitTree, masterBars: masterBars, master: master, quiz: quiz, h: h, pc: pc, sv: sv, stepper: stepper, codeBlock: codeBlock, btn: btn, clearOn: clearOn, sup: sup, fr: fr };
 })();

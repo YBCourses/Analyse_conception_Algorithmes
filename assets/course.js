@@ -22,9 +22,12 @@ window.COURSE = {
       ]
     },
     {
-      n: 2, titre: "Structures linéaires", duree: "3 h", statut: "bientot",
-      resume: "Rappel de la mémoire en C, listes chaînées, piles et files.",
-      diaporama: null, support: null, fichiers: []
+      n: 2, titre: "Structures linéaires", duree: "3 h · cours, TD et TP", statut: "disponible",
+      resume: "Rappel de la mémoire en C, pointeurs, malloc et free, listes chaînées, piles et files.",
+      diaporama: "s2/slides.html", support: "s2/support.html", tp: "s2/tp.html",
+      fichiers: [
+        { nom: "TP 2 · code de départ en C", chemin: "files/s2/tp2.c", type: "C" }
+      ]
     },
     {
       n: 3, titre: "Arbres, tas et files de priorité", duree: "3 h", statut: "bientot",

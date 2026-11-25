@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support de cours · Séance 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/doc.css">
+</head>
+<body>
+<header class="top"><div class="gut">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 2</div>
+  <h1>Structures linéaires</h1>
+  <div class="meta"><span>Support de cours</span><span>Yassine Ben-Aboud</span><span>INPT · 2026–2027</span></div>
+  <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a class="cur" href="support.html">Support de cours</a><a href="tp.html">Sujet du TP 2</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
+</div></header>
+
+<div class="gut layout">
+<aside class="toc"><h4>Sommaire</h4>
+  <a href="#memoire">1 · La mémoire en C</a>
+  <a href="#tableau">2 · Tableau ou liste ?</a>
+  <a href="#liste">3 · La liste chaînée</a>
+  <a href="#pile">4 · La pile</a>
+  <a href="#file">5 · La file</a>
+  <a href="#code">6 · Code de référence</a>
+  <a href="#exercices">7 · Exercices corrigés</a>
+  <a href="#glossaire">8 · Glossaire</a>
+</aside>
+<article>
+
+<h2 id="memoire"><span class="n">1</span>La mémoire en C</h2>
+<h3>Variable, adresse, valeur</h3>
+<div class="def" data-t="Définition">Une <span class="kw">variable</span> est une case de la mémoire qui a un <b>nom</b>, une <b>valeur</b> et une <b>adresse</b>. L’adresse est le numéro de la case : elle ne change jamais pendant la vie de la variable. Un <code>int</code> occupe 4 octets : les adresses de variables voisines sont donc espacées de 4.</div>
+<pre class="code" data-lang="C">int main(void) {
+    int a = 5;          /* a : case n° 100, valeur 5  */
+    int b = 7;          /* b : case n° 104, valeur 7  */
+    int c = a + b;      /* c : case n° 108, valeur 12 */
+    a = 100;            /* la valeur change, le numéro de case jamais */
+    return 0;
+}</pre>
+<p>Les numéros de cases sont ici des nombres simples pour faciliter l’explication. Le TP vous fera observer les vrais numéros, affichés en hexadécimal.</p>
+<h3>Les variables locales</h3>
+<div class="def" data-t="Définition">Une <span class="kw">variable locale</span> est une variable déclarée <b>à l’intérieur d’une fonction</b>. Elle <b>naît</b> quand le programme exécute sa déclaration et <b>meurt</b> quand la fonction se termine : sa case est rendue et son contenu est perdu. Les variables locales sont rangées dans la zone appelée <b>la pile</b>, gérée automatiquement.</div>
+<pre class="code" data-lang="C">void compter(void) {
+    int x = 10;    /* x naît ici */
+}                  /* x meurt ici */
+
+int main(void) {
+    int a = 5;     /* a naît ici */
+    compter();
+    return 0;
+}                  /* a meurt ici */</pre>
+<p>Chaque appel de fonction dispose de son propre espace de variables locales : pendant que <code>compter</code> s’exécute, la pile contient <code>a</code> (de main) puis <code>x</code> (de compter). À la fin de <code>compter</code>, <code>x</code> disparaît.</p>
+<h3>Le pointeur</h3>
+<div class="def" data-t="Définition">Un <span class="kw">pointeur</span> est une variable dont la <b>valeur</b> est <b>l’adresse d’une autre case</b>, c’est-à-dire un numéro. On dit qu’il <b>désigne</b> cette case, et on le dessine par une flèche : la flèche n’est que le dessin du numéro rangé dans le pointeur.</div>
+<div class="tw"><table class="tbl">
+  <tr><th>Expression</th><th>Se lit</th><th>Avec <code>int a = 5; int *p = &amp;a;</code></th></tr>
+  <tr><td><code>int *p</code></td><td>déclare un pointeur p vers un entier</td><td></td></tr>
+  <tr><td><code>a</code></td><td>la valeur de a</td><td>5</td></tr>
+  <tr><td><code>&amp;a</code></td><td>l’adresse de a</td><td>100</td></tr>
+  <tr><td><code>p</code></td><td>la valeur de p, donc une adresse</td><td>100</td></tr>
+  <tr><td><code>*p</code></td><td>la case désignée par p</td><td>5</td></tr>
+  <tr><td><code>&amp;p</code></td><td>l’adresse de p lui-même</td><td>104</td></tr>
+  <tr><td><code>*p = 9</code></td><td>écrit 9 dans la case désignée</td><td>a vaut 9</td></tr>
+</table></div>
+<div class="keep"><b>p</b> est l’adresse, <b>*p</b> est la case. Ne les confondez jamais.</div>
+<h3>NULL</h3>
+<p><span class="kw">NULL</span> est une valeur de pointeur qui signifie « ne désigne aucune case ». Suivre un pointeur NULL (écrire <code>*p</code>) fait planter le programme : on teste <code>if (p != NULL)</code> avant. NULL marque aussi la <b>fin d’une liste chaînée</b>.</p>
+<h3>La pile et le tas</h3>
+<div class="tw"><table class="tbl">
+  <tr><th></th><th>La pile</th><th>Le tas</th></tr>
+  <tr><td><b>Contient</b></td><td>les variables locales des fonctions</td><td>des blocs réservés avec <code>malloc</code></td></tr>
+  <tr><td><b>Durée de vie</b></td><td>automatique : fin de la fonction</td><td>choisie par vous : jusqu’à <code>free</code></td></tr>
+  <tr><td><b>Taille</b></td><td>limitée (quelques Mo)</td><td>très grande</td></tr>
+  <tr><td><b>Risque</b></td><td>dépassement (récursion infinie)</td><td>fuite mémoire si on oublie <code>free</code></td></tr>
+</table></div>
+<h3>malloc, free et sizeof</h3>
+<ul>
+  <li><code>sizeof(T)</code> : le nombre d’octets d’un type T (<code>sizeof(int)</code> vaut 4).</li>
+  <li><code>malloc(n)</code> : réserve un bloc de n octets dans le tas et renvoie son adresse, ou <code>NULL</code> si la mémoire manque.</li>
+  <li><code>free(p)</code> : rend au système le bloc désigné par p.</li>
+</ul>
+<pre class="code" data-lang="C">int *p = malloc(sizeof(int));   /* p désigne un bloc de 4 octets du tas */
+*p = 42;                        /* on écrit dans le bloc */
+free(p);                        /* on rend le bloc : il n'est plus à nous */
+p = NULL;                       /* bonne habitude : plus d'adresse périmée */</pre>
+<div class="keep">Règle d’or : <b>chaque <code>malloc</code> doit avoir son <code>free</code></b>, une seule fois.</div>
+<h3>Une fonction reçoit des copies</h3>
+<p>En C, chaque paramètre est <b>copié</b> à l’appel. Pour qu’une fonction modifie une variable de l’appelant, on lui passe son <b>adresse</b>.</p>
+<div class="tabs">
+<div><div class="cap">Par valeur : ne modifie pas a</div><pre class="code" data-lang="C">void f(int x) {
+    x = 9;
+}
+
+int main(void) {
+    int a = 5;
+    f(a);           /* a vaut toujours 5 */
+    return 0;
+}</pre></div>
+<div><div class="cap">Par adresse : modifie a</div><pre class="code" data-lang="C">void g(int *y) {
+    *y = 9;
+}
+
+int main(void) {
+    int a = 5;
+    g(&amp;a);          /* a vaut maintenant 9 */
+    return 0;
+}</pre></div>
+</div>
+<h3>Structures et pointeurs vers structures</h3>
+<pre class="code" data-lang="C">struct Noeud {
+    int valeur;
+    struct Noeud *suivant;     /* adresse d'un autre nœud */
+};</pre>
+<p>Avec une variable <code>n</code>, on écrit <code>n.valeur</code>. Avec un pointeur <code>p</code>, on écrit <code>p-&gt;valeur</code>, qui équivaut à <code>(*p).valeur</code>.</p>
+<h3>Pointeur de pointeur : plusieurs étoiles</h3>
+<p>Un pointeur est une variable comme les autres : il a lui-même une adresse. On peut donc ranger <b>l’adresse d’un pointeur</b> dans un autre pointeur. Une étoile de plus dans la déclaration = un niveau de flèche de plus.</p>
+<pre class="code" data-lang="C">int main(void) {
+    int a = 5;          /* a  : case n° 100, valeur 5   */
+    int *p = &amp;a;        /* p  : case n° 104, valeur 100 */
+    int **pp = &amp;p;      /* pp : case n° 112, valeur 104 */
+    **pp = 9;           /* suit deux flèches : a vaut 9  */
+    *pp = NULL;         /* *pp est p : p vaut NULL       */
+    return 0;
+}</pre>
+<div class="tw"><table class="tbl">
+  <tr><th>Expression</th><th>Type</th><th>Vaut</th><th>Se lit</th></tr>
+  <tr><td><code>a</code></td><td><code>int</code></td><td>5</td><td>la valeur de a</td></tr>
+  <tr><td><code>p</code></td><td><code>int *</code></td><td>100</td><td>l’adresse de a</td></tr>
+  <tr><td><code>*p</code></td><td><code>int</code></td><td>5</td><td>la case désignée par p : a</td></tr>
+  <tr><td><code>pp</code></td><td><code>int **</code></td><td>104</td><td>l’adresse de p</td></tr>
+  <tr><td><code>*pp</code></td><td><code>int *</code></td><td>100</td><td>la case désignée par pp : p lui-même</td></tr>
+  <tr><td><code>**pp</code></td><td><code>int</code></td><td>5</td><td>deux flèches suivies : a</td></tr>
+</table></div>
+<div class="keep">Chaque <b>*</b> appliqué <b>suit une flèche</b> et fait perdre une étoile au type : <code>int **</code> → <code>int *</code> → <code>int</code>.</div>
+<h4 style="margin:26px 0 6px;color:var(--head)">À quoi servent deux étoiles : modifier un pointeur dans une fonction</h4>
+<p>Une fonction qui doit <b>modifier un pointeur</b> de l’appelant reçoit l’<b>adresse de ce pointeur</b>, donc un pointeur de pointeur. Sinon, elle ne travaille que sur une copie.</p>
+<div class="tabs">
+<div><div class="cap">Ne marche pas : q est une copie de p</div><pre class="code" data-lang="C">void alloue(int *q) {
+    q = malloc(sizeof(int));
+    *q = 7;
+}
+
+int main(void) {
+    int *p = NULL;
+    alloue(p);      /* p vaut toujours NULL ;
+                       le bloc est perdu (fuite) */
+    return 0;
+}</pre></div>
+<div><div class="cap">Marche : pp contient l’adresse de p</div><pre class="code" data-lang="C">void alloue(int **pp) {
+    *pp = malloc(sizeof(int));
+    **pp = 7;
+}
+
+int main(void) {
+    int *p = NULL;
+    alloue(&amp;p);     /* p désigne maintenant le bloc */
+    return 0;
+}</pre></div>
+</div>
+<p>C’est exactement le cas de la <b>tête d’une liste</b> : <code>Noeud *tete</code> est un pointeur, donc une fonction d’insertion qui doit le modifier reçoit un <code>Noeud **tete</code> et on l’appelle avec <code>inserer(&amp;tete, 5)</code>. Dans la fonction, <code>*tete</code> est la variable de l’appelant.</p>
+<h4 style="margin:26px 0 6px;color:var(--head)">Les matrices : un tableau de tableaux</h4>
+<p>Une matrice de 2 lignes et 3 colonnes peut se construire dans le tas comme <b>un tableau de 2 pointeurs</b>, chacun désignant <b>une ligne de 3 entiers</b>. Le type de <code>m</code> est <code>int **</code>.</p>
+<pre class="code" data-lang="C">int main(void) {
+    int **m = malloc(2 * sizeof(int *));   /* tableau de 2 pointeurs  */
+    m[0] = malloc(3 * sizeof(int));        /* ligne 0 : 3 entiers     */
+    m[1] = malloc(3 * sizeof(int));        /* ligne 1 : 3 entiers     */
+    m[1][2] = 6;                           /* ligne 1, colonne 2      */
+    free(m[0]);                            /* on libère les lignes... */
+    free(m[1]);
+    free(m);                               /* ...puis le tableau      */
+    return 0;
+}</pre>
+<div class="tw"><table class="tbl">
+  <tr><th>Expression</th><th>Type</th><th>Se lit</th></tr>
+  <tr><td><code>m</code></td><td><code>int **</code></td><td>l’adresse du tableau de pointeurs</td></tr>
+  <tr><td><code>m[1]</code></td><td><code>int *</code></td><td>l’adresse de la ligne 1 (une étoile de moins)</td></tr>
+  <tr><td><code>m[1][2]</code></td><td><code>int</code></td><td>la case n° 2 de la ligne 1 (encore une étoile de moins)</td></tr>
+</table></div>
+<p><code>m[1][2]</code> s’écrit aussi <code>*(*(m + 1) + 2)</code> : deux étoiles, donc deux flèches suivies. Les crochets sont une écriture plus lisible. On libère toujours les <b>lignes avant le tableau de pointeurs</b> : sinon on perdrait les adresses des lignes (fuite mémoire). Au-delà de deux étoiles (<code>int ***</code>, un tableau de matrices), le principe reste le même : une étoile par niveau de flèche.</p>
+<h3>Quatre erreurs classiques</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Erreur</th><th>Exemple</th><th>Conséquence</th></tr>
+  <tr><td><b>Fuite mémoire</b></td><td><code>p = malloc(…); p = malloc(…);</code></td><td>le premier bloc est perdu, personne ne peut le libérer</td></tr>
+  <tr><td><b>Pointeur NULL ou non initialisé</b></td><td><code>int *p = NULL; *p = 5;</code></td><td>plantage (erreur de segmentation)</td></tr>
+  <tr><td><b>Double free</b></td><td><code>free(p); free(p);</code></td><td>comportement indéfini ; <code>p = NULL</code> après le premier free l’évite</td></tr>
+  <tr><td><b>Pointeur pendant</b></td><td><code>free(p); *p = 9;</code></td><td>écriture dans un bloc qui n’est plus à nous : bug sournois</td></tr>
+</table></div>
+
+<h2 id="tableau"><span class="n">2</span>Tableau ou liste ?</h2>
+<p>Un <b>tableau</b> donne un accès direct : <code>t[i]</code> coûte une opération, car l’adresse se calcule (début + i × taille). Mais sa taille est fixe, et <b>insérer au début</b> oblige à décaler les n éléments : <b>Θ(n)</b>.</p>
+<div class="exemple"><b>Exemple</b>Pour insérer 9 au début de <code>[4, 7, 1, 8, 3]</code>, il faut faire <code>t[5] ← t[4]</code>, <code>t[4] ← t[3]</code>, …, <code>t[1] ← t[0]</code> (5 décalages), puis <code>t[0] ← 9</code>. Pour n = 1 000 000, c’est un million de décalages à chaque insertion.</div>
+<p>Idée : comme dans une chasse au trésor où chaque indice donne l’emplacement du suivant, on met dans chaque élément <b>l’adresse de l’élément suivant</b>. Les éléments n’ont plus besoin d’être voisins en mémoire : c’est la <b>liste chaînée</b>.</p>
+
+<h2 id="liste"><span class="n">3</span>La liste chaînée</h2>
+<div class="def" data-t="Définition">Un <span class="kw">nœud</span> est un bloc du tas qui contient une <b>valeur</b> et l’<b>adresse du nœud suivant</b>. Une <span class="kw">liste chaînée</span> est une suite de nœuds reliés ainsi. La variable <code>tete</code> désigne le premier ; le dernier nœud pointe vers <b>NULL</b>.</div>
+<p>Les nœuds sont dispersés dans le tas : leurs adresses ne se suivent pas, seules les flèches les relient. La tête est la seule entrée de la liste.</p>
+<h3>Parcourir</h3>
+<pre class="code" data-lang="pseudo-code">courant ← tete
+tant que courant ≠ NULL faire
+    afficher(courant.valeur)
+    courant ← courant.suivant</pre>
+<p>On visite chaque nœud une fois : <b>Θ(n)</b>.</p>
+<h3>Insérer au début</h3>
+<pre class="code" data-lang="pseudo-code">n ← nouveau nœud
+n.valeur ← 5
+n.suivant ← tete        // 1. le nouveau nœud désigne l'ancien premier
+tete ← n                // 2. la tête désigne le nouveau nœud</pre>
+<div class="warn">Si on inverse les deux dernières lignes, <code>tete ← n</code> d’abord, plus personne ne désigne l’ancienne liste : elle est <b>perdue</b>, et <code>n.suivant ← tete</code> fait pointer le nœud sur lui-même. <b>L’ordre des affectations décide si la liste survit.</b></div>
+<p>Quatre instructions, quelle que soit la longueur : <b>Θ(1)</b>. C’est la réponse à la question d’échauffement : tableau Θ(n), liste Θ(1).</p>
+<h3>Insérer à la fin</h3>
+<pre class="code" data-lang="pseudo-code">courant ← tete
+tant que courant.suivant ≠ NULL faire
+    courant ← courant.suivant
+n ← nouveau nœud (valeur 5, suivant NULL)
+courant.suivant ← n</pre>
+<p>Il faut parcourir la liste pour trouver le dernier nœud : <b>Θ(n)</b>. Avec une variable <code>queue</code> qui désigne en permanence le dernier nœud, l’insertion en fin devient <b>Θ(1)</b> (à condition de mettre <code>queue</code> à jour).</p>
+<h3>Rechercher</h3>
+<p>Parcours avec test <code>courant.valeur = x</code> : c’est la recherche séquentielle, <b>Θ(n)</b>. La recherche dichotomique est impossible : elle exige d’aller directement au milieu, et une liste n’offre pas d’accès direct.</p>
+<h3>Supprimer</h3>
+<pre class="code" data-lang="pseudo-code">// supprimer un nœud de valeur x (cas général)
+precedent ← tete ;  courant ← tete.suivant
+tant que courant.valeur ≠ x faire
+    precedent ← courant ;  courant ← courant.suivant
+precedent.suivant ← courant.suivant     // on court-circuite courant
+libérer(courant)
+
+// cas particulier : supprimer le premier nœud
+temp ← tete
+tete ← tete.suivant
+libérer(temp)</pre>
+<p>Trouver le nœud coûte <b>Θ(n)</b>, le retirer une fois trouvé coûte <b>Θ(1)</b>. Dans le cas du premier nœud, on garde son adresse dans <code>temp</code> avant de changer <code>tete</code>, sinon on le perdrait sans pouvoir le libérer.</p>
+<h3>Libérer toute la liste</h3>
+<pre class="code" data-lang="pseudo-code">courant ← tete
+tant que courant ≠ NULL faire
+    suivant ← courant.suivant      // garder le suivant AVANT de libérer
+    libérer(courant)
+    courant ← suivant
+tete ← NULL</pre>
+<h3>Tableau contre liste chaînée</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Opération</th><th>Tableau</th><th>Liste chaînée</th></tr>
+  <tr><td>Accéder à l’élément n° i</td><td class="t-ok">Θ(1)</td><td class="t-bad">Θ(n)</td></tr>
+  <tr><td>Insérer au début</td><td class="t-bad">Θ(n)</td><td class="t-ok">Θ(1)</td></tr>
+  <tr><td>Insérer à la fin</td><td class="t-ok">Θ(1) si de la place</td><td class="t-warn">Θ(n), ou Θ(1) avec une queue</td></tr>
+  <tr><td>Rechercher une valeur</td><td class="t-warn">Θ(n), ou Θ(log n) si trié</td><td class="t-warn">Θ(n)</td></tr>
+  <tr><td>Taille</td><td>fixe</td><td>variable, sans limite</td></tr>
+  <tr><td>Mémoire</td><td>juste les valeurs</td><td>une adresse de plus par élément</td></tr>
+</table></div>
+<div class="keep">Aucune structure n’est « meilleure » : on choisit selon les <b>opérations les plus fréquentes</b>.</div>
+<h3>Variantes</h3>
+<ul>
+  <li><b>Liste doublement chaînée</b> : chaque nœud connaît son précédent et son suivant. On parcourt dans les deux sens et on supprime un nœud sans parcours préalable, au prix d’un pointeur de plus par nœud.</li>
+  <li><b>Liste circulaire</b> : le dernier nœud désigne de nouveau le premier. Utile pour tourner en boucle (tourniquet). Il n’y a plus de NULL : il faut un autre critère d’arrêt.</li>
+</ul>
+
+<h2 id="pile"><span class="n">4</span>La pile</h2>
+<div class="def" data-t="Définition">Une <span class="kw">pile</span> est une structure où l’on n’ajoute et ne retire que <b>par le dessus</b> : le <b>dernier entré est le premier sorti</b> (LIFO, <i>last in, first out</i>). Exemples : annuler (Ctrl+Z), bouton « retour » d’un navigateur, pile d’assiettes.</div>
+<div class="tw"><table class="tbl">
+  <tr><th>Opération</th><th>Effet</th><th class="num">Coût</th></tr>
+  <tr><td><code>empiler(x)</code></td><td>pose x au sommet</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>dépiler()</code></td><td>retire et renvoie l’élément du sommet</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>sommet()</code></td><td>montre le sommet sans le retirer</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>est_vide()</code></td><td>vrai si la pile est vide</td><td class="num">Θ(1)</td></tr>
+</table></div>
+<p>Dépiler une pile <b>vide</b> est une erreur : on teste <code>est_vide()</code> avant. Une pile faite avec un tableau de taille fixe peut aussi être <b>pleine</b>.</p>
+<h3>Deux implémentations</h3>
+<div class="tabs">
+<div><div class="cap">Avec un tableau</div><pre class="code" data-lang="pseudo-code">empiler(x):
+    sommet ← sommet + 1
+    t[sommet] ← x
+dépiler():
+    x ← t[sommet]
+    sommet ← sommet - 1
+    retourner x</pre></div>
+<div><div class="cap">Avec une liste chaînée</div><pre class="code" data-lang="pseudo-code">empiler(x):
+    insérer x en tête
+dépiler():
+    x ← tete.valeur
+    supprimer la tête
+    retourner x</pre></div>
+</div>
+<p>Dans les deux cas, toutes les opérations coûtent <b>Θ(1)</b>. Le tableau est limité en taille ; la liste n’a pas de limite et réutilise l’insertion et la suppression en tête.</p>
+<h3>Application 1 : parenthèses bien formées</h3>
+<p>La <b>dernière</b> parenthèse ouverte doit être la <b>première</b> fermée. Algorithme :</p>
+<ol>
+  <li>ouvrante <code>( [ {</code> : on l’empile ;</li>
+  <li>fermante <code>) ] }</code> : si la pile est vide, c’est mal parenthésé ; sinon on dépile et on vérifie la correspondance ;</li>
+  <li>à la fin, la pile doit être vide.</li>
+</ol>
+<div class="tw"><table class="tbl">
+  <tr><th>Expression</th><th>Verdict</th><th>Pourquoi</th></tr>
+  <tr><td><code>{ [ ( ) ] }</code></td><td class="t-ok">correct</td><td>chaque fermante rencontre son ouvrante, pile vide à la fin</td></tr>
+  <tr><td><code>( [ ) ]</code></td><td class="t-bad">incorrect</td><td>la fermante <code>)</code> trouve <code>[</code> au sommet</td></tr>
+  <tr><td><code>( ( )</code></td><td class="t-bad">incorrect</td><td>il reste une ouvrante dans la pile à la fin</td></tr>
+  <tr><td><code>( ) )</code></td><td class="t-bad">incorrect</td><td>fermante alors que la pile est vide</td></tr>
+</table></div>
+<p>Chaque caractère est traité une fois, avec des opérations en Θ(1) : le coût total est <b>Θ(n)</b>.</p>
+<h3>Application 2 : la notation postfixe</h3>
+<p>Dans la <span class="kw">notation postfixe</span>, l’opérateur est écrit <b>après</b> ses deux opérandes : plus de parenthèses ni de priorités.</p>
+<div class="tw"><table class="tbl">
+  <tr><th>Habituel</th><th>Postfixe</th></tr>
+  <tr><td><code>3 + 4</code></td><td><code>3 4 +</code></td></tr>
+  <tr><td><code>(3 + 4) × 2</code></td><td><code>3 4 + 2 *</code></td></tr>
+  <tr><td><code>3 + 4 × 2</code></td><td><code>3 4 2 * +</code></td></tr>
+  <tr><td><code>5 + (1 + 2) × 4 − 3</code></td><td><code>5 1 2 + 4 * + 3 -</code></td></tr>
+</table></div>
+<p>Évaluation : un <b>nombre</b> s’empile ; un <b>opérateur</b> dépile deux nombres (b puis a), calcule <code>a op b</code> et empile le résultat ; à la fin, il reste <b>un seul nombre</b>, le résultat. Exemple pour <code>3 4 + 2 *</code> : pile 3 ; pile 3, 4 ; « + » donne 7 ; pile 7, 2 ; « * » donne 14.</p>
+<h3>Application 3 : la pile d’appels</h3>
+<p>Chaque appel de fonction en cours est une fiche posée sur une pile (séance 1). On empile à chaque appel, on dépile à chaque retour. Toute fonction récursive peut être réécrite sans récursion avec une <b>pile explicite</b>.</p>
+
+<h2 id="file"><span class="n">5</span>La file</h2>
+<div class="def" data-t="Définition">Une <span class="kw">file</span> est une structure où l’on <b>ajoute à la fin</b> et où l’on <b>retire au début</b> : le <b>premier entré est le premier sorti</b> (FIFO, <i>first in, first out</i>). Exemples : file d’attente à un guichet, travaux d’une imprimante, paquets d’un routeur.</div>
+<div class="tw"><table class="tbl">
+  <tr><th>Opération</th><th>Effet</th><th class="num">Coût visé</th></tr>
+  <tr><td><code>enfiler(x)</code></td><td>ajoute x à la fin</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>défiler()</code></td><td>retire et renvoie l’élément du début</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>premier()</code></td><td>montre l’élément du début sans le retirer</td><td class="num">Θ(1)</td></tr>
+  <tr><td><code>est_vide()</code></td><td>vrai si la file est vide</td><td class="num">Θ(1)</td></tr>
+</table></div>
+<p>Défiler une file <b>vide</b> est une erreur : on teste <code>est_vide()</code> avant. Le défi est de garder <b>Θ(1)</b> pour les deux opérations principales, alors qu’on travaille aux <b>deux extrémités</b>.</p>
+<h3>Pile contre file</h3>
+<p>On ajoute 1, 2, 3 puis on retire trois fois. Avec une <b>pile</b> (LIFO), les valeurs sortent dans l’ordre <b>3, 2, 1</b>. Avec une <b>file</b> (FIFO), elles sortent dans l’ordre <b>1, 2, 3</b>. Choisir entre les deux, c’est choisir dans quel ordre on traite les éléments en attente : le plus récent d’abord, ou le plus ancien.</p>
+<h3>Avec un tableau : le piège du décalage</h3>
+<p>Première idée : le premier élément est toujours dans la case 0. Pour défiler, on retire la case 0 et on décale tout le monde d’une case : <b>n − 1 décalages</b>, donc <b>Θ(n)</b>. C’est le défaut du chapitre 2.</p>
+<p>Meilleure idée : ne rien décaler. On garde une variable <code>début</code>, l’indice du premier élément. Défiler consiste seulement à <b>avancer début d’une case</b>. Mais on finit par atteindre la fin du tableau alors qu’il reste de la place au début : on revient alors à la case 0. C’est le <b>tableau circulaire</b>.</p>
+<h3>Le tableau circulaire</h3>
+<p>Trois variables : le tableau <code>t</code> de <code>N</code> cases, <code>début</code> (indice du premier élément) et <code>taille</code> (nombre d’éléments présents). Pour avancer d’une case <b>en bouclant</b>, on écrit <code>(i + 1) mod N</code> : avec N = 6, après la case 5 on retombe sur la case 0 (<code>mod</code> est le reste de la division, <code>%</code> en C).</p>
+<pre class="code" data-lang="pseudo-code">enfiler(x):
+    t[(début + taille) mod N] ← x
+    taille ← taille + 1
+défiler():
+    x ← t[début]
+    début ← (début + 1) mod N
+    taille ← taille - 1
+    retourner x</pre>
+<p>Aucun décalage : enfiler et défiler coûtent <b>Θ(1)</b>. La file est <b>pleine</b> quand <code>taille = N</code> et <b>vide</b> quand <code>taille = 0</code>. Exemple : N = 5, début = 3, taille = 4 : les éléments sont dans les cases 3, 4, 0, 1 ; le prochain <code>enfiler</code> écrit dans la case <code>(3 + 4) mod 5 = 2</code>.</p>
+<h3>Avec une liste chaînée : tete et queue</h3>
+<p>Retirer au début d’une liste est facile (suppression en tête, Θ(1)). Ajouter à la fin ne l’est pas : avec seulement <code>tete</code>, il faut parcourir toute la liste, donc <b>Θ(n)</b>. L’astuce est de garder une seconde variable <code>queue</code> qui désigne <b>le dernier nœud</b> : on accroche le nouveau nœud directement au bout.</p>
+<div class="tabs">
+<div><div class="cap">Enfiler</div><pre class="code" data-lang="pseudo-code">enfiler(x):
+    n ← nouveau nœud
+    n.valeur ← x
+    n.suivant ← NULL
+    si queue = NULL alors   // file vide
+        tete ← n
+    sinon
+        queue.suivant ← n
+    queue ← n</pre></div>
+<div><div class="cap">Défiler</div><pre class="code" data-lang="pseudo-code">défiler():
+    temp ← tete
+    x ← temp.valeur
+    tete ← tete.suivant
+    si tete = NULL alors    // file devenue vide
+        queue ← NULL
+    libérer(temp)
+    retourner x</pre></div>
+</div>
+<p>Les deux opérations coûtent <b>Θ(1)</b>. Attention au <b>cas particulier de la file vide</b> : à l’enfilage dans une file vide, <code>tete</code> et <code>queue</code> désignent le même nœud ; au défilage du dernier nœud, il faut remettre <code>queue</code> à NULL, sinon elle désignerait un bloc libéré (pointeur pendant).</p>
+<h3>Récapitulatif des coûts</h3>
+<div class="tw"><table class="tbl">
+  <tr><th>Réalisation</th><th class="num">enfiler</th><th class="num">défiler</th><th>Limite</th></tr>
+  <tr><td>Tableau, premier toujours en case 0</td><td class="num">Θ(1)</td><td class="num t-bad">Θ(n)</td><td>taille fixe</td></tr>
+  <tr><td>Tableau circulaire</td><td class="num t-ok">Θ(1)</td><td class="num t-ok">Θ(1)</td><td>taille fixe</td></tr>
+  <tr><td>Liste avec <code>tete</code> seule</td><td class="num t-bad">Θ(n)</td><td class="num">Θ(1)</td><td>aucune</td></tr>
+  <tr><td>Liste avec <code>tete</code> et <code>queue</code></td><td class="num t-ok">Θ(1)</td><td class="num t-ok">Θ(1)</td><td>aucune</td></tr>
+</table></div>
+<h3>À quoi sert une file ?</h3>
+<ul>
+  <li><b>Système d’exploitation</b> : les tâches prêtes attendent dans une file et passent chacune à leur tour sur le processeur (tourniquet).</li>
+  <li><b>Réseau</b> : un routeur met les paquets en file ; si elle est pleine, les nouveaux paquets sont perdus.</li>
+  <li><b>Algorithmes</b> : le parcours en largeur d’un graphe (séance 6) utilise une file pour garder l’ordre de visite.</li>
+</ul>
+
+<h2 id="code"><span class="n">6</span>Code de référence</h2>
+<p>Pour la liste chaînée et la pile : la version C (celle du TP), puis une version Python simplifiée. En Python, le ramasse-miettes libère les nœuds inutilisés : pas de <code>free</code>.</p>
+<h3>Nœud, création et insertion en tête</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+Noeud *creer_noeud(int v) {
+    Noeud *n = (Noeud *)malloc(sizeof(Noeud));
+    n-&gt;valeur = v;
+    n-&gt;suivant = NULL;
+    return n;
+}
+
+void inserer_tete(Noeud **tete, int v) {
+    Noeud *n = creer_noeud(v);
+    n-&gt;suivant = *tete;   /* 1. relier à l'ancien premier */
+    *tete = n;            /* 2. changer la tête */
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">class Noeud:
+    def __init__(self, valeur, suivant=None):
+        self.valeur = valeur
+        self.suivant = suivant
+
+
+def inserer_tete(tete, v):
+    """Renvoie la nouvelle tête."""
+    return Noeud(v, tete)
+
+
+# utilisation
+tete = None
+for v in range(1, 6):
+    tete = inserer_tete(tete, v)</pre></div>
+</div>
+<h3>Parcours, recherche, insertion en fin</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">void afficher(Noeud *tete) {
+    Noeud *c;
+    for (c = tete; c != NULL; c = c-&gt;suivant)
+        printf("%d -&gt; ", c-&gt;valeur);
+    printf("NULL\n");
+}
+
+Noeud *rechercher(Noeud *tete, int x) {
+    while (tete != NULL &amp;&amp; tete-&gt;valeur != x)
+        tete = tete-&gt;suivant;
+    return tete;             /* NULL si absent */
+}
+
+void inserer_fin(Noeud **tete, int v) {
+    Noeud *n = creer_noeud(v), *c;
+    if (*tete == NULL) { *tete = n; return; }
+    c = *tete;
+    while (c-&gt;suivant != NULL) c = c-&gt;suivant;
+    c-&gt;suivant = n;
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def afficher(tete):
+    c = tete
+    while c is not None:
+        print(c.valeur, end=" -> ")
+        c = c.suivant
+    print("None")
+
+
+def rechercher(tete, x):
+    while tete is not None and tete.valeur != x:
+        tete = tete.suivant
+    return tete              # None si absent
+
+
+def inserer_fin(tete, v):
+    n = Noeud(v)
+    if tete is None:
+        return n
+    c = tete
+    while c.suivant is not None:
+        c = c.suivant
+    c.suivant = n
+    return tete</pre></div>
+</div>
+<h3>Suppression et libération</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">int supprimer(Noeud **tete, int x) {
+    Noeud *prec = NULL, *cour = *tete;
+    while (cour != NULL &amp;&amp; cour-&gt;valeur != x) {
+        prec = cour;
+        cour = cour-&gt;suivant;
+    }
+    if (cour == NULL) return 0;          /* absent */
+    if (prec == NULL) *tete = cour-&gt;suivant;
+    else prec-&gt;suivant = cour-&gt;suivant;
+    free(cour);
+    return 1;
+}
+
+void liberer(Noeud **tete) {
+    Noeud *cour = *tete, *suiv;
+    while (cour != NULL) {
+        suiv = cour-&gt;suivant;   /* AVANT free */
+        free(cour);
+        cour = suiv;
+    }
+    *tete = NULL;
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def supprimer(tete, x):
+    """Renvoie la nouvelle tête."""
+    prec, cour = None, tete
+    while cour is not None and cour.valeur != x:
+        prec, cour = cour, cour.suivant
+    if cour is None:
+        return tete                      # absent
+    if prec is None:
+        return cour.suivant              # on supprime le premier
+    prec.suivant = cour.suivant
+    return tete
+
+# liberer : inutile en Python, il suffit de
+# tete = None</pre></div>
+</div>
+<h3>Matrice allouée dynamiquement</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">int **creer_matrice(int lignes, int colonnes) {
+    int **m = (int **)malloc(lignes * sizeof(int *));
+    int i;
+    for (i = 0; i &lt; lignes; i++)
+        m[i] = (int *)malloc(colonnes * sizeof(int));
+    return m;
+}
+
+void liberer_matrice(int **m, int lignes) {
+    int i;
+    for (i = 0; i &lt; lignes; i++) free(m[i]);   /* les lignes d'abord */
+    free(m);                                   /* puis le tableau */
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def creer_matrice(lignes, colonnes):
+    # une liste de listes : une liste de lignes
+    return [[0] * colonnes for _ in range(lignes)]
+
+
+m = creer_matrice(2, 3)
+m[1][2] = 6
+# pas de free : le ramasse-miettes s'en charge</pre></div>
+</div>
+<h3>Pile (tableau) et parenthèses</h3>
+<div class="tabs">
+<div><div class="cap">C</div><pre class="code" data-lang="C">#define MAX 1000
+char pile[MAX];
+int sommet = -1;
+
+void empiler(char c) { pile[++sommet] = c; }
+char depiler(void)   { return pile[sommet--]; }
+int  est_vide(void)  { return sommet &lt; 0; }
+
+int bien_parenthesee(const char *s) {
+    int i;
+    char c, o;
+    sommet = -1;
+    for (i = 0; s[i] != '\0'; i++) {
+        c = s[i];
+        if (c == '(' || c == '[' || c == '{') empiler(c);
+        else if (c == ')' || c == ']' || c == '}') {
+            if (est_vide()) return 0;
+            o = depiler();
+            if ((c == ')' &amp;&amp; o != '(') ||
+                (c == ']' &amp;&amp; o != '[') ||
+                (c == '}' &amp;&amp; o != '{')) return 0;
+        }
+    }
+    return est_vide();
+}</pre></div>
+<div><div class="cap">Python</div><pre class="code" data-lang="Python">def bien_parenthesee(s):
+    pile = []                        # une liste sert de pile
+    paires = {")": "(", "]": "[", "}": "{"}
+    for c in s:
+        if c in "([{":
+            pile.append(c)           # empiler
+        elif c in ")]}":
+            if not pile:             # pile vide ?
+                return False
+            if pile.pop() != paires[c]:   # dépiler
+                return False
+    return not pile
+
+
+def evaluer_postfixe(expression):
+    pile = []
+    for t in expression.split():
+        if t in "+-*/":
+            b, a = pile.pop(), pile.pop()
+            pile.append({"+": a + b, "-": a - b,
+                         "*": a * b, "/": a // b}[t])
+        else:
+            pile.append(int(t))
+    return pile[0]</pre></div>
+</div>
+
+<h3>File (tableau circulaire et liste chaînée)</h3>
+<div class="tabs">
+<div><div class="cap">C : tableau circulaire</div><pre class="code" data-lang="C">#define N 8
+int t[N];
+int debut = 0, taille = 0;
+
+int enfiler(int x) {
+    if (taille == N) return 0;        /* file pleine */
+    t[(debut + taille) % N] = x;
+    taille++;
+    return 1;
+}
+
+int defiler(int *x) {
+    if (taille == 0) return 0;        /* file vide */
+    *x = t[debut];
+    debut = (debut + 1) % N;
+    taille--;
+    return 1;
+}</pre></div>
+<div><div class="cap">C : liste avec tete et queue</div><pre class="code" data-lang="C">typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+typedef struct {
+    Noeud *tete;
+    Noeud *queue;
+} File;
+
+void file_init(File *f) { f-&gt;tete = NULL; f-&gt;queue = NULL; }
+int  file_est_vide(const File *f) { return f-&gt;tete == NULL; }
+
+void enfiler(File *f, int x) {
+    Noeud *n = malloc(sizeof(Noeud));
+    n-&gt;valeur = x;
+    n-&gt;suivant = NULL;
+    if (f-&gt;queue == NULL) f-&gt;tete = n;      /* file vide */
+    else f-&gt;queue-&gt;suivant = n;
+    f-&gt;queue = n;
+}
+
+int defiler(File *f) {                /* file non vide */
+    Noeud *temp = f-&gt;tete;
+    int x = temp-&gt;valeur;
+    f-&gt;tete = temp-&gt;suivant;
+    if (f-&gt;tete == NULL) f-&gt;queue = NULL;
+    free(temp);
+    return x;
+}</pre></div>
+</div>
+<div class="cap">Python</div>
+<pre class="code" data-lang="Python">from collections import deque
+
+file = deque()
+file.append(5)         # enfiler
+file.append(8)
+x = file.popleft()     # défiler : renvoie 5
+# Avec une simple liste, file.pop(0) coûte Θ(n) :
+# tous les éléments sont décalés. deque évite cela.</pre>
+
+<h2 id="exercices"><span class="n">7</span>Exercices corrigés</h2>
+<p>Cherchez d’abord seul, puis ouvrez la solution.</p>
+<h3>Mémoire</h3>
+<div class="card"><h4>Exercice 1</h4><pre class="code" data-lang="C">int a = 3, b = 4;
+int *p = &amp;a;
+int *q = &amp;b;
+*p = *q;
+q = p;
+*q = 0;</pre>Que valent a et b à la fin ? Vers quoi pointe q ?<details><summary>Solution</summary><div><code>*p = *q</code> : a prend la valeur de b, soit 4. <code>q = p</code> : q désigne maintenant a. <code>*q = 0</code> : a vaut 0. Résultat : <b>a = 0, b = 4</b>, et q désigne a.</div></details></div>
+<div class="card"><h4>Exercice 2</h4><pre class="code" data-lang="C">int *p;
+*p = 10;</pre>Quel est le problème ?<details><summary>Solution</summary><div>p n’est pas <b>initialisé</b> : il contient une adresse au hasard. Écrire dedans plante ou abîme la mémoire. Il fallait <code>p = malloc(sizeof(int))</code> ou <code>p = &amp;a</code>.</div></details></div>
+<div class="card"><h4>Exercice 3</h4><pre class="code" data-lang="C">Noeud *n = malloc(sizeof(Noeud));
+n-&gt;valeur = 1;
+free(n);
+printf("%d", n-&gt;valeur);</pre>Quel est le problème ?<details><summary>Solution</summary><div>Après <code>free(n)</code>, n est un <b>pointeur pendant</b> : le bloc ne nous appartient plus. Mettre <code>n = NULL</code> après le free évite l’erreur, ou au moins la rend visible (plantage immédiat plutôt que bug sournois).</div></details></div>
+<div class="card"><h4>Exercice 11 (pointeurs de pointeurs)</h4><pre class="code" data-lang="C">int a = 1, b = 2;
+int *p = &amp;a;
+int **pp = &amp;p;
+**pp = 10;
+*pp = &amp;b;
+**pp = 20;</pre>Que valent a et b à la fin ? Vers quoi pointe p ?<details><summary>Solution</summary><div><code>**pp = 10</code> : pp désigne p, qui désigne a : a vaut 10. <code>*pp = &amp;b</code> : on range l’adresse de b dans p (à travers pp) : p désigne maintenant b. <code>**pp = 20</code> : pp désigne p, qui désigne b : b vaut 20. Résultat : <b>a = 10, b = 20</b>, et p désigne b.</div></details></div>
+<div class="card"><h4>Exercice 12 (matrice)</h4>Écrivez en C une fonction qui construit une matrice 3 × 4 remplie de zéros, la remplit avec <code>m[i][j] = i * 4 + j</code>, puis la libère complètement. Combien de <code>malloc</code> et combien de <code>free</code> ?<details><summary>Solution</summary><div>Un <code>malloc</code> pour le tableau de 3 pointeurs, plus 3 pour les lignes : <b>4 malloc</b>. Il faut donc <b>4 free</b> : 3 pour les lignes, puis 1 pour le tableau de pointeurs, dans cet ordre. Voir <code>creer_matrice</code> et <code>liberer_matrice</code> dans le code de référence ; la valeur <code>m[2][3]</code> est 11.</div></details></div>
+<h3>Listes et piles</h3>
+<div class="card"><h4>Exercice 4</h4>La liste est <code>2 → 5 → 8</code>. On fait <code>inserer_tete(1)</code> puis <code>supprimer(5)</code>. Quelle liste obtient-on ? Quel est le coût de chaque opération ?<details><summary>Solution</summary><div>Après l’insertion : <code>1 → 2 → 5 → 8</code> (Θ(1)). Après la suppression de 5 : <b><code>1 → 2 → 8</code></b> (Θ(n) pour trouver 5, puis Θ(1) pour le retirer).</div></details></div>
+<div class="card"><h4>Exercice 5</h4>Pile vide. On fait : empiler 1, empiler 2, empiler 3, dépiler, empiler 4, dépiler, dépiler. Quelles valeurs sortent, dans quel ordre ? Que reste-t-il ?<details><summary>Solution</summary><div>Sorties : <b>3, 4, 2</b>. Il reste <b>1</b> dans la pile.</div></details></div>
+<div class="card"><h4>Exercice 6</h4>Évaluez en postfixe : <code>2 3 4 * +</code> puis <code>6 2 / 3 -</code>.<details><summary>Solution</summary><div><code>2 3 4 * +</code> : 3 × 4 = 12, puis 2 + 12 = <b>14</b>. <code>6 2 / 3 -</code> : 6 ÷ 2 = 3, puis 3 − 3 = <b>0</b>.</div></details></div>
+<div class="card"><h4>Exercice 7 (supplémentaire)</h4>Quelle est la complexité de l’insertion à la fin d’une liste chaînée de n nœuds, sans puis avec une variable <code>queue</code> ?<details><summary>Solution</summary><div>Sans queue : il faut parcourir les n − 1 premiers nœuds, donc <b>Θ(n)</b>. Avec queue : on écrit directement <code>queue.suivant ← n</code> puis <code>queue ← n</code>, donc <b>Θ(1)</b>.</div></details></div>
+<div class="card"><h4>Exercice 8 (supplémentaire)</h4>Écrivez en pseudo-code l’<b>inversion d’une liste chaînée</b> en un seul parcours, sans créer de nouveaux nœuds.<details><summary>Solution</summary><div><pre class="code" data-lang="pseudo-code">precedent ← NULL
+courant ← tete
+tant que courant ≠ NULL faire
+    suivant ← courant.suivant      // garder la suite
+    courant.suivant ← precedent    // retourner la flèche
+    precedent ← courant
+    courant ← suivant
+tete ← precedent</pre>Un seul parcours : <b>Θ(n)</b>. À chaque tour, on retourne une flèche ; sans la variable <code>suivant</code>, on perdrait la suite de la liste.</div></details></div>
+<div class="card"><h4>Exercice 9 (supplémentaire)</h4>Évaluez <code>5 1 2 + 4 * + 3 -</code> et donnez l’expression usuelle correspondante.<details><summary>Solution</summary><div>1 + 2 = 3 ; 3 × 4 = 12 ; 5 + 12 = 17 ; 17 − 3 = <b>14</b>. Expression usuelle : <code>5 + (1 + 2) × 4 − 3</code>.</div></details></div>
+<div class="card"><h4>Exercice 10 (supplémentaire)</h4>L’expression <code>{ [ ( ] ) }</code> est-elle bien parenthésée ? Dessinez la pile à chaque étape.<details><summary>Solution</summary><div>Pile après chaque caractère : <code>{</code> ; <code>{ [</code> ; <code>{ [ (</code> ; puis on lit <code>]</code> : on dépile <code>(</code> qui ne correspond pas à <code>]</code>. <b>Mal parenthésée.</b></div></details></div>
+
+<h3>Files</h3>
+<div class="card"><h4>Exercice 13 (files)</h4>File vide. On fait : enfiler 1, enfiler 2, enfiler 3, défiler, enfiler 4, défiler, défiler. Quelles valeurs sortent, dans quel ordre ? Que reste-t-il ? Comparez avec l’exercice 5.<details><summary>Solution</summary><div>Sorties : <b>1, 2, 3</b>. Il reste <b>4</b> dans la file. Avec une pile, les mêmes opérations donnaient 3, 4, 2 et il restait 1 : l’ordre de sortie est inversé.</div></details></div>
+<div class="card"><h4>Exercice 14 (tableau circulaire)</h4>Tableau circulaire de N = 5 cases, <code>début = 3</code>, <code>taille = 4</code>. Dans quelles cases se trouvent les éléments ? Où <code>enfiler</code> écrit-il ? Que vaut <code>début</code> après un <code>défiler</code> ?<details><summary>Solution</summary><div>Éléments dans les cases <b>3, 4, 0, 1</b> (on boucle après la case 4). <code>enfiler</code> écrit dans la case <code>(3 + 4) mod 5 = 2</code>. Après un <code>défiler</code> : <code>début = (3 + 1) mod 5 = 4</code> et <code>taille = 3</code>.</div></details></div>
+<div class="card"><h4>Exercice 15 (supplémentaire : liste avec queue)</h4>Une file est une liste chaînée avec <code>tete</code> et <code>queue</code>. Elle contient un seul élément. On appelle <code>défiler</code>. Que doivent valoir <code>tete</code> et <code>queue</code> ensuite ? Que se passe-t-il si on oublie de modifier <code>queue</code> ?<details><summary>Solution</summary><div>La file est vide : <b>tete = NULL et queue = NULL</b>. Si on oublie <code>queue ← NULL</code>, queue désigne un bloc déjà libéré (pointeur pendant) : le prochain <code>enfiler</code> écrirait dans ce bloc libéré au lieu de créer une file propre.</div></details></div>
+
+<h2 id="glossaire"><span class="n">8</span>Glossaire</h2>
+<div class="tw"><table class="tbl">
+  <tr><th>Terme</th><th>Définition</th></tr>
+  <tr><td>Adresse</td><td>Numéro d’une case de la mémoire.</td></tr>
+  <tr><td>Variable locale</td><td>Variable déclarée dans une fonction : elle naît à sa déclaration et meurt à la fin de la fonction.</td></tr>
+  <tr><td>Pointeur</td><td>Variable dont la valeur est l’adresse d’une autre case.</td></tr>
+  <tr><td>Pointeur de pointeur</td><td>Variable dont la valeur est l’adresse d’un pointeur (<code>int **</code>). Chaque étoile suit une flèche.</td></tr>
+  <tr><td>NULL</td><td>Valeur de pointeur qui ne désigne aucune case.</td></tr>
+  <tr><td>Pile (mémoire)</td><td>Zone des variables locales, gérée automatiquement.</td></tr>
+  <tr><td>Tas</td><td>Zone des blocs réservés avec malloc, libérés avec free.</td></tr>
+  <tr><td>Fuite mémoire</td><td>Bloc réservé dont plus aucun pointeur ne conserve l’adresse.</td></tr>
+  <tr><td>Pointeur pendant</td><td>Pointeur qui garde l’adresse d’un bloc déjà libéré.</td></tr>
+  <tr><td>Structure (struct)</td><td>Bloc qui regroupe plusieurs champs.</td></tr>
+  <tr><td>Nœud</td><td>Bloc contenant une valeur et l’adresse du suivant.</td></tr>
+  <tr><td>Liste chaînée</td><td>Suite de nœuds reliés par des adresses, désignée par sa tête.</td></tr>
+  <tr><td>Tête</td><td>Variable qui désigne le premier nœud d’une liste.</td></tr>
+  <tr><td>Pile (structure)</td><td>Structure LIFO : dernier entré, premier sorti.</td></tr>
+  <tr><td>File (structure)</td><td>Structure FIFO : premier entré, premier sorti. On ajoute à la fin, on retire au début.</td></tr>
+  <tr><td>Queue (d’une file)</td><td>Variable qui désigne le dernier nœud d’une file faite avec une liste chaînée.</td></tr>
+  <tr><td>Tableau circulaire</td><td>Tableau dont on revient à la case 0 après la dernière case, grâce à un calcul « modulo N ».</td></tr>
+  <tr><td>Empiler, dépiler</td><td>Poser un élément au sommet, retirer celui du sommet.</td></tr>
+  <tr><td>Notation postfixe</td><td>Écriture où l’opérateur suit ses deux opérandes.</td></tr>
+</table></div>
+<div class="keep">Séance suivante : files, arbres et tas. Revoyez les listes chaînées : elles servent encore.</div>
+</article>
+</div>
+<script src="../assets/doc.js"></script>
+</body>
+</html>

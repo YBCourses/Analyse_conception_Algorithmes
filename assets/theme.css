@@ -27,6 +27,11 @@
   --cover-bg: #0B2A47;
   --cover-fg: #F3F8FD;
   --cover-accent: #6DB3EE;
+  --pa0: #1F6FB5;
+  --pa1: #C77700;
+  --pa2: #7A4FC2;
+  --pa3: #0F8A6A;
+  --node: var(--head);
   --c-one: #7B8A9A;
   --c-log: #13896A;
   --c-n: #1F6FB5;
@@ -57,6 +62,10 @@
     --bad: #FF8E7D;
     --bad-soft: #43201B;
     --letter: #060C13;
+    --pa0: #6DB3EE;
+    --pa1: #F0B34D;
+    --pa2: #B293F0;
+    --pa3: #3CCBA0;
     --c-one: #9AAABA;
     --c-log: #3CCBA0;
     --c-n: #6DB3EE;
@@ -85,6 +94,10 @@
   --bad: #FF8E7D;
   --bad-soft: #43201B;
   --letter: #060C13;
+  --pa0: #6DB3EE;
+  --pa1: #F0B34D;
+  --pa2: #B293F0;
+  --pa3: #3CCBA0;
   --c-one: #9AAABA;
   --c-log: #3CCBA0;
   --c-n: #6DB3EE;

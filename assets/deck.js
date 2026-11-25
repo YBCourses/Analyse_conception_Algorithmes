@@ -23,6 +23,61 @@
     if (s.classList.contains('cover') || s.classList.contains('divider')) s.insertAdjacentHTML('afterbegin', DECO);
   });
 
+  /* Ajustement automatique (optionnel, <body data-autofit>) : agrandit le contenu des diapositives
+     de texte quand il reste trop de place libre. Les diapositives avec simulation restent telles quelles. */
+  var AUTO = document.body.hasAttribute('data-autofit');
+  if (AUTO) slides.forEach(function (s) {
+    if (s.classList.contains('cover') || s.classList.contains('divider')) return;
+    var gate = s.querySelector(':scope > .gate'); if (gate) { s._fit = gate; s._gate = true; return; }
+    if (s.querySelector('.obj, .mb, .sim, .tracer')) return;
+    var title = s.querySelector(':scope > .title'); if (!title) return;
+    var kids = [].filter.call(s.children, function (c) { return c !== title && !/(^|\s)(sub|notes|deco|plate)(\s|$)/.test(c.className); });
+    if (!kids.length) return;
+    var box = document.createElement('div'); box.className = 'fitbox';
+    s.insertBefore(box, kids[0]); kids.forEach(function (k) { box.appendChild(k); }); s._fit = box;
+  });
+  function fitSlide(s, force) {
+    var box = s._fit; if (!box || (s._fitDone && !force)) return;
+    var k = stage.getBoundingClientRect().height / 1080; if (!k) return;
+    var wasAll = stage.classList.contains('show-all'); stage.classList.add('show-all', 'fit-measure');
+    box.style.zoom = ''; box.style.flex = 'none';
+    var top = (box.getBoundingClientRect().top - stage.getBoundingClientRect().top) / k;
+    var avail = 1010 - top, h0 = box.getBoundingClientRect().height / k, z = 1;
+    var sr = stage.getBoundingClientRect();
+    /* contenu qui dépasse de son cadre (texte débordant, code tronqué) */
+    function over() {
+      var pf = box.style.flex, els, i, e, res = false;
+      box.style.flex = '';                      /* état final : la boîte remplit l'espace restant */
+      els = box.querySelectorAll('*');
+      for (i = 0; i < els.length && !res; i++) {
+        e = els[i];
+        if (!e.clientHeight || !e.clientWidth || /(^|\s)(arr|ac|cell|mb|mb-row|mb-arrow|ops)(\s|$)/.test(e.className + '')) continue;
+        if (e.scrollHeight > e.clientHeight + 4 || e.scrollWidth > e.clientWidth + 4) res = true;
+      }
+      box.style.flex = pf;
+      return res;
+    }
+    if (!s._gate && over()) {
+      for (var d = 0.96; d >= 0.62; d -= 0.04) { box.style.zoom = d; z = d; if (!over()) break; }
+    } else if (h0 < avail * 0.9) {
+      /* on n'agrandit pas au-delà d'une police d'environ 42 px à l'écran (plus gros = illisible et disproportionné) */
+      var fs0 = 0;
+      [].forEach.call(box.querySelectorAll('*'), function (e) {
+        if (e.matches('.title,h1,h2,.big') || !e.clientWidth) return;
+        if ([].some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); })) fs0 = Math.max(fs0, parseFloat(getComputedStyle(e).fontSize) || 0);
+      });
+      var cap = fs0 ? Math.max(1, 42 / fs0) : 1.5;
+      for (var t = 1.04; t <= Math.min(s._gate ? 1.36 : 1.5, cap); t += 0.04) {
+        box.style.zoom = t; var hh = box.getBoundingClientRect().height / k, mr = 0;
+        [].forEach.call(box.querySelectorAll('*'), function (e) { var r = e.getBoundingClientRect(); if (r.width) mr = Math.max(mr, (r.right - sr.left) / k); });
+        if (hh > avail * 0.985 || mr > 1812 || over()) break; z = t;
+      }
+    }
+    box.style.zoom = z !== 1 ? z : ''; box.style.flex = '';
+    if (!wasAll) stage.classList.remove('show-all');
+    void stage.offsetHeight; stage.classList.remove('fit-measure');
+    s._fitDone = true;
+  }
   function fit() {
     var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
     stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
@@ -44,6 +99,7 @@
     var ch = sl.getAttribute('data-ch');
     if (ch) { chip.innerHTML = '<b>' + ch + '</b><span></span>'; chip.lastChild.textContent = sl.getAttribute('data-chname') || ''; chip.style.opacity = 1; }
     else { chip.style.opacity = 0; }
+    if (AUTO) fitSlide(sl);
     updateNotes(); setHash();
   }
   function next() {
@@ -134,6 +190,7 @@
   overview.addEventListener('click', function (e) { if (e.target === overview) closeOv(); });
   help.addEventListener('click', function (e) { if (e.target === help) closeOv(); });
 
+  if (AUTO && document.fonts && document.fonts.ready) document.fonts.ready.then(function () { slides.forEach(function (s) { s._fitDone = false; }); fitSlide(slides[cur], true); });
   var m = /^#s(\d+)$/.exec(location.hash);
   show(m ? parseInt(m[1], 10) - 1 : 0, 'start');
   window.addEventListener('hashchange', function () {

@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Séance 2 · Structures linéaires</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css?v=1795649354672">
+<link rel="stylesheet" href="../assets/deck.css?v=1795649354672">
+<style>
+  /* Éléments propres à cette séance */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 26px; }
+  .fbox { background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 34px; text-align: center; font-size: 34px; line-height: 1.35; box-shadow: 0 14px 36px rgba(15,53,87,.08); }
+  .fbox.algo { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); min-width: 320px; font-size: 30px; }
+  .fbox .mono { white-space: nowrap; }
+  .fbox { padding: 24px 28px; font-size: 32px; }
+  .flow { gap: 16px; }
+  .fbox.algo small { color: #BCD3E8; font-size: 26px; }
+  .fbox .mono { font-size: 38px; color: var(--accent); font-weight: 700; }
+  .fbox b.l { display: block; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .fbox.algo b.l { color: var(--cover-accent); }
+  .farrow { font-size: 64px; color: var(--blue); line-height: 1; }
+  .tl { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; padding-top: 40px; flex: 1; align-content: start; }
+  .tl::before { content: ""; position: absolute; left: 4%; right: 4%; top: 62px; height: 6px; background: var(--line); border-radius: 3px; }
+  .tl .nd { position: relative; display: flex; flex-direction: column; gap: 16px; align-items: stretch; }
+  .tl .dot { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 6px solid var(--line); margin: 0 auto; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: var(--muted); z-index: 1; }
+  .tl .nd.now .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tl .nd .panel { padding: 26px 24px; font-size: 27px; flex: 1; }
+  .tl .nd.now .panel { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .tl .nd.now .panel h3 { color: #fff; }
+  .tl .nd.now .small { color: #A9C2DB; }
+  .tl h3 { font-size: 34px; }
+  .cyc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; align-items: stretch; }
+  .cyc .c { position: relative; background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 20px; text-align: center; font-size: 29px; line-height: 1.3; margin-right: 38px; box-shadow: 0 14px 36px rgba(15,53,87,.07); }
+  .cyc .c:last-child { margin-right: 0; }
+  .cyc .c::after { content: "›"; position: absolute; right: -37px; top: 50%; transform: translateY(-58%); font-size: 64px; color: var(--blue); }
+  .cyc .c:last-child::after { display: none; }
+  .cyc .c b.n { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 32px; margin: 0 auto 14px; }
+  .cyc .c.hot { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .cyc .c.hot b.n { background: var(--cover-accent); color: #06121f; }
+  .mach { text-align: center; }
+  .mach .ic { font-size: 74px; line-height: 1; margin-bottom: 8px; }
+  .mach .sec { font: 800 78px var(--mono); color: var(--head); }
+  .mach .opsb { display: inline-block; margin-top: 12px; background: var(--ok-soft); color: var(--ok); font: 700 28px var(--mono); border-radius: 12px; padding: 8px 18px; }
+  .dbl { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 22px; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 28px 38px; font-size: 38px; box-shadow: 0 8px 22px rgba(15,53,87,.06); }
+  .dbl .nm { font: 700 36px var(--mono); color: var(--accent); text-align: right; }
+  .dbl .ef b { color: var(--head); }
+  .dbl .ar { font-size: 44px; text-align: center; color: var(--blue); }
+  .sq { display: inline-block; width: 46px; height: 46px; border-radius: 10px; margin: 5px; }
+  .sq.f { background: var(--c-one); } .sq.l { background: var(--blue); } .sq.l2 { background: var(--c-n2); }
+  .doll { border: 5px solid var(--blue); border-radius: 34px; padding: 22px 26px; background: color-mix(in srgb, var(--accent-soft) 80%, transparent); font: 700 28px var(--serif); color: var(--head); }
+  .doll.d2 { border-color: var(--c-nlog); } .doll.d3 { border-color: var(--c-n2); } .doll.d4 { border-color: var(--c-exp); }
+  .fibchips { display: flex; gap: 18px; align-items: center; flex-wrap: nowrap; }
+  .fibchips .ch { width: 118px; height: 118px; border-radius: 22px; border: 4px solid var(--blue); background: var(--accent-soft); display: grid; place-items: center; font: 800 52px var(--mono); color: var(--head); }
+  .fibchips .ch.s { border-color: var(--ok); background: var(--ok-soft); }
+  .fibchips .pl { font-size: 38px; color: var(--muted); }
+  .rl { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .blk { background: var(--accent); color: #fff; border-radius: 14px; padding: 12px 30px; font: 700 30px var(--mono); }
+  :root[data-theme="dark"] .blk { color: #06121f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .blk { color: #06121f; } }
+  .blk.b2 { background: var(--c-n2); color: #fff; }
+  .gridmini { display: grid; gap: 6px; }
+  .gridmini i { width: 34px; height: 34px; border-radius: 7px; background: var(--accent); }
+  .eq { font: 700 78px var(--serif); color: var(--head); text-align: center; line-height: 1.2; }
+  .eqc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; text-align: center; font-size: 30px; margin-top: 14px; }
+  .eqc div { background: var(--accent-soft); border-radius: 16px; padding: 16px 20px; color: var(--head); }
+  .fm { font: 700 66px var(--serif); text-align: center; color: var(--head); }
+  .ann { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 8px; font-size: 31px; }
+  .ann div { background: var(--panel); border-radius: 18px; padding: 20px 26px; }
+  .ann b { display: block; font: 800 40px var(--mono); color: var(--accent); margin-bottom: 4px; }
+  .mini { width: 100%; height: auto; }
+  .mini text { fill: var(--muted); font-size: 22px; }
+</style>
+</head>
+<body data-autofit>
+<div id="viewport">
+<div id="stage">
+<div id="bar"></div>
+<header id="head">
+  <div class="brand"><img class="logo" src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"><span class="sep"></span><span class="course">Conception et Analyse des Algorithmes</span></div>
+  <div id="chip"></div>
+</header>
+
+<section class="slide cover">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Module M111 · Algorithmique et Programmation · AP 3</div>
+  <h1>Conception et Analyse des Algorithmes</h1>
+  <div class="sub2">Séance 2 · Structures linéaires</div>
+  <div class="who"><b>Yassine Ben-Aboud</b><br><span>INPT · Année universitaire 2026–2027</span></div>
+  <aside class="notes">Accueil. Rappeler le format : deux heures de cours et de TD avec simulations, puis une heure de TP en C. Le diaporama, le support et le sujet du TP sont sur la page du cours.</aside>
+</section>
+
+<section class="slide">
+  <h2 class="title">Là où nous en sommes</h2>
+  <p class="sub">Trois idées de la séance 1 serviront à chaque diapositive d’aujourd’hui.</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Complexité</span><h3>Compter les opérations</h3><div class="small">T(n) est le nombre d’opérations pour une entrée de taille n. On l’exprime à l’aide de Θ.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Familles</span><h3>1, log n, n, n², 2ⁿ</h3><div class="small">Quand n double : rien ne change, une opération de plus, le double, le quadruple…</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Récursivité</span><h3>La pile d’appels</h3><div class="small">Chaque appel en cours est une fiche posée sur une pile en mémoire.</div></div>
+  </div>
+  <div class="callout step" data-g="4">Aujourd’hui, on choisit <b>comment ranger les données en mémoire</b>, et on mesure ce que coûte chaque opération.</div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Question d’échauffement</h2>
+  <p class="sub">Un tableau contient n valeurs. On veut en insérer une nouvelle <b>au début</b>. Combien d’opérations, selon vous ?</p>
+  <div class="grid4" style="flex:none">
+    <div class="panel step" data-g="1" style="text-align:center;font:700 44px var(--mono)">1</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 44px var(--mono)">log n</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 44px var(--mono)">n</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 44px var(--mono)">n²</div>
+  </div>
+  <div class="callout step" data-g="2">Réfléchissez, puis votez à main levée. La réponse arrive dans quelques diapositives, avec une simulation.</div>
+  <aside class="notes">Ne pas donner la réponse (n décalages). On y revient au chapitre 2.</aside>
+</section>
+
+<section class="slide">
+  <h2 class="title">Six séances pour apprendre à concevoir et à comparer des algorithmes</h2>
+  <div class="tl">
+    <div class="nd"><div class="dot">1</div><div class="panel"><h3>Complexité</h3><div class="small">Mesurer, comparer, prévoir le coût d’un algorithme</div></div></div>
+    <div class="nd now"><div class="dot">2</div><div class="panel"><h3>Structures linéaires</h3><div class="small">Mémoire en C, listes, piles, files</div></div></div>
+    <div class="nd"><div class="dot">3</div><div class="panel"><h3>Arbres et tas</h3><div class="small">Arbres binaires, ABR, tas, file de priorité</div></div></div>
+    <div class="nd"><div class="dot">4</div><div class="panel"><h3>Hachage et diviser pour régner</h3><div class="small">Tables, tri fusion</div></div></div>
+    <div class="nd"><div class="dot">5</div><div class="panel"><h3>Glouton et prog. dynamique</h3><div class="small">Choix local, mémoïsation</div></div></div>
+    <div class="nd"><div class="dot">6</div><div class="panel"><h3>Graphes</h3><div class="small">Parcours, plus courts chemins</div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Au programme aujourd’hui</h2>
+  <div class="split">
+    <ol class="num">
+      <li class="step"><span><b>La mémoire en C</b><br><span class="small">variables, pointeurs, pile et tas, malloc et free</span></span></li>
+      <li class="step"><span><b>Tableau ou liste ?</b><br><span class="small">les limites du tableau</span></span></li>
+      <li class="step"><span><b>La liste chaînée</b><br><span class="small">nœuds, insertion, parcours, suppression</span></span></li>
+      <li class="step"><span><b>La pile</b><br><span class="small">dernier entré, premier sorti, et ses applications</span></span></li>
+      <li class="step"><span><b>La file</b><br><span class="small">premier entré, premier sorti : tableau circulaire et liste</span></span></li>
+    </ol>
+    <div class="panel navy col" style="gap:20px">
+      <span class="tag" style="color:var(--cover-accent)">Objectifs</span>
+      <h3>À la fin de la séance, vous saurez :</h3>
+      <ul class="lst sm" style="color:#E6F0FA">
+        <li>expliquer ce qu’est un pointeur et où vit un bloc <b>malloc</b></li>
+        <li>construire et modifier une liste chaînée sans perdre de nœud</li>
+        <li>comparer tableau et liste avec les familles de croissance</li>
+        <li>utiliser une pile pour résoudre un problème</li>
+        <li>choisir entre pile et file, et construire une file en Θ(1)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">1</div>
+  <div class="eyebrow">Chapitre 1</div>
+  <h2>La mémoire en C</h2>
+  <div class="q">Où vivent les données d’un programme, et comment <b>désigner un endroit</b> de la mémoire ?</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Une variable est une case mémoire</h2>
+  <div class="split">
+    <div class="col" style="gap:30px">
+      <div class="def" data-t="Vocabulaire">Une <span class="kw">variable</span> est une case de la mémoire qui a trois choses : un <b>nom</b>, une <b>valeur</b> et une <b>adresse</b>.</div>
+      <div class="txt step" data-g="1">L’<span class="kw">adresse</span> est le <b>numéro de la case</b>, comme le numéro d’un casier. Elle ne change jamais pendant la vie de la variable.</div>
+      <div class="callout step" data-g="2">Un <span class="mono">int</span> occupe <b>4 octets</b> : voilà pourquoi les numéros de cases voisines sont espacés de 4 (100, 104, 108…).</div>
+    </div>
+    <div id="mem-static-vars" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Les variables locales</h2>
+  <div class="split">
+    <div class="col" style="gap:24px">
+      <div class="def" data-t="Définition">Une <span class="kw">variable locale</span> est une variable déclarée <b>à l’intérieur d’une fonction</b>. Elle n’existe que pendant l’exécution de cette fonction.</div>
+      <ol class="num" style="font-size:33px">
+        <li class="step" data-g="1"><span>Elle <b>naît</b> quand le programme exécute sa déclaration.</span></li>
+        <li class="step" data-g="2"><span>Elle <b>meurt</b> quand la fonction se termine : sa case est rendue et son contenu est perdu.</span></li>
+        <li class="step" data-g="3"><span>Elle est rangée dans la zone appelée <b>la pile</b>, gérée automatiquement.</span></li>
+      </ol>
+    </div>
+    <pre class="code free" style="font-size:33px;line-height:1.7">void compter(void) {
+    int x = 10;    // x naît ici
+}                  // x meurt ici
+
+int main(void) {
+    int a = 5;     // a naît ici
+    compter();
+    return 0;
+}                  // a meurt ici</pre>
+  </div>
+  <div class="callout step" data-g="4" style="font-size:31px">Dans les simulations qui suivent, la colonne <b>PILE</b> montre les variables locales vivantes. Chaque case porte son <b>numéro</b>, son <b>nom</b> et sa <b>valeur</b>.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Suivre trois variables pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir comment le programme range des variables en mémoire : une case, un numéro, une valeur.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les cases qui apparaissent dans la <b>pile</b> avec leur numéro, et la valeur de <b>a</b> qui change sans que son numéro change.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas. Avant l’étape <span class="mono">int c = a + b;</span>, prédisez la valeur de <b>c</b>.</div></div>
+  </div>
+  <div id="sim-vars" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Naissance et mort d’une variable locale</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir qu’une variable locale disparaît quand sa fonction se termine.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les variables de <b>main</b> et celles de <b>compter</b> portent chacune une étiquette. Regardez ce qui reste après la fin de compter.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas jusqu’à la fin de <b>compter</b> : que devient <b>x</b> ? Et <b>a</b> ?</div></div>
+  </div>
+  <div id="sim-local" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Le pointeur : une variable qui contient une adresse</h2>
+  <div class="split">
+    <div class="col" style="gap:26px">
+      <div class="def" data-t="Définition">Un <span class="kw">pointeur</span> est une variable dont la <b>valeur</b> est <b>l’adresse d’une autre case</b>. On dit qu’il <b>désigne</b> cette case. On dessine souvent cela par une <b>flèche</b>.</div>
+      <div class="txt step" data-g="1">Image : un papier sur lequel on a écrit « casier n° 100 ». Le papier n’est pas le casier, mais il permet de le retrouver. <b>Le nombre écrit sur le papier</b> est la valeur du pointeur.</div>
+    </div>
+    <div class="col" style="gap:18px">
+      <div class="panel step" data-g="2" style="padding:18px 28px"><span class="mono acc" style="font-size:40px">int *p</span><div class="small">déclare un pointeur <b>p</b> vers un entier</div></div>
+      <div class="panel step" data-g="3" style="padding:18px 28px"><span class="mono acc" style="font-size:40px">&amp;a</span><div class="small">se lit « l’adresse de <b>a</b> » : un numéro de case</div></div>
+      <div class="panel step" data-g="4" style="padding:18px 28px"><span class="mono acc" style="font-size:40px">*p</span><div class="small">se lit « la case dont l’adresse est dans <b>p</b> »</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Un pointeur en action</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre ce qu’est un pointeur et ce que font <b>&amp;</b> et <b>*</b>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>valeur</b> écrite dans p (un numéro de case) et la <b>flèche</b> qui la dessine. Écrire dans <b>*p</b> modifie la case de <b>a</b>.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avant la ligne <span class="mono">*p = 9;</span>, prédisez la valeur de <b>a</b> après cette ligne.</div></div>
+  </div>
+  <div id="sim-ptr" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Lire les notations sans se tromper</h2>
+  <p class="sub">On suppose <span class="mono">int a = 5;</span> (case 100) et <span class="mono">int *p = &amp;a;</span> (case 104).</p>
+  <table class="tbl" style="font-size:35px">
+    <tr class="step" data-g="1"><th>Expression</th><th>Se lit</th><th>Vaut</th></tr>
+    <tr class="step" data-g="1"><td class="mono">a</td><td>la valeur de a</td><td class="mono">5</td></tr>
+    <tr class="step" data-g="2"><td class="mono">&amp;a</td><td>l’adresse de a</td><td class="mono">100</td></tr>
+    <tr class="step" data-g="3"><td class="mono">p</td><td>la valeur de p, donc une adresse</td><td class="mono">100</td></tr>
+    <tr class="step" data-g="4"><td class="mono">*p</td><td>la valeur de la case désignée par p</td><td class="mono">5</td></tr>
+    <tr class="step" data-g="5"><td class="mono">&amp;p</td><td>l’adresse de p lui-même</td><td class="mono">104</td></tr>
+    <tr class="step" data-g="6"><td class="mono">*p = 9</td><td>écrit 9 dans la case désignée, donc dans a</td><td class="mono">a vaut 9</td></tr>
+  </table>
+  <div class="keep step" data-g="7"><b>p</b> est une adresse, <b>*p</b> est une case. Et p a aussi sa propre adresse, <b>&amp;p</b> : nous y reviendrons.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">NULL : le pointeur qui ne désigne rien</h2>
+  <div class="split">
+    <div class="col" style="gap:24px">
+      <div class="def" data-t="Définition"><span class="kw">NULL</span> est une valeur de pointeur qui signifie « ne désigne aucune case ». On le dessine sans flèche.</div>
+      <div class="callout warn step" data-g="1">Suivre un pointeur <b>NULL</b> (écrire <span class="mono">*p</span>) fait <b>planter</b> le programme.</div>
+      <div class="callout good step" data-g="2">Bon réflexe : <span class="mono">if (p != NULL) { … }</span> avant de suivre un pointeur. NULL sert aussi à marquer la <b>fin d’une liste</b>.</div>
+    </div>
+    <div id="mem-static-null" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Deux zones de mémoire : la pile et le tas</h2>
+  <table class="tbl" style="font-size:33px">
+    <tr class="step" data-g="1"><th></th><th>La pile</th><th>Le tas</th></tr>
+    <tr class="step" data-g="1"><td><b>Contient</b></td><td>les variables locales des fonctions</td><td>des blocs réservés à la demande avec <span class="mono">malloc</span></td></tr>
+    <tr class="step" data-g="2"><td><b>Durée de vie</b></td><td>automatique : la variable disparaît à la fin de la fonction</td><td>choisie par <b>vous</b> : le bloc vit jusqu’à <span class="mono">free</span></td></tr>
+    <tr class="step" data-g="3"><td><b>Taille</b></td><td>limitée (quelques Mo)</td><td>très grande</td></tr>
+    <tr class="step" data-g="4"><td><b>Risque</b></td><td>dépassement (récursion infinie)</td><td>oubli de <span class="mono">free</span> : fuite mémoire</td></tr>
+  </table>
+  <div class="keep step" data-g="5">Une liste chaînée vit dans le <b>tas</b> : ses nœuds sont créés quand on en a besoin, et détruits quand on les supprime.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">malloc, free et sizeof</h2>
+  <div class="grid3">
+    <div class="def step" data-g="1" data-t="sizeof"><span class="mono acc">sizeof(int)</span><br>Le nombre d’octets occupés par un type. Pour un <span class="mono">int</span> : <b>4</b>.</div>
+    <div class="def step" data-g="2" data-t="malloc"><span class="mono acc">malloc(n)</span><br>Réserve un bloc de <b>n octets</b> dans le tas et renvoie son <b>adresse</b>, ou NULL si la mémoire manque.</div>
+    <div class="def step" data-g="3" data-t="free"><span class="mono acc">free(p)</span><br>Rend au système le bloc dont l’adresse est dans <b>p</b>. Après cela, on ne s’en sert plus.</div>
+  </div>
+  <div class="keep step" data-g="4">Règle d’or : <b>chaque malloc doit avoir son free</b>, une seule fois.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">La vie d’un bloc du tas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir la vie d’un bloc : réservé, utilisé, puis rendu.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le bloc qui apparaît dans le <b>tas</b>, le numéro rangé dans p, puis le bloc <b>hachuré</b> après free.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Regardez <b>p</b> juste après free : que contient-il encore ?</div></div>
+  </div>
+  <div id="sim-malloc" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Une fonction travaille sur des copies</h2>
+  <p class="sub">En C, quand on appelle une fonction, chaque paramètre est <b>copié</b>. Comment une fonction peut-elle alors modifier une variable de l’appelant ?</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre pourquoi une fonction ne peut pas modifier une variable passée « par valeur », et comment faire autrement.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les cases dans la pile : <b>x</b> est une copie de la valeur de a, alors que <b>y</b> contient <b>l’adresse</b> de a.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez les deux scénarios : que vaut <b>a</b> à la fin de chacun ?</div></div>
+  </div>
+  <div id="sim-copy" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Regrouper des données : la structure</h2>
+  <div class="split">
+    <div class="col" style="gap:22px">
+      <div class="def" data-t="Définition">Une <span class="kw">structure</span> (<span class="mono">struct</span>) regroupe plusieurs champs dans un même bloc.</div>
+      <pre class="code free" style="font-size:30px">struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+};</pre>
+      <div class="txt step" data-g="1">Ce nœud contient <b>un entier</b> et <b>un pointeur vers un autre nœud</b> : c’est la brique de la liste chaînée.</div>
+    </div>
+    <div class="col" style="gap:20px">
+      <div id="mem-static-struct" class="step" data-g="1"></div>
+      <table class="tbl step" data-g="2" style="font-size:30px">
+        <tr><th>Quand on a…</th><th>On écrit</th></tr>
+        <tr><td>une variable <span class="mono">n</span></td><td class="mono">n.valeur</td></tr>
+        <tr><td>un pointeur <span class="mono">p</span></td><td class="mono">p-&gt;valeur</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Un pointeur vers un pointeur</h2>
+  <div class="split even" style="gap:56px">
+    <div class="col" style="gap:26px">
+      <div class="def" data-t="Idée" style="font-size:36px">Un pointeur est <b>une variable comme les autres</b> : elle a elle-même un numéro de case. On peut donc ranger <b>son adresse</b> dans un autre pointeur.</div>
+      <div class="txt step" data-g="1" style="font-size:33px">Image : un papier dit « le prochain papier est dans le casier 104 », et le casier 104 contient un papier qui dit « le trésor est dans le casier 100 ».</div>
+    </div>
+    <div class="col" style="gap:24px">
+      <div id="mem-static-pp" class="step" data-g="1"></div>
+      <div class="callout step" data-g="2" style="font-size:33px"><span class="mono">int **pp</span> : pointeur vers un pointeur vers un entier. <b>Une étoile de plus = un niveau de flèche de plus.</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Suivre deux flèches</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre ce que fait <b>**pp</b> et ce que fait <b>*pp</b>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La valeur de chaque pointeur (un numéro de case) et les <b>deux flèches</b> : pp mène à p, p mène à a.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avant <span class="mono">**pp = 9;</span>, dites quelle variable va changer. Avant <span class="mono">*pp = NULL;</span>, dites laquelle change cette fois.</div></div>
+  </div>
+  <div id="sim-pp" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Lire les étoiles</h2>
+  <p class="sub">On suppose <span class="mono">int a = 5;</span> (case 100), <span class="mono">int *p = &amp;a;</span> (case 104) et <span class="mono">int **pp = &amp;p;</span> (case 112).</p>
+  <table class="tbl" style="font-size:33px">
+    <tr class="step" data-g="1"><th>Expression</th><th>Type</th><th>Vaut</th><th>Se lit</th></tr>
+    <tr class="step" data-g="1"><td class="mono">a</td><td class="mono">int</td><td class="mono">5</td><td>la valeur de a</td></tr>
+    <tr class="step" data-g="2"><td class="mono">p</td><td class="mono">int *</td><td class="mono">100</td><td>l’adresse de a</td></tr>
+    <tr class="step" data-g="3"><td class="mono">*p</td><td class="mono">int</td><td class="mono">5</td><td>la case désignée par p : a</td></tr>
+    <tr class="step" data-g="4"><td class="mono">pp</td><td class="mono">int **</td><td class="mono">104</td><td>l’adresse de p</td></tr>
+    <tr class="step" data-g="5"><td class="mono">*pp</td><td class="mono">int *</td><td class="mono">100</td><td>la case désignée par pp : p lui-même</td></tr>
+    <tr class="step" data-g="6"><td class="mono">**pp</td><td class="mono">int</td><td class="mono">5</td><td>deux flèches suivies : a</td></tr>
+  </table>
+  <div class="keep step" data-g="7">Chaque <b>*</b> appliqué <b>suit une flèche</b> et fait perdre une étoile au type : <span class="mono">int **</span> → <span class="mono">int *</span> → <span class="mono">int</span>.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Modifier un pointeur dans une fonction</h2>
+  <p class="sub">Une fonction doit allouer un bloc pour l’appelant, par le pointeur <b>p</b>. Deux écritures sont comparées.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Comprendre pourquoi une fonction qui doit <b>modifier un pointeur</b> reçoit un pointeur de pointeur.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Avec <b>int *q</b>, q est une <b>copie</b> de p : modifier q ne change pas p. Avec <b>int **pp</b>, pp contient <b>l’adresse de p</b> : *pp est p lui-même.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez les deux scénarios : à la fin, p contient-il l’adresse du bloc ? Que devient le bloc dans le premier cas ?</div></div>
+  </div>
+  <div id="sim-alloue" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Application : la tête d’une liste</h2>
+  <p class="sub">C’est exactement le même problème : la tête d’une liste est un pointeur, <span class="mono">Noeud *tete</span>, et une fonction d’insertion doit pouvoir le modifier.</p>
+  <div class="grid2">
+    <div class="panel col step" data-g="1"><span class="pill bad">Ne marche pas</span><pre class="code free" style="font-size:26px">void inserer(Noeud *tete, int v)</pre><div>La fonction reçoit une <b>copie</b> de tete. Elle peut changer la copie, mais la variable de l’appelant reste inchangée : l’insertion est perdue (et le nœud, fuite).</div></div>
+    <div class="panel col step" data-g="2"><span class="pill ok">Marche</span><pre class="code free" style="font-size:26px">void inserer(Noeud **tete, int v)</pre><div>La fonction reçoit l’<b>adresse de tete</b>. <span class="mono">*tete</span> est la variable de l’appelant. On l’appelle avec <span class="mono">inserer(&amp;tete, 5)</span>.</div></div>
+  </div>
+  <div class="keep step" data-g="3"><span class="mono">Noeud **</span> : pointeur vers un pointeur vers un nœud. Même schéma que <span class="mono">int **</span> : la liste sera modifiable depuis une fonction.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Les matrices : un tableau de tableaux</h2>
+  <p class="sub">Une matrice de 2 lignes et 3 colonnes peut se construire dans le tas comme <b>un tableau de 2 pointeurs</b>, chacun désignant <b>une ligne de 3 entiers</b>.</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Construire une matrice en mémoire dynamique et comprendre le rôle des <b>deux étoiles</b> de <span class="mono">int **m</span>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le bloc de deux pointeurs (m[0] et m[1]) qui désignent chacun une ligne. Les numéros de cases dans les pointeurs.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Suivez les trois <span class="mono">malloc</span>, puis les trois <span class="mono">free</span>. Pourquoi libère-t-on <b>m</b> en dernier ?</div></div>
+  </div>
+  <div id="sim-matrix" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Lire m[i][j]</h2>
+  <div style="display:flex;gap:34px;align-items:flex-start;margin-bottom:6px"><div id="mem-static-matrix"></div><div id="mx-static" style="margin-top:34px"></div></div>
+  <table class="tbl" style="font-size:29px">
+    <tr class="step" data-g="1"><th>Expression</th><th>Type</th><th>Vaut</th><th>Se lit</th></tr>
+    <tr class="step" data-g="1"><td class="mono">m</td><td class="mono">int **</td><td class="mono">2000</td><td>l’adresse du tableau de pointeurs</td></tr>
+    <tr class="step" data-g="2"><td class="mono">m[1]</td><td class="mono">int *</td><td class="mono">2112</td><td>l’adresse de la ligne 1 (une étoile de moins)</td></tr>
+    <tr class="step" data-g="3"><td class="mono">m[1][2]</td><td class="mono">int</td><td class="mono">6</td><td>la case n° 2 de la ligne 1 (encore une étoile de moins)</td></tr>
+  </table>
+  <div class="callout step" data-g="4" style="font-size:30px"><span class="mono">m[1][2]</span> s’écrit aussi <span class="mono">*(*(m + 1) + 2)</span> : <b>deux étoiles</b>, donc deux flèches suivies. Les crochets sont juste une écriture plus lisible.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Quatre erreurs classiques</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Reconnaître quatre erreurs de mémoire avant de les écrire soi-même.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les blocs et flèches en <b style="color:var(--bad)">rouge</b> signalent le problème. Chaque scénario se termine par la conséquence.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez chaque scénario et trouvez la ligne fautive.</div></div>
+  </div>
+  <div id="sim-errors" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Question 1</h2>
+  <div id="q1" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Question 2</h2>
+  <div id="q2" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="La mémoire en C">
+  <h2 class="title">Question 3</h2>
+  <div id="q3" style="max-width:1560px"></div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">2</div>
+  <div class="eyebrow">Chapitre 2</div>
+  <h2>Tableau ou liste ?</h2>
+  <div class="q">Pourquoi inventer une autre structure, puisqu’on sait déjà utiliser des <b>tableaux</b> ?</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Tableau ou liste ?">
+  <h2 class="title">Le tableau : ses forces et ses limites</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="panel col" style="gap:20px"><span class="pill ok">Force</span><h3 style="margin:0">Accès direct</h3>
+      <div class="txt step" data-g="1"><span class="mono">t[i]</span> coûte <b>une opération</b> : l’adresse se calcule, <b>début + i × 4</b>.</div>
+      <div id="arr-forces" class="step" data-g="1"></div>
+      <div class="callout good step" data-g="2" style="font-size:30px">Pour <span class="mono">t[3]</span> : 200 + 3 × 4 = <b>212</b>. Un calcul, pas de parcours.</div></div>
+    <div class="panel col" style="gap:20px"><span class="pill bad">Limites</span><h3 style="margin:0">Taille fixe, insertions coûteuses</h3>
+      <ul class="lst sm"><li class="step" data-g="3">La <b>taille</b> est fixée à la création : pour agrandir, il faut tout recopier.</li><li class="step" data-g="4">Pour <b>insérer au début</b> ou au milieu, il faut <b>décaler</b> des cases pour faire de la place.</li><li class="step" data-g="5">Les cases doivent être <b>voisines</b> : un grand tableau exige un grand bloc libre d’un seul tenant.</li></ul>
+      <div class="callout step" data-g="6" style="font-size:30px;margin-top:auto">Combien d’opérations pour insérer au début ? Réponse à la diapositive suivante.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Tableau ou liste ?">
+  <h2 class="title">Insérer au début d’un tableau</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Compter les opérations nécessaires pour insérer une valeur au début d’un tableau.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Chaque élément est <b>décalé d’une case vers la droite</b>, en commençant par le dernier. Le compteur compte les décalages.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Essayez n = 4, 5 puis 8 : quel est le lien entre n et le nombre de décalages ?</div></div>
+  </div>
+  <div id="sim-shift" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Tableau ou liste ?">
+  <h2 class="title">Le coût : n décalages</h2>
+  <div class="split even top" style="gap:48px">
+    <table class="tbl" style="font-size:36px">
+      <tr class="step" data-g="1"><th class="num">n</th><th class="num">Décalages</th><th>Si 1 décalage = 1 ns</th></tr>
+      <tr class="step" data-g="1"><td class="num">1 000</td><td class="num">1 000</td><td>1 µs</td></tr>
+      <tr class="step" data-g="2"><td class="num">1 000 000</td><td class="num">1 000 000</td><td>1 ms</td></tr>
+      <tr class="step" data-g="3"><td class="num">1 000 000 000</td><td class="num">1 000 000 000</td><td>1 s</td></tr>
+    </table>
+    <div class="col" style="gap:26px">
+      <div class="def step" data-g="4" data-t="Résultat" style="font-size:40px">Insérer au début d’un tableau de n éléments coûte <b>n décalages</b> : <b>Θ(n)</b>, famille linéaire.</div>
+      <div class="callout step" data-g="5" style="font-size:36px">Si on insère <b>souvent</b> au début, ce coût se répète à chaque insertion : pour n insertions, environ <b>n²/2</b> décalages.</div>
+    </div>
+  </div>
+  <div class="keep step" data-g="6">Peut-on insérer au début <b>sans rien décaler</b> ? C’est possible si les éléments n’ont pas besoin d’être voisins en mémoire.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Tableau ou liste ?">
+  <h2 class="title">Une autre idée : la chasse au trésor</h2>
+  <p class="sub">Dans une chasse au trésor, chaque indice ne donne <b>que l’emplacement du suivant</b>. Les indices peuvent être cachés n’importe où.</p>
+  <div class="split">
+    <div class="col" style="gap:20px">
+      <div class="panel step" data-g="1"><b>Indice 1</b><br>« Le prochain indice est dans le casier 12. »</div>
+      <div class="panel step" data-g="2"><b>Indice 2 (casier 12)</b><br>« Le prochain indice est dans le casier 47. »</div>
+      <div class="panel step" data-g="3"><b>Indice 3 (casier 47)</b><br>« Il n’y a plus d’indice : fin du jeu. »</div>
+    </div>
+    <div class="col" style="gap:24px">
+      <div class="callout step" data-g="4">Pour <b>ajouter un indice</b> au début, il suffit d’en écrire un nouveau qui désigne l’ancien premier. On ne déplace <b>rien</b>.</div>
+      <div class="def step" data-g="5" data-t="L’idée">Au lieu de cases voisines, on met dans chaque élément <b>l’adresse du suivant</b>. C’est la <span class="kw">liste chaînée</span>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">3</div>
+  <div class="eyebrow">Chapitre 3</div>
+  <h2>La liste chaînée</h2>
+  <div class="q">Comment relier des données <b>dispersées</b> dans la mémoire ?</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Le nœud : une valeur et l’adresse du suivant</h2>
+  <div class="split">
+    <div class="col" style="gap:24px">
+      <div class="def" data-t="Définition">Un <span class="kw">nœud</span> est un petit bloc du tas qui contient <b>une valeur</b> et <b>l’adresse du nœud suivant</b>.</div>
+      <div class="txt step" data-g="1">On le dessine par deux cases : la <b>valeur</b> et le <b>pointeur</b> « suivant ».</div>
+    </div>
+    <div class="col" style="gap:30px;align-items:center">
+      <div id="chain-node" class="step" data-g="1"></div>
+      <div id="mem-static-node" class="step" data-g="2"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Une liste : une tête, des nœuds, NULL à la fin</h2>
+  <div id="mem-static-list" style="margin-top:6px"></div>
+  <div class="grid3" style="flex:none">
+    <div class="panel step" data-g="1" style="font-size:30px"><span class="tag">La tête</span>La variable <span class="mono">tete</span> est la <b>seule entrée</b> de la liste : elle désigne le premier nœud.</div>
+    <div class="panel step" data-g="2" style="font-size:30px"><span class="tag">Les nœuds</span>Ils sont <b>dispersés</b> dans le tas. Leurs adresses ne se suivent pas, seules les flèches les relient.</div>
+    <div class="panel step" data-g="3" style="font-size:30px"><span class="tag">La fin</span>Le dernier nœud pointe vers <b>NULL</b>. C’est ainsi que l’on sait que la liste s’arrête.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Parcourir une liste</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Visiter tous les nœuds d’une liste, dans l’ordre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>courant</b> qui avance de nœud en nœud en suivant les flèches, et l’affichage qui se construit.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avant chaque avancée, prédisez la valeur qui va être affichée.</div></div>
+  </div>
+  <div id="sim-parcours" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Insérer au début de la liste</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Insérer un nœud au début de la liste sans perdre l’ancienne liste.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les <b>flèches</b> qui se créent, et l’<b>ordre</b> dans lequel on les crée.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez « bon ordre », puis « mauvais ordre » : que devient l’ancienne liste ?</div></div>
+  </div>
+  <div id="sim-tete" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Le coût d’une insertion en tête</h2>
+  <div class="split even top">
+    <table class="tbl">
+      <tr class="step" data-g="1"><th class="num">n</th><th class="num">Tableau (décalages)</th><th class="num">Liste (instructions)</th></tr>
+      <tr class="step" data-g="1"><td class="num">10</td><td class="num">10</td><td class="num t-ok">4</td></tr>
+      <tr class="step" data-g="2"><td class="num">1 000</td><td class="num">1 000</td><td class="num t-ok">4</td></tr>
+      <tr class="step" data-g="3"><td class="num">1 000 000</td><td class="num t-bad">1 000 000</td><td class="num t-ok">4</td></tr>
+    </table>
+    <div class="col">
+      <div class="def step" data-g="4" data-t="Résultat">Insérer en tête d’une liste coûte <b>4 instructions</b>, quelle que soit sa longueur : c’est un coût <b>constant</b>, <b>Θ(1)</b>.</div>
+      <div class="callout good step" data-g="5">Voici la réponse à l’échauffement : le tableau coûte <b>Θ(n)</b>, la liste <b>Θ(1)</b>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Insérer à la fin de la liste</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Insérer un nœud à la fin, alors qu’on ne connaît que la tête.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nombre d’avancées de <b>courant</b> avant de tomber sur le dernier nœud.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Comptez les avancées. Combien y en aurait-il avec 1 000 nœuds ?</div></div>
+  </div>
+  <div id="sim-fin" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Insérer à la fin : un coût de n</h2>
+  <div class="split">
+    <div class="col" style="gap:22px">
+      <div class="panel step" data-g="1">Il faut <b>parcourir toute la liste</b> pour trouver le dernier nœud : <b>n − 1 avancées</b>.</div>
+      <div class="def step" data-g="2" data-t="Résultat">Insérer à la fin : <b>Θ(n)</b>.</div>
+    </div>
+    <div class="col" style="gap:22px">
+      <div class="callout step" data-g="3">Astuce : on peut mémoriser en plus une variable <span class="mono">queue</span> qui désigne le dernier nœud. L’insertion en fin devient alors <b>Θ(1)</b>.</div>
+      <div class="panel step" data-g="4" style="font-size:30px">Il faut alors mettre à jour <span class="mono">queue</span> à chaque insertion en fin et à chaque suppression du dernier nœud.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Rechercher une valeur : pas de raccourci</h2>
+  <div class="split">
+    <pre class="code free" data-pc style="font-size:32px;line-height:1.8">courant ← tete
+tant que courant ≠ NULL faire
+    si courant.valeur = x alors
+        retourner courant
+    courant ← courant.suivant
+retourner NULL</pre>
+    <div class="col" style="gap:22px">
+      <div class="def step" data-g="1" data-t="Résultat">C’est la recherche séquentielle de la séance 1 : <b>Θ(n)</b> au pire.</div>
+      <div class="callout warn step" data-g="2">Impossible d’utiliser la <b>recherche dichotomique</b> : elle exige d’aller directement au <b>milieu</b>, et une liste n’offre pas d’accès direct.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Supprimer un nœud</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Supprimer un nœud sans casser la liste ni oublier de libérer sa mémoire.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nœud est d’abord <b>court-circuité</b> par une flèche, puis <b>libéré</b> (hachuré).</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez « au milieu » puis « le premier » : pourquoi faut-il une variable <b>temp</b> dans le second cas ?</div></div>
+  </div>
+  <div id="sim-suppr" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Libérer toute la liste</h2>
+  <div class="split">
+    <pre class="code free" data-pc style="font-size:32px;line-height:1.8">courant ← tete
+tant que courant ≠ NULL faire
+    suivant ← courant.suivant
+    libérer(courant)
+    courant ← suivant
+tete ← NULL</pre>
+    <div class="col" style="gap:22px">
+      <div class="callout warn step" data-g="1">Il faut <b>garder le suivant avant de libérer</b>. Après <span class="mono">libérer(courant)</span>, lire <span class="mono">courant.suivant</span> serait lire un bloc déjà rendu.</div>
+      <div class="callout good step" data-g="2">À la fin, <b>tete ← NULL</b> : la liste est vide, et plus aucun bloc n’est perdu.</div>
+      <div class="def step" data-g="3" data-t="Coût">Un passage sur chaque nœud : <b>Θ(n)</b>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Tableau contre liste chaînée</h2>
+  <table class="tbl" style="font-size:31px">
+    <tr class="step" data-g="1"><th>Opération</th><th>Tableau</th><th>Liste chaînée</th></tr>
+    <tr class="step" data-g="1"><td>Accéder à l’élément n° i</td><td class="t-ok">Θ(1)</td><td class="t-bad">Θ(n)</td></tr>
+    <tr class="step" data-g="2"><td>Insérer au début</td><td class="t-bad">Θ(n)</td><td class="t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="3"><td>Insérer à la fin</td><td class="t-ok">Θ(1) si de la place</td><td class="t-warn">Θ(n), ou Θ(1) avec une queue</td></tr>
+    <tr class="step" data-g="4"><td>Rechercher une valeur</td><td class="t-warn">Θ(n), ou Θ(log n) si trié</td><td class="t-warn">Θ(n)</td></tr>
+    <tr class="step" data-g="5"><td>Taille</td><td>fixe</td><td>variable, sans limite</td></tr>
+    <tr class="step" data-g="6"><td>Mémoire</td><td>juste les valeurs</td><td>une adresse de plus par élément</td></tr>
+  </table>
+  <div class="keep step" data-g="7">Aucune structure n’est « meilleure » : <b>on choisit selon les opérations les plus fréquentes</b>.</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Deux variantes à connaître</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">Liste doublement chaînée</span><div id="chain-dbl" style="overflow:hidden"></div>
+      <div class="step" data-g="1">Chaque nœud connaît son <b>précédent</b> et son <b>suivant</b> : on peut parcourir dans les <b>deux sens</b>, et supprimer un nœud sans parcours préalable.<div class="small">Prix : un pointeur de plus par nœud.</div></div></div>
+    <div class="panel col"><span class="tag">Liste circulaire</span><div id="chain-circ" style="overflow:hidden"></div>
+      <div class="step" data-g="2">Le dernier nœud désigne de nouveau le <b>premier</b>. Utile pour tourner en boucle : tourniquet de tâches, jeu à tour de rôle.<div class="small">Attention : plus de NULL, il faut un autre critère d’arrêt.</div></div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Question 4</h2>
+  <div id="q4" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="La liste chaînée">
+  <h2 class="title">Question 5</h2>
+  <div id="q5" style="max-width:1560px"></div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">4</div>
+  <div class="eyebrow">Chapitre 4</div>
+  <h2>La pile</h2>
+  <div class="q">Comment <b>revenir en arrière</b>, ou gérer des tâches imbriquées ?</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Un besoin concret : revenir en arrière</h2>
+  <div class="grid3" style="flex:none">
+    <div class="panel step" data-g="1"><span class="tag">Éditeur</span><h3>Annuler (Ctrl+Z)</h3>La <b>dernière</b> action faite est la <b>première</b> annulée.</div>
+    <div class="panel step" data-g="2"><span class="tag">Navigateur</span><h3>Bouton « retour »</h3>On revient à la <b>dernière</b> page visitée, puis à l’avant-dernière…</div>
+    <div class="panel step" data-g="3"><span class="tag">Cuisine</span><h3>Pile d’assiettes</h3>On pose et on prend l’assiette du <b>dessus</b>. Celle du dessous attend.</div>
+  </div>
+  <div class="def step" data-g="4" data-t="Définition">Une <span class="kw">pile</span> est une structure où l’on n’ajoute et ne retire que <b>par le dessus</b> : le <b>dernier entré est le premier sorti</b>. En anglais : LIFO (<i>last in, first out</i>).</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Les opérations d’une pile</h2>
+  <table class="tbl" style="font-size:33px">
+    <tr class="step" data-g="1"><th>Opération</th><th>Effet</th><th class="num">Coût</th></tr>
+    <tr class="step" data-g="1"><td class="mono">empiler(x)</td><td>pose x au sommet</td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="2"><td class="mono">dépiler()</td><td>retire et renvoie l’élément du sommet</td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="3"><td class="mono">sommet()</td><td>montre l’élément du sommet sans le retirer</td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="4"><td class="mono">est_vide()</td><td>vrai si la pile ne contient rien</td><td class="num t-ok">Θ(1)</td></tr>
+  </table>
+  <div class="grid2" style="flex:none">
+    <div class="callout warn step" data-g="5"><b>Pile vide</b> : dépiler ou lire le sommet est une erreur. On teste <span class="mono">est_vide()</span> avant.</div>
+    <div class="callout warn step" data-g="6"><b>Pile pleine</b> : possible seulement si la pile est faite avec un tableau de taille fixe.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Manipulez une pile</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Manipuler une pile, et voir trois façons de la représenter en mémoire.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Quelle valeur sort en premier, et le coût de chaque opération : <b>toujours 1</b>.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Empilez 5 valeurs, dépilez-en 2, puis changez de vue (tableau, liste chaînée). Essayez de dépiler une pile vide.</div></div>
+  </div>
+  <div id="sim-pile" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Deux façons de construire une pile</h2>
+  <div class="grid2">
+    <div class="panel col step" data-g="1"><span class="tag">Avec un tableau</span>
+      <pre class="code free" data-pc style="font-size:27px;line-height:1.7">empiler(x):
+    sommet ← sommet + 1
+    t[sommet] ← x
+dépiler():
+    x ← t[sommet]
+    sommet ← sommet - 1
+    retourner x</pre>
+      <div class="small">Simple et rapide, mais la taille est <b>limitée</b> : risque de pile pleine.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Avec une liste chaînée</span>
+      <pre class="code free" data-pc style="font-size:27px;line-height:1.7">empiler(x):
+    insérer x en tête
+dépiler():
+    x ← tete.valeur
+    supprimer la tête
+    retourner x</pre>
+      <div class="small">Pas de limite de taille. On <b>réutilise l’insertion et la suppression en tête</b> du chapitre 3 : toutes deux en Θ(1).</div></div>
+  </div>
+  <div class="keep step" data-g="3">Dans les deux cas, toutes les opérations coûtent <b>Θ(1)</b>.</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Application 1 : les parenthèses</h2>
+  <p class="sub">Comment un compilateur vérifie-t-il qu’une expression est bien parenthésée ?</p>
+  <div class="split even">
+    <div class="col" style="gap:16px">
+      <div class="panel step" data-g="1" style="padding:18px 28px"><span class="mono" style="font-size:40px">{ [ ( ) ] }</span><span class="pill ok" style="margin-left:18px">correct</span></div>
+      <div class="panel step" data-g="2" style="padding:18px 28px"><span class="mono" style="font-size:40px">( [ ) ]</span><span class="pill bad" style="margin-left:18px">incorrect</span></div>
+      <div class="panel step" data-g="3" style="padding:18px 28px"><span class="mono" style="font-size:40px">( ( )</span><span class="pill bad" style="margin-left:18px">incorrect</span></div>
+    </div>
+    <div class="col" style="gap:20px">
+      <div class="def step" data-g="4" data-t="L’idée">La <b>dernière</b> parenthèse ouverte doit être la <b>première</b> fermée : c’est exactement le comportement d’une pile.</div>
+      <ol class="num step" data-g="5" style="font-size:30px"><li><span>Ouvrante : on l’<b>empile</b>.</span></li><li><span>Fermante : on <b>dépile</b> et on vérifie que cela correspond.</span></li><li><span>À la fin, la pile doit être <b>vide</b>.</span></li></ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Vérifier des parenthèses avec une pile</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Vérifier qu’une expression est bien parenthésée en utilisant une pile.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les ouvrantes <b>s’empilent</b>, chaque fermante <b>dépile</b>. Le caractère lu est surligné.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez les cinq expressions. Pourquoi <span class="mono">([)]</span> est-elle refusée alors que chaque type de parenthèse est bien fermé ?</div></div>
+  </div>
+  <div id="sim-parens" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Application 2 : la notation postfixe</h2>
+  <div class="split even top">
+    <div class="col" style="gap:20px">
+      <div class="def" data-t="Définition">Dans la <span class="kw">notation postfixe</span>, l’opérateur est écrit <b>après</b> ses deux opérandes. Pas de parenthèses, pas de priorités.</div>
+      <table class="tbl" style="font-size:30px">
+        <tr class="step" data-g="1"><th>Habituel</th><th>Postfixe</th></tr>
+        <tr class="step" data-g="1"><td class="mono">3 + 4</td><td class="mono">3 4 +</td></tr>
+        <tr class="step" data-g="2"><td class="mono">(3 + 4) × 2</td><td class="mono">3 4 + 2 *</td></tr>
+        <tr class="step" data-g="3"><td class="mono">3 + 4 × 2</td><td class="mono">3 4 2 * +</td></tr>
+      </table>
+    </div>
+    <div class="col" style="gap:20px">
+      <div class="panel step" data-g="4"><span class="tag">Algorithme d’évaluation</span>
+        <ol class="num" style="font-size:30px"><li><span>Un <b>nombre</b> : on l’empile.</span></li><li><span>Un <b>opérateur</b> : on dépile deux nombres, on calcule, on empile le résultat.</span></li><li><span>À la fin : <b>un seul nombre</b> reste, c’est le résultat.</span></li></ol></div>
+      <div class="callout step" data-g="5">Les calculatrices à pile et certains langages utilisent cette notation.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Évaluer une expression postfixe</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Évaluer une expression sans parenthèses ni priorités, avec une pile.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les nombres <b>s’empilent</b>. Un opérateur <b>dépile deux nombres</b> et <b>empile</b> le résultat.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Prédisez le résultat de <span class="mono">3 4 + 2 *</span> avant la fin, puis essayez la plus longue.</div></div>
+  </div>
+  <div id="sim-postfix" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">La pile d’appels : un vieil ami</h2>
+  <div class="split">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Souvenez-vous de la factorielle (séance 1) : chaque appel en cours était une <b>fiche posée sur une pile</b>.</div>
+      <div class="txt step" data-g="2">On empile à chaque appel, on dépile à chaque retour : <b>c’est exactement une pile LIFO</b>.</div>
+      <div class="callout step" data-g="3">Toute fonction récursive peut être réécrite sans récursion, avec une <b>pile explicite</b> que l’on gère soi-même.</div>
+    </div>
+    <div class="col" style="align-items:center">
+      <div class="pile-wrap step" data-g="1"><div class="pile-col">
+        <div class="assiette top" style="font-size:30px">fact(3)</div>
+        <div class="assiette" style="font-size:30px">fact(2)</div>
+        <div class="assiette" style="font-size:30px">fact(1)</div>
+        <div class="assiette" style="font-size:30px">fact(0)</div>
+        <div class="assiette" style="font-size:30px;opacity:.6">main</div></div><div class="pile-base"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Question 6</h2>
+  <div id="q6" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="La pile">
+  <h2 class="title">Question 7</h2>
+  <div id="q7" style="max-width:1560px"></div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">5</div>
+  <div class="eyebrow">Chapitre 5</div>
+  <h2>La file</h2>
+  <div class="q">Comment servir les éléments <b>dans l’ordre d’arrivée</b> ?</div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Un besoin concret : attendre son tour</h2>
+  <div class="grid3" style="flex:none">
+    <div class="panel step" data-g="1"><span class="tag">Guichet</span><h3>File d’attente</h3>Le <b>premier</b> arrivé est le <b>premier</b> servi. On arrive par le fond, on part par la tête.</div>
+    <div class="panel step" data-g="2"><span class="tag">Imprimante</span><h3>Travaux d’impression</h3>Les documents sortent <b>dans l’ordre où ils ont été envoyés</b>.</div>
+    <div class="panel step" data-g="3"><span class="tag">Réseau</span><h3>Paquets d’un routeur</h3>Les paquets attendent leur tour pour être transmis, <b>dans l’ordre d’arrivée</b>.</div>
+  </div>
+  <div class="def step" data-g="4" data-t="Définition">Une <span class="kw">file</span> est une structure où l’on <b>ajoute à la fin</b> et où l’on <b>retire au début</b> : le <b>premier entré est le premier sorti</b>. En anglais : FIFO (<i>first in, first out</i>).</div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Les opérations d’une file</h2>
+  <table class="tbl" style="font-size:33px">
+    <tr class="step" data-g="1"><th>Opération</th><th>Effet</th><th class="num">Coût visé</th></tr>
+    <tr class="step" data-g="1"><td class="mono">enfiler(x)</td><td>ajoute x à la <b>fin</b></td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="2"><td class="mono">défiler()</td><td>retire et renvoie l’élément du <b>début</b></td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="3"><td class="mono">premier()</td><td>montre l’élément du début sans le retirer</td><td class="num t-ok">Θ(1)</td></tr>
+    <tr class="step" data-g="4"><td class="mono">est_vide()</td><td>vrai si la file ne contient rien</td><td class="num t-ok">Θ(1)</td></tr>
+  </table>
+  <div class="grid2" style="flex:none">
+    <div class="callout warn step" data-g="5"><b>File vide</b> : défiler ou lire le premier est une erreur. On teste <span class="mono">est_vide()</span> avant.</div>
+    <div class="callout step" data-g="6"><b>Le défi</b> : garder <b>Θ(1)</b> pour les deux opérations, alors qu’on travaille aux <b>deux extrémités</b>.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Pile contre file</h2>
+  <p class="sub">Mêmes éléments, mêmes ajouts : l’ordre de sortie est <b>inversé</b>.</p>
+  <div class="grid2">
+    <div class="panel col step" data-g="1"><span class="tag">Pile (LIFO)</span><h3>Dernier entré, premier sorti</h3>
+      <div class="small">On ajoute 1, 2, 3. On retire trois fois.</div>
+      <div class="keep" style="font-size:42px;font-family:var(--mono)">sort : 3, 2, 1</div>
+      <div class="small">Un seul côté : le <b>sommet</b>.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">File (FIFO)</span><h3>Premier entré, premier sorti</h3>
+      <div class="small">On ajoute 1, 2, 3. On retire trois fois.</div>
+      <div class="keep" style="font-size:42px;font-family:var(--mono)">sort : 1, 2, 3</div>
+      <div class="small">Deux côtés : on entre par la <b>fin</b>, on sort par le <b>début</b>.</div></div>
+  </div>
+  <div class="callout step" data-g="3">Choisir pile ou file, c’est choisir <b>dans quel ordre on traite les éléments en attente</b> : le plus récent d’abord, ou le plus ancien.</div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Manipulez une file</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Manipuler une file, et voir deux façons de la représenter en mémoire.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Quelle valeur sort en premier ? Que deviennent <b>début</b> et <b>fin</b> dans le tableau, et <b>tete</b> et <b>queue</b> dans la liste ?</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Enfilez 5 valeurs, défilez-en 2, enfilez encore. Dans la vue tableau, remplissez la file : que se passe-t-il quand <b>fin</b> arrive au bout ?</div></div>
+  </div>
+  <div id="sim-file" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Avec un tableau : le piège du décalage</h2>
+  <div class="split even top">
+    <div class="col" style="gap:20px">
+      <div class="txt step" data-g="1"><b>Première idée</b> : le premier élément est toujours dans la case 0. Pour défiler, on retire la case 0 et on <b>décale tout le monde</b> d’une case vers la gauche.</div>
+      <div class="callout warn step" data-g="2">On retrouve le défaut du chapitre 2 : défiler coûte <b>n − 1 décalages</b>, donc <b>Θ(n)</b>. Pour une file de un million d’éléments, c’est inacceptable.</div>
+    </div>
+    <div class="col" style="gap:20px">
+      <div class="txt step" data-g="3"><b>Meilleure idée</b> : ne rien décaler. On garde une variable <b>début</b> : l’indice du premier élément. Défiler, c’est seulement <b>avancer début d’une case</b>.</div>
+      <div class="callout step" data-g="4">Problème : à force d’avancer, on arrive au bout du tableau alors qu’il reste de la place <b>au début</b>. Solution : <b>revenir à la case 0</b> après la dernière case. C’est le <b>tableau circulaire</b>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Le tableau circulaire</h2>
+  <div class="split even top">
+    <div class="col" style="gap:18px">
+      <div class="panel step" data-g="1"><span class="tag">Trois variables</span>
+        <ul class="lst sm"><li><span class="mono">t</span> : le tableau, de <span class="mono">N</span> cases</li><li><span class="mono">début</span> : indice du premier élément</li><li><span class="mono">taille</span> : nombre d’éléments présents</li></ul></div>
+      <div class="def step" data-g="2" data-t="Revenir à la case 0">Pour avancer d’une case en <b>bouclant</b>, on écrit <span class="mono">(i + 1) mod N</span>. Avec N = 6 : après la case 5, on retombe sur la case 0. (<span class="mono">mod</span> est le reste de la division, <span class="mono">%</span> en C.)</div>
+    </div>
+    <div class="col" style="gap:18px">
+      <pre class="code free step" data-g="3" data-pc style="font-size:27px;line-height:1.7">enfiler(x):
+    t[(début + taille) mod N] ← x
+    taille ← taille + 1
+défiler():
+    x ← t[début]
+    début ← (début + 1) mod N
+    taille ← taille - 1
+    retourner x</pre>
+      <div class="keep step" data-g="4">Aucun décalage : enfiler et défiler coûtent <b>Θ(1)</b>. Limite : la file est <b>pleine</b> quand <span class="mono">taille = N</span>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Avec une liste chaînée : deux pointeurs</h2>
+  <div class="col" style="gap:22px;flex:1;justify-content:center">
+    <div style="display:flex;justify-content:center"><div id="mem-static-file" class="step" data-g="1"></div></div>
+    <div class="grid3" style="flex:none">
+      <div class="panel step" data-g="2"><span class="tag">Retirer au début</span>Facile : c’est la suppression en tête, en <b>Θ(1)</b>.</div>
+      <div class="panel step" data-g="3"><span class="tag">Ajouter à la fin</span>Avec seulement <b>tete</b>, il faut parcourir la liste (chapitre 3) : <b>Θ(n)</b>.</div>
+      <div class="callout good step" data-g="4"><b>Astuce</b> : une seconde variable <b>queue</b> désigne le <b>dernier nœud</b>. On accroche le nouveau nœud au bout, sans rien parcourir.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Enfiler et défiler avec tete et queue</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir comment enfiler et défiler restent en Θ(1) grâce à deux variables : tete et queue.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Quelle variable change à l’<b>enfilage</b> ? Laquelle change au <b>défilage</b> ? Le parcours est-il nécessaire ?</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez « Enfiler 5 », puis « Défiler ». Pourquoi faut-il traiter à part le cas d’une file qui devient vide ?</div></div>
+  </div>
+  <div id="sim-file-list" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">À quoi sert une file ?</h2>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Système</span><h3>Tâches en attente</h3><div class="small">Le système d’exploitation range les tâches prêtes dans une file : chacune passe à son tour sur le processeur (<b>tourniquet</b>).</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Réseau</span><h3>Paquets en transit</h3><div class="small">Un routeur met les paquets dans une file. Si elle est pleine, les nouveaux paquets sont <b>perdus</b>.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Algorithmes</span><h3>Parcours en largeur</h3><div class="small">On visite d’abord les voisins les plus proches, puis leurs voisins : une file garde l’ordre de visite. Vu à la <b>séance 6</b> (graphes).</div></div>
+  </div>
+  <div class="keep step" data-g="4">Quand l’ordre d’arrivée compte : <b>file</b>. Quand le dernier arrivé doit passer en premier : <b>pile</b>.</div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Question 8</h2>
+  <div id="q8" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="5" data-chname="La file">
+  <h2 class="title">Question 9</h2>
+  <div id="q9" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 1 à 3 : la mémoire</h2>
+  <p class="sub">Cherchez seul quelques minutes, puis révélez la solution.</p>
+  <div class="grid3">
+    <div class="col"><b class="acc">Exercice 1</b>
+      <pre class="code free" style="font-size:25px">int a = 3, b = 4;
+int *p = &amp;a;
+int *q = &amp;b;
+*p = *q;
+q = p;
+*q = 0;</pre>
+      <div class="small">Que valent a et b à la fin ? Vers quoi pointe q ?</div>
+      <div class="callout good step" style="font-size:26px"><span class="mono">*p = *q</span> : a prend 4. <span class="mono">q = p</span> : q désigne a. <span class="mono">*q = 0</span> : a vaut 0. <b>a = 0, b = 4</b>, q désigne a.</div></div>
+    <div class="col"><b class="acc">Exercice 2</b>
+      <pre class="code free" style="font-size:25px">int *p;
+*p = 10;</pre>
+      <div class="small">Quel est le problème ?</div>
+      <div class="callout good step" style="font-size:26px">p n’a pas été <b>initialisé</b> : il contient une adresse au hasard. Écrire dedans plante, ou abîme la mémoire. Il fallait <span class="mono">p = malloc(…)</span> ou <span class="mono">p = &amp;a</span>.</div></div>
+    <div class="col"><b class="acc">Exercice 3</b>
+      <pre class="code free" style="font-size:25px">Noeud *n = malloc(sizeof(Noeud));
+n-&gt;valeur = 1;
+free(n);
+printf("%d", n-&gt;valeur);</pre>
+      <div class="small">Quel est le problème ?</div>
+      <div class="callout good step" style="font-size:26px">Après <span class="mono">free(n)</span>, n est un <b>pointeur pendant</b> : le bloc ne nous appartient plus. Remettre <span class="mono">n = NULL</span> après le free évite l’erreur.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 4 à 6 : listes et piles</h2>
+  <div class="grid3">
+    <div class="col"><b class="acc">Exercice 4</b>
+      <div class="panel" style="font-size:28px">Liste <b class="mono">2 → 5 → 8</b>. On fait <span class="mono">inserer_tete(1)</span> puis <span class="mono">supprimer(5)</span>. Quelle liste obtient-on ? Quel est le coût de chaque opération ?</div>
+      <div class="callout good step" style="font-size:26px">Après l’insertion : 1 → 2 → 5 → 8 (Θ(1)). Après la suppression de 5 : <b>1 → 2 → 8</b> (Θ(n) pour trouver 5, puis Θ(1) pour le retirer).</div></div>
+    <div class="col"><b class="acc">Exercice 5</b>
+      <div class="panel" style="font-size:28px">Pile vide. On fait : empiler 1, empiler 2, empiler 3, dépiler, empiler 4, dépiler, dépiler. Quelles valeurs sortent, dans quel ordre ? Que reste-t-il ?</div>
+      <div class="callout good step" style="font-size:26px">Sorties : <b>3, 4, 2</b>. Il reste <b>1</b> dans la pile.</div></div>
+    <div class="col"><b class="acc">Exercice 6</b>
+      <div class="panel" style="font-size:28px">Évaluez en postfixe : <b class="mono">2 3 4 * +</b> puis <b class="mono">6 2 / 3 -</b>.</div>
+      <div class="callout good step" style="font-size:26px"><span class="mono">2 3 4 * +</span> : 3 × 4 = 12, puis 2 + 12 = <b>14</b>. <span class="mono">6 2 / 3 -</span> : 6 ÷ 2 = 3, puis 3 − 3 = <b>0</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 7 et 8 : pointeurs de pointeurs</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 7</b>
+      <pre class="code free" style="font-size:27px">int a = 1, b = 2;
+int *p = &amp;a;
+int **pp = &amp;p;
+**pp = 10;
+*pp = &amp;b;
+**pp = 20;</pre>
+      <div class="small">Que valent a et b à la fin ? Vers quoi pointe p ?</div>
+      <div class="callout good step" style="font-size:28px"><span class="mono">**pp = 10</span> : a vaut 10. <span class="mono">*pp = &amp;b</span> : p reçoit l’adresse de b, donc p désigne b. <span class="mono">**pp = 20</span> : b vaut 20. <b>a = 10, b = 20</b>, p désigne b.</div></div>
+    <div class="col"><b class="acc">Exercice 8</b>
+      <div class="panel" style="font-size:30px">Une matrice de 3 lignes et 4 colonnes est allouée avec <span class="mono">int **m</span>. Combien faut-il de <span class="mono">malloc</span> ? De <span class="mono">free</span> ? Dans quel ordre libère-t-on ? Quelle est la valeur de <span class="mono">m[2][3]</span> si <span class="mono">m[i][j] = i * 4 + j</span> ?</div>
+      <div class="callout good step" style="font-size:28px"><b>4 malloc</b> (le tableau de 3 pointeurs, puis les 3 lignes) et <b>4 free</b> : les 3 lignes d’abord, le tableau de pointeurs en dernier. <span class="mono">m[2][3] = 2 × 4 + 3 = <b>11</b></span>.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 9 et 10 : les files</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 9</b>
+      <div class="panel" style="font-size:30px">File vide. On fait : enfiler 1, enfiler 2, enfiler 3, défiler, enfiler 4, défiler, défiler. Quelles valeurs sortent, dans quel ordre ? Que reste-t-il ? Comparez avec l’exercice 5 (pile).</div>
+      <div class="callout good step" style="font-size:28px">Sorties : <b>1, 2, 3</b>. Il reste <b>4</b> dans la file. Avec une pile, les mêmes opérations donnaient 3, 4, 2 et il restait 1.</div></div>
+    <div class="col"><b class="acc">Exercice 10</b>
+      <div class="panel" style="font-size:30px">Tableau circulaire de N = 5 cases, <span class="mono">début = 3</span>, <span class="mono">taille = 4</span>. Dans quelles cases se trouvent les éléments ? Où <span class="mono">enfiler</span> écrit-il ? Quelle est la valeur de début après un <span class="mono">défiler</span> ?</div>
+      <div class="callout good step" style="font-size:28px">Éléments en cases <b>3, 4, 0, 1</b> (on boucle après la 4). <span class="mono">enfiler</span> écrit en <span class="mono">(3 + 4) mod 5 = <b>2</b></span>. Après un <span class="mono">défiler</span> : <span class="mono">début = (3 + 1) mod 5 = <b>4</b></span>.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Bilan" data-chname="Bilan">
+  <h2 class="title">À retenir</h2>
+  <div class="col" style="gap:16px;flex:1;justify-content:center">
+    <div class="panel step" style="padding:20px 36px"><b>Pointeur</b> : une variable qui contient une adresse. <b>p</b> est l’adresse, <b>*p</b> est la case. <b>NULL</b> ne désigne rien.</div>
+    <div class="panel step" style="padding:20px 36px"><b>Pile</b> : variables locales, durée automatique. <b>Tas</b> : blocs de <b>malloc</b>, durée choisie. <b>Un malloc, un free.</b></div>
+    <div class="panel step" style="padding:20px 36px"><b>Liste chaînée</b> : des nœuds reliés par des adresses. Insertion en tête <b>Θ(1)</b>, accès au i-ème <b>Θ(n)</b>. L’<b>ordre</b> des affectations décide si la liste survit.</div>
+    <div class="panel step" style="padding:20px 36px"><b>Tableau ou liste</b> : on choisit selon les opérations les plus fréquentes.</div>
+    <div class="panel step" style="padding:20px 36px"><b>Pile</b> : dernier entré, premier sorti, toutes les opérations en <b>Θ(1)</b>. Parenthèses et notation postfixe sont ses applications classiques.</div>
+    <div class="panel step" style="padding:20px 36px"><b>File</b> : premier entré, premier sorti. Avec un <b>tableau circulaire</b> ou une liste avec <b>tete et queue</b>, enfiler et défiler coûtent <b>Θ(1)</b>.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Suite" data-chname="Suite">
+  <h2 class="title">TP d’aujourd’hui et prochaine séance</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">TP 2 · une heure, en C</span><h3>Listes chaînées, piles et files</h3>
+      <ul class="lst sm"><li>Observer les adresses de nœuds créés avec malloc</li><li>Écrire l’insertion en tête et la suppression</li><li>Mesurer : liste contre tableau pour n insertions en tête</li><li>Une pile qui vérifie les parenthèses</li><li>Une file avec tete et queue</li></ul>
+      <div class="small" style="margin-top:auto">Le code de départ et le sujet sont sur la page du cours. Le compte rendu se dépose sur Classroom.</div></div>
+    <div class="panel navy col"><span class="tag" style="color:var(--cover-accent)">Séance 3</span><h3>Arbres et tas</h3>
+      <ul class="lst sm" style="color:#E6F0FA"><li>Arbres binaires</li><li>Arbres binaires de recherche</li><li>Tas et file de priorité</li></ul>
+      <div class="small" style="margin-top:auto">Revoyez les listes chaînées : elles servent encore.</div></div>
+  </div>
+  <div class="keep">Merci de votre attention. Des questions ?</div>
+</section>
+
+<div id="foot"><span><b>Yassine Ben-Aboud</b> · Séance 2 · Structures linéaires</span></div>
+<div id="nav">
+  <button id="b-prev" aria-label="Précédent" title="Précédent">◀</button>
+  <button id="b-next" aria-label="Suivant" title="Suivant">▶</button>
+  <button id="b-ov" aria-label="Aperçu" title="Aperçu (O)">▦</button>
+  <button id="b-theme" aria-label="Thème" title="Thème (T)">◐</button>
+  <button id="b-full" aria-label="Plein écran" title="Plein écran (F)">⛶</button>
+  <button id="b-help" aria-label="Aide" title="Aide (?)">?</button>
+  <span id="count"></span>
+</div>
+<div id="notes"></div>
+<div id="overview" class="ov"><h4>Plan de la séance</h4><div class="grid"></div></div>
+<div id="help" class="ov"><h4>Raccourcis</h4>
+  <table>
+    <tr><td><kbd>→</kbd> <kbd>Espace</kbd></td><td>Suivant (révèle d’abord les éléments cachés)</td></tr>
+    <tr><td><kbd>←</kbd></td><td>Précédent</td></tr>
+    <tr><td><kbd>O</kbd></td><td>Aperçu de toutes les diapositives</td></tr>
+    <tr><td><kbd>N</kbd></td><td>Notes de l’enseignant</td></tr>
+    <tr><td><kbd>T</kbd></td><td>Thème clair ou sombre</td></tr>
+    <tr><td><kbd>F</kbd></td><td>Plein écran</td></tr>
+    <tr><td><kbd>Échap</kbd></td><td>Fermer un panneau</td></tr>
+  </table>
+  <p class="small" style="margin-top:20px">Astuce : ajoutez <span class="mono">?all</span> à l’adresse pour tout afficher d’un coup.</p>
+</div>
+</div>
+</div>
+
+<script src="../assets/sim.js?v=1795649354672"></script>
+<script src="../assets/sim2.js?v=1795649354672"></script>
+<script>
+(function () {
+  var S2 = Sim2, h = Sim.h;
+  [].forEach.call(document.querySelectorAll('[data-pc]'), function (e) { e.innerHTML = Sim.pc(e.textContent); });
+  /* Dans une colonne flex, le texte mêlé à du gras doit rester dans un seul bloc. */
+  var INL = { B: 1, I: 1, EM: 1, STRONG: 1, BR: 1, SUB: 1, SUP: 1, A: 1 };
+  [].forEach.call(document.querySelectorAll('.panel.col'), function (p) {
+    var kids = [].slice.call(p.childNodes), run = [];
+    function flush() { if (!run.length) return; var d = document.createElement('div'); p.insertBefore(d, run[0]); run.forEach(function (n) { d.appendChild(n); }); run = []; }
+    kids.forEach(function (n) {
+      var inline = (n.nodeType === 3 && n.textContent.trim() !== '') || (n.nodeType === 1 && (INL[n.tagName] || (n.tagName === 'SPAN' && n.className.indexOf('kw') >= 0)));
+      if (inline) run.push(n); else flush();
+    });
+    flush();
+  });
+
+  S2.memStatic('#mem-static-vars', { stack: [{ id: 'a', name: 'a', addr: 100, v: 5 }, { id: 'b', name: 'b', addr: 104, v: 7 }, { id: 'c', name: 'c', addr: 108, v: 12 }] }, { noheap: true, zoom: 1.35 });
+  S2.memStatic('#mem-static-null', { stack: [{ id: 'p', name: 'p', addr: 100, p: null, ptr: true }] }, { noheap: true, zoom: 1.35 });
+  S2.memStatic('#mem-static-pp', { stack: [{ id: 'a', name: 'a', addr: 100, v: 5 }, { id: 'p', name: 'p', addr: 104, p: 'a', ptr: true }, { id: 'pp', name: 'pp', addr: 112, p: 'p', ptr: true }] }, { noheap: true, zoom: 1.35 });
+  S2.memStatic('#mem-static-struct', { stack: [], heap: [{ id: 'n', addr: 2000, fields: [{ n: 'valeur', v: 7 }, { n: 'suivant', p: null, ptr: true }] }] }, { sw: 120, zoom: 1.0 });
+  S2.memStatic('#mem-static-matrix', { stack: [{ id: 'm', name: 'm', addr: 100, p: 'R', ptr: true }], heap: [
+    { id: 'R', addr: 2000, fields: [{ n: 'm[0]', p: 'L0', ptr: true, sm: true }, { n: 'm[1]', p: 'L1', ptr: true, sm: true }] },
+    { id: 'L0', addr: 2048, fields: [{ n: '[0]', v: 1, sm: true }, { n: '[1]', v: 2, sm: true }, { n: '[2]', v: 3, sm: true }] },
+    { id: 'L1', addr: 2112, fields: [{ n: '[0]', v: 4, sm: true }, { n: '[1]', v: 5, sm: true }, { n: '[2]', v: 6, sm: true }] }] }, { sw: 220, hg: 60, zoom: 0.92 });
+  document.getElementById('mx-static').appendChild(S2.matrixView({ heap: [{ id: 'R', fields: [{ n: 'm[0]', p: 'L0', ptr: true }, { n: 'm[1]', p: 'L1', ptr: true }] }, { id: 'L0', fields: [{ v: 1 }, { v: 2 }, { v: 3 }] }, { id: 'L1', fields: [{ v: 4 }, { v: 5 }, { v: 6 }] }] }, { rows: 2, cols: 3, hl: [1, 2] }));
+  S2.chain('#chain-node', { vals: [7], head: false });
+  S2.memStatic('#mem-static-node', { stack: [], heap: [{ id: 'n', addr: 2000, fields: [{ n: 'valeur', v: 7 }, { n: 'suivant', p: null, ptr: true }] }] }, { sw: 120 });
+  S2.memStatic('#mem-static-list', { stack: [{ id: 'tete', name: 'tete', addr: 100, p: 'A', ptr: true }], heap: [
+    { id: 'A', addr: 2000, fields: [{ n: 'valeur', v: 7 }, { n: 'suivant', p: 'B', ptr: true }] },
+    { id: 'B', addr: 2048, fields: [{ n: 'valeur', v: 3 }, { n: 'suivant', p: 'C', ptr: true }] },
+    { id: 'C', addr: 2112, fields: [{ n: 'valeur', v: 9 }, { n: 'suivant', p: null, ptr: true }] }] }, { zoom: 1.4 });
+  S2.chain('#chain-dbl', { vals: [7, 3, 9], dbl: true });
+  S2.chain('#chain-circ', { vals: [7, 3, 9], circ: true });
+  Sim.arrayViz(document.getElementById('arr-forces'), { values: [4, 7, 1, 8, 3, 6], cls: { 3: 'cur' }, ptrs: {}, cw: 82 });
+  [].forEach.call(document.querySelectorAll('#arr-forces .ac'), function (c, i) { c.querySelector('.idx').textContent = 'n° ' + (200 + 4 * i); });
+
+  S2.memTracer('#sim-vars', { code: S2.code.vars, steps: S2.scen.vars(), noheap: true, layout: 'side' });
+  S2.memTracer('#sim-local', { code: S2.code.local, steps: S2.scen.local(), noheap: true, layout: 'side' });
+  S2.memTracer('#sim-ptr', { code: S2.code.ptr, steps: S2.scen.ptr(), noheap: true, layout: 'side' });
+  S2.memTracer('#sim-pp', { code: S2.code.pp, steps: S2.scen.pp(), noheap: true, layout: 'side' });
+  S2.memTracer('#sim-malloc', { code: S2.code.malloc, steps: S2.scen.malloc(), layout: 'side' });
+  S2.memTracer('#sim-copy', { code: S2.code.copy, steps: S2.scen.copy(), noheap: true, layout: 'side', scenarios: [
+    { label: 'Passage par valeur : f(a)', steps: S2.scen.copy(), code: S2.code.copy },
+    { label: 'Passage de l’adresse : g(&a)', steps: S2.scen.ref(), code: S2.code.ref }] });
+  S2.memTracer('#sim-alloue', { code: S2.code.alloueKo, steps: S2.scen.alloueKo(), layout: 'side', scenarios: [
+    { label: 'Avec int *q : une copie de p', steps: S2.scen.alloueKo(), code: S2.code.alloueKo },
+    { label: 'Avec int **pp : l’adresse de p', steps: S2.scen.alloueOk(), code: S2.code.alloueOk }] });
+  S2.memTracer('#sim-matrix', { code: S2.code.matrix, steps: S2.scen.matrix(), layout: 'side', codeW: 640, codeSize: 21, sw: 230, hg: 48, zoom: 0.9, noteSize: 24, matrix: { rows: 2, cols: 3 } });
+  S2.memTracer('#sim-errors', { code: S2.code.err.leak, steps: S2.scen.leak(), layout: 'side', scenarios: [
+    { label: 'Fuite mémoire', steps: S2.scen.leak(), code: S2.code.err.leak },
+    { label: 'Pointeur NULL', steps: S2.scen.nul(), code: S2.code.err.nul },
+    { label: 'Double free', steps: S2.scen.dbl(), code: S2.code.err.dbl },
+    { label: 'Pointeur pendant', steps: S2.scen.dang(), code: S2.code.err.dang }] });
+  S2.arrayShift('#sim-shift');
+  S2.memTracer('#sim-parcours', { code: S2.code.parcours, steps: S2.scen.parcours(), delay: 1700 });
+  S2.memTracer('#sim-tete', { code: S2.code.teteOk, steps: S2.scen.teteOk(), scenarios: [
+    { label: 'Bon ordre', steps: S2.scen.teteOk(), code: S2.code.teteOk },
+    { label: 'Mauvais ordre', steps: S2.scen.teteKo(), code: S2.code.teteKo }] });
+  S2.memTracer('#sim-fin', { code: S2.code.fin, steps: S2.scen.fin(), delay: 1700 });
+  S2.memTracer('#sim-suppr', { code: S2.code.suppr, steps: S2.scen.supprMilieu(), scenarios: [
+    { label: 'Supprimer au milieu (3)', steps: S2.scen.supprMilieu(), code: S2.code.suppr },
+    { label: 'Supprimer le premier (7)', steps: S2.scen.supprTete(), code: S2.code.supprTete }] });
+  S2.stackPlay('#sim-pile');
+  S2.parens('#sim-parens');
+  S2.postfix('#sim-postfix');
+
+  S2.queuePlay('#sim-file');
+  S2.memTracer('#sim-file-list', { code: S2.code.enfiler, steps: S2.scen.enfiler(), scenarios: [
+    { label: 'Enfiler 5', steps: S2.scen.enfiler(), code: S2.code.enfiler },
+    { label: 'Défiler', steps: S2.scen.defiler(), code: S2.code.defiler }] });
+  S2.memStatic('#mem-static-file', { stack: [{ id: 'tete', name: 'tete', addr: 100, p: 'A', ptr: true }, { id: 'queue', name: 'queue', addr: 104, p: 'C', ptr: true }], heap: [
+    { id: 'A', addr: 2000, fields: [{ n: 'valeur', v: 7 }, { n: 'suivant', p: 'B', ptr: true }] },
+    { id: 'B', addr: 2048, fields: [{ n: 'valeur', v: 3 }, { n: 'suivant', p: 'C', ptr: true }] },
+    { id: 'C', addr: 2112, fields: [{ n: 'valeur', v: 9 }, { n: 'suivant', p: null, ptr: true }] }] }, { zoom: 1.0 });
+  Sim.quiz('#q8', { q: 'On enfile 1, 2, 3, puis on défile deux fois, puis on enfile 4. Que contient la file, du premier au dernier ?', opts: ['1, 4', '3, 4', '2, 3, 4', '4, 3'], ans: 1, why: 'Après trois enfilages : 1, 2, 3 (le 1 est le premier). Deux défilages retirent 1 puis 2. Il reste 3. On enfile 4 à la fin : du premier au dernier, 3 puis 4.' });
+  Sim.quiz('#q9', { q: 'Une file est faite avec une liste chaînée qui n’a QUE la variable tete. Quel est le coût de enfiler ?', opts: ['Θ(1), comme défiler', 'Θ(n) : il faut parcourir la liste jusqu’au dernier nœud', 'Θ(log n)', 'Θ(n²)'], ans: 1, why: 'Sans variable queue, on ne connaît pas l’adresse du dernier nœud : on doit parcourir toute la liste pour l’atteindre. Garder queue permet d’accrocher le nouveau nœud directement : Θ(1).' });
+  Sim.quiz('#q1', { q: 'On écrit : int a = 5; int *p = &a; *p = 9; Que vaut a ensuite, et que contient p ?', opts: ['a vaut 5 ; p contient 9', 'a vaut 9 ; p contient l’adresse de a', 'a vaut 9 ; p contient 9', 'On ne peut pas savoir'], ans: 1, why: '*p est la case dont l’adresse est dans p, donc a : écrire 9 dans *p modifie a. p n’a pas changé : il contient toujours l’adresse de a (100 dans notre exemple).' });
+  Sim.quiz('#q2', { q: 'On a int a = 5; int *p = &a; int **pp = &p; Après **pp = 9; *pp = NULL; que valent a et p ?', opts: ['a vaut 5 ; p vaut NULL', 'a vaut 9 ; p vaut NULL', 'a vaut 9 ; p désigne toujours a', 'a vaut NULL ; p vaut 9'], ans: 1, why: '**pp suit deux flèches jusqu’à a : a vaut 9. *pp est p lui-même : y ranger NULL met p à NULL. a n’est pas affecté par cette seconde instruction.' });
+  Sim.quiz('#q3', { q: 'Dans une boucle de un million de tours, on écrit : p = malloc(100); sans jamais appeler free. Que se passe-t-il ?', opts: ['Rien : le système rend la mémoire tout seul', 'Une fuite mémoire : environ 100 Mo sont réservés et perdus', 'Le programme plante dès le premier tour', 'Les blocs sont réutilisés automatiquement'], ans: 1, why: 'Chaque tour réserve un nouveau bloc et écrase p : le précédent n’a plus de pointeur, il est perdu. Un million de blocs de 100 octets représentent environ 100 Mo.' });
+  Sim.quiz('#q4', { q: 'Une liste contient un million de nœuds. Combien d’instructions faut-il pour insérer un nœud en tête ?', opts: ['Environ un million', 'Environ 20 (le logarithme)', 'Quatre, quelle que soit la longueur', 'Environ mille'], ans: 2, why: 'L’insertion en tête ne parcourt rien : créer le nœud, ranger la valeur, relier au premier, changer tete. Quatre instructions, coût constant Θ(1).' });
+  Sim.quiz('#q5', { q: 'Dans l’insertion en tête, on exécute tete ← n AVANT n.suivant ← tete. Qu’arrive-t-il ?', opts: ['Rien, l’ordre n’a pas d’importance', 'L’ancienne liste est perdue et le nouveau nœud se désigne lui-même', 'Le programme refuse de compiler', 'Le nouveau nœud est placé à la fin'], ans: 1, why: 'Après tete ← n, plus personne ne contient l’adresse de l’ancienne liste. Puis n.suivant ← tete donne n.suivant = n : le nœud pointe sur lui-même. Il faut d’abord relier n à l’ancienne tête, ensuite seulement déplacer tete.' });
+  Sim.quiz('#q6', { q: 'On empile 1, 2, 3, puis on dépile deux fois, puis on empile 4. Que contient la pile, de bas en haut ?', opts: ['1, 4', '1, 2, 4', '3, 4', '4, 1'], ans: 0, why: 'Après trois empilements : 1, 2, 3. Deux dépilements retirent 3 puis 2. Il reste 1. On empile 4 : de bas en haut, 1 puis 4.' });
+  Sim.quiz('#q7', { q: 'Quelle expression n’est PAS bien parenthésée ?', opts: ['( [ { } ] )', '{ ( ) ( ) }', '( [ ) ]', '[ ] ( ) { }'], ans: 2, why: 'Dans ( [ ) ], la fermante ) arrive alors que le sommet de la pile est [ : elles ne correspondent pas. La dernière ouvrante doit être la première fermée.' });
+})();
+</script>
+<script src="../assets/deck.js?v=1795649354672"></script>
+</body>
+</html>

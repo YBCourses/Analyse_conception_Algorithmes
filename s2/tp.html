@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TP 2 · Listes chaînées, piles et files</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/doc.css">
+</head>
+<body data-tp="tp2" data-seance="2" data-titre="TP 2 · Listes chaînées, piles et files" data-fichiers="tp2.c">
+<header class="top"><div class="gut">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 2</div>
+  <h1>TP 2 · Listes chaînées, piles et files</h1>
+  <div class="meta"><span>Durée : 1 heure</span><span>Langage : C</span><span>Yassine Ben-Aboud</span></div>
+  <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a href="support.html">Support de cours</a><a class="cur" href="tp.html">Sujet du TP 2</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
+</div></header>
+
+<div class="gut layout">
+<aside class="toc"><h4>Sommaire</h4>
+  <a href="#identite">Vos informations</a>
+  <a href="#mode">Mode d’emploi</a>
+  <a href="#demarrer">Pour démarrer</a>
+  <a href="#p1">Partie 1 · La mémoire</a>
+  <a href="#p2">Partie 2 · La liste</a>
+  <a href="#p3">Partie 3 · Mesurer</a>
+  <a href="#p4">Partie 4 · Une pile</a>
+  <a href="#p5">Partie 5 · Une file</a>
+  <a href="#envoi">Envoyer le compte rendu</a>
+  <a href="#aide">Aide</a>
+</aside>
+<article>
+
+<h2 id="identite">Vos informations</h2>
+<div class="ident">
+  <label>Nom<input id="f-nom" data-k="nom" autocomplete="family-name" placeholder="Nom de famille"></label>
+  <label>Prénom<input id="f-prenom" data-k="prenom" autocomplete="given-name" placeholder="Prénom"></label>
+  <label>Groupe ou filière<input id="f-groupe" data-k="groupe" placeholder="Par exemple : 1A, groupe 2"></label>
+  <label>Binôme (facultatif)<input id="f-binome" data-k="binome" placeholder="Nom et prénom de votre binôme"></label>
+</div>
+<p class="small" style="font-size:14px;color:var(--muted);margin-top:10px">Ces informations figureront dans votre fichier de compte rendu. Tout ce que vous saisissez dans cette page est enregistré automatiquement dans votre navigateur : vous pouvez fermer la page et reprendre plus tard, sur le même ordinateur.</p>
+
+<h2 id="mode">Mode d’emploi du TP</h2>
+<div class="stepline"><b class="num">1</b><div><b>Renseignez vos informations</b> ci-dessus.</div></div>
+<div class="stepline"><b class="num">2</b><div><b>Téléchargez</b> <code>tp2.c</code>, <b>complétez</b> les six TODO et <b>testez</b> votre programme partie par partie.</div></div>
+<div class="stepline"><b class="num">3</b><div><b>Remplissez les tableaux</b> de cette page avec ce que votre programme affiche, et <b>répondez aux questions</b>.</div></div>
+<div class="stepline"><b class="num">4</b><div><b>Exportez</b> votre compte rendu en JSON (section « Envoyer le compte rendu »), puis déposez dans le devoir du TP 2 sur <b>Classroom</b> <b>deux fichiers</b> : le JSON et votre <code>tp2.c</code> complété.</div></div>
+<div class="callout">Dans ce TP, vous <b>prédisez avant d’exécuter</b> : vos prédictions comptent autant que les mesures.</div>
+
+<h2 id="demarrer">Pour démarrer</h2>
+<p>Vous allez construire une liste chaînée en C, mesurer ce qu’elle apporte face à un tableau, puis écrire une pile qui vérifie des parenthèses et une file.</p>
+<p><a class="btn" href="../files/s2/tp2.c" download>Télécharger tp2.c</a></p>
+<pre class="code" data-lang="terminal">gcc tp2.c -o tp2 -O0 -Wall
+./tp2            # sous Windows : tp2.exe</pre>
+<p>Le fichier contient la structure <code>Noeud</code>, des fonctions fournies (<code>creer_noeud</code>, <code>afficher</code>, <code>longueur</code>, <code>rechercher</code>, une pile de caractères, le type <code>File</code>) et six fonctions à écrire, marquées <code>TODO 1</code> à <code>TODO 6</code>. Les fonctions <code>partie1()</code> à <code>partie5()</code> font les expériences. Au départ, seule la partie 1 est active : dans <code>main</code>, vous activerez les suivantes une par une.</p>
+
+<h2 id="p1">Partie 1 · Observer la mémoire <span class="dur">10 min</span></h2>
+<div class="step-tp"><b>1.1</b> Lisez <code>partie1()</code> : elle crée une variable <code>a</code>, un pointeur <code>p</code> qui désigne <code>a</code>, puis trois nœuds avec <code>creer_noeud</code> (donc <code>malloc</code>).</div>
+<div class="step-tp"><b>1.2</b> Exécutez et recopiez ce qui s’affiche. Les adresses changent d’une machine à l’autre : seuls comptent les <b>écarts</b> et les <b>tailles</b>.</div>
+<div class="tw"><table class="tbl" data-table="p1" data-title="Partie 1 · observations de la mémoire">
+  <tr><th>Observation</th><th>Valeur affichée</th></tr>
+  <tr><td>adresse de <code>a</code></td><td data-in></td></tr>
+  <tr><td>valeur de <code>p</code></td><td data-in></td></tr>
+  <tr><td>adresse de <code>n1</code></td><td data-in></td></tr>
+  <tr><td>adresse de <code>n2</code></td><td data-in></td></tr>
+  <tr><td>adresse de <code>n3</code></td><td data-in></td></tr>
+  <tr><td><code>n2 − n1</code> (octets)</td><td data-in></td></tr>
+  <tr><td><code>n3 − n2</code> (octets)</td><td data-in></td></tr>
+  <tr><td><code>sizeof(int)</code></td><td data-in></td></tr>
+  <tr><td><code>sizeof(Noeud *)</code></td><td data-in></td></tr>
+  <tr><td><code>sizeof(Noeud)</code></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p1_q1">Comparez l’adresse de <code>a</code> et la valeur de <code>p</code>. Que constatez-vous, et pourquoi ?</li>
+  <li data-q="p1_q2">Les trois nœuds sont-ils côte à côte en mémoire ? Qu’est-ce que cela change par rapport aux cases d’un tableau ?</li>
+  <li data-q="p1_q3"><code>sizeof(Noeud)</code> n’est pas égal à <code>sizeof(int)</code> + <code>sizeof(Noeud *)</code>. Proposez une explication (indice : le compilateur aligne les champs).</li>
+</ol>
+
+<h2 id="p2">Partie 2 · Écrire et tester la liste <span class="dur">25 min</span></h2>
+<div class="step-tp"><b>2.1 · TODO 1</b> Écrivez <code>inserer_tete(Noeud **tete, int v)</code>. Trois instructions, dans l’ordre du cours : créer le nœud, le relier à l’ancien premier, changer la tête. Rappelez-vous pourquoi le paramètre est un <code>Noeud **</code>.</div>
+<div class="step-tp"><b>2.2 · TODO 2</b> Écrivez <code>supprimer(Noeud **tete, int x)</code>. Elle supprime la première occurrence de <code>x</code> et renvoie 1, ou renvoie 0 si <code>x</code> est absent. Traitez à part le cas du <b>premier</b> nœud.</div>
+<div class="step-tp"><b>2.3 · TODO 3</b> Écrivez <code>liberer(Noeud **tete)</code> : libère tous les nœuds et met la tête à <code>NULL</code>. Piège : lisez le suivant <b>avant</b> de libérer.</div>
+<div class="step-tp"><b>2.4</b> <b>Avant d’exécuter</b>, prédisez dans la colonne de gauche ce que <code>partie2()</code> va afficher à chaque étape. Puis activez <code>partie2()</code> dans <code>main</code> et recopiez ce qui s’affiche.</div>
+<div class="tw"><table class="tbl" data-table="p2" data-title="Partie 2 · liste après chaque étape">
+  <tr><th>Étape</th><th>Liste prédite</th><th>Liste affichée</th></tr>
+  <tr><td>après 5 insertions en tête (1, 2, 3, 4, 5)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>après <code>supprimer(3)</code></td><td data-in></td><td data-in></td></tr>
+  <tr><td>après <code>supprimer(5)</code> (le premier)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>après <code>supprimer(1)</code> (le dernier)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>après <code>supprimer(42)</code> (absent)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>compteurs <code>malloc</code> et <code>free</code> à la fin</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p2_q1">Pourquoi la liste s’affiche-t-elle dans l’ordre 5, 4, 3, 2, 1 alors qu’on a inséré 1, 2, 3, 4, 5 ?</li>
+  <li data-q="p2_q2">Donnez la complexité, avec Θ, de l’insertion en tête et de la suppression d’une valeur x. Justifiez en une phrase.</li>
+  <li data-q="p2_q3">Les compteurs <code>malloc</code> et <code>free</code> sont-ils égaux ? Que signifierait une différence ?</li>
+</ol>
+
+<h2 id="p3">Partie 3 · Liste contre tableau <span class="dur">10 min</span></h2>
+<p>Activez <code>partie3()</code>. Elle construit, pour chaque n, la structure en insérant n valeurs <b>toujours en tête</b> : dans une liste (le temps est une moyenne sur plusieurs constructions), puis dans un tableau où il faut décaler tous les éléments. Le temps est en millisecondes.</p>
+<div class="tw"><table class="tbl" data-table="p3" data-title="Partie 3 · n insertions en tête">
+  <tr><th class="num">n</th><th>Liste (ms)</th><th>Rapport avec la ligne précédente</th><th>Tableau (ms)</th><th>Rapport avec la ligne précédente</th></tr>
+  <tr><td class="num">5 000</td><td data-in></td><td class="num">—</td><td data-in></td><td class="num">—</td></tr>
+  <tr><td class="num">10 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">20 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">40 000</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p3_q1">Quand n double, par combien le temps est-il multiplié pour la liste ? Pour le tableau ? Quelle famille de croissance reconnaissez-vous dans chaque cas ?</li>
+  <li data-q="p3_q2">À partir de n = 40 000, estimez le temps du tableau pour n = 400 000. Exprimez-le en secondes ou en minutes.</li>
+  <li data-q="p3_q3">Reliez vos mesures aux coûts du cours : une insertion en tête coûte Θ(1) dans une liste et Θ(n) dans un tableau. Que donne le total pour n insertions ?</li>
+</ol>
+
+<h2 id="p4">Partie 4 · Une pile pour les parenthèses <span class="dur">15 min</span></h2>
+<div class="step-tp"><b>4.1 · TODO 4</b> Écrivez <code>bien_parenthesee(const char *s)</code> avec la pile de caractères fournie (<code>empiler</code>, <code>depiler</code>, <code>est_vide</code>). Suivez l’algorithme du cours : ouvrante, on empile ; fermante, on dépile et on vérifie ; à la fin, la pile doit être vide.</div>
+<div class="step-tp"><b>4.2</b> <b>Avant d’exécuter</b>, notez dans la colonne « Attendu » ce que doit répondre votre fonction pour chaque expression. Puis activez <code>partie4()</code> et recopiez le résultat.</div>
+<div class="tw"><table class="tbl" data-table="p4" data-title="Partie 4 · expressions testées">
+  <tr><th>Expression</th><th>Attendu (bien ou mal)</th><th>Résultat du programme</th></tr>
+  <tr><td class="mono">([]{})</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="mono">([)]</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="mono">((a+b)*c</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="mono">{[()()]}</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="mono">())</td><td data-in></td><td data-in></td></tr>
+  <tr><td class="mono">x + y</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p4_q1">Pourquoi l’expression <code>x + y</code>, qui ne contient aucune parenthèse, est-elle jugée bien parenthésée ?</li>
+  <li data-q="p4_q2">Quelle est la complexité de <code>bien_parenthesee</code> pour une expression de longueur n ? Justifiez avec le coût de <code>empiler</code> et de <code>depiler</code>.</li>
+  <li data-q="p4_q3">Pourquoi une pile convient-elle ici ? Que se passerait-il avec une structure « premier entré, premier sorti » ?</li>
+</ol>
+
+<h2 id="p5">Partie 5 · Une file <span class="dur">10 min</span></h2>
+<p>Une file est une structure « premier entré, premier sorti ». Vous la construisez avec la liste chaînée, en gardant <b>deux</b> pointeurs : <code>tete</code> (le premier, celui qui sortira) et <code>queue</code> (le dernier arrivé). La structure <code>File</code> et son affichage sont fournis.</p>
+<div class="step-tp"><b>5.1 · TODO 5</b> Écrivez <code>file_enfiler(File *f, int v)</code> : ajoute <code>v</code> à la <b>fin</b>, <b>sans parcourir</b> la liste. Pensez au cas particulier de la file vide (alors <code>tete</code> doit aussi changer).</div>
+<div class="step-tp"><b>5.2 · TODO 6</b> Écrivez <code>file_defiler(File *f, int *x)</code> : retire le <b>premier</b> nœud, range sa valeur dans <code>*x</code> et renvoie 1 ; renvoie 0 si la file est vide. Si la file devient vide, <code>queue</code> doit être remis à <code>NULL</code>. N’oubliez pas <code>nb_free++</code>.</div>
+<div class="step-tp"><b>5.3</b> <b>Avant d’exécuter</b>, prédisez ce que va afficher <code>partie5()</code>. Puis activez-la dans <code>main</code> et recopiez le résultat.</div>
+<div class="tw"><table class="tbl" data-table="p5" data-title="Partie 5 · la file">
+  <tr><th>Étape</th><th>Attendu (votre prédiction)</th><th>Résultat du programme</th></tr>
+  <tr><td>Après enfiler 1, 2, 3, 4 (contenu et queue)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>Valeurs renvoyées par les deux défilages</td><td data-in></td><td data-in></td></tr>
+  <tr><td>Contenu après ces deux défilages</td><td data-in></td><td data-in></td></tr>
+  <tr><td>Contenu après enfiler 5</td><td data-in></td><td data-in></td></tr>
+  <tr><td>Valeurs sorties quand on vide la file</td><td data-in></td><td data-in></td></tr>
+  <tr><td>Valeur renvoyée par défiler sur une file vide</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p5_q1">Dans quel ordre sortent les valeurs ? Que donnerait la même suite d’opérations avec la pile de la partie 4 ?</li>
+  <li data-q="p5_q2">Quelle est la complexité de <code>file_enfiler</code> et de <code>file_defiler</code> ? Que deviendrait celle de <code>file_enfiler</code> si la structure n’avait que <code>tete</code>, sans <code>queue</code> ?</li>
+  <li data-q="p5_q3">Pourquoi faut-il remettre <code>f->queue</code> à <code>NULL</code> quand on défile le dernier nœud ? Que se passerait-il au prochain <code>file_enfiler</code> si on l’oubliait ?</li>
+</ol>
+
+<h2 id="envoi">Envoyer le compte rendu</h2>
+<div class="callout">Votre compte rendu se compose de <b>deux fichiers</b> : l’export JSON de cette page et votre <code>tp2.c</code> complété.</div>
+<div class="stepline"><b class="num">1</b><div><b>Vérifiez</b> que votre programme compile sans erreur, que les parties 2, 4 et 5 donnent les résultats attendus et que <code>malloc</code> et <code>free</code> sont égaux. Cochez ensuite :
+  <label class="chk"><input type="checkbox" data-k="code_c_ok"> J’ai complété et testé <code>tp2.c</code> (TODO 1 à 6)</label></div></div>
+<div class="stepline"><b class="num">2</b><div><b>Exportez</b> votre compte rendu. Le fichier <code>TP2_NOM_Prenom.json</code> contient vos informations, les tableaux, vos réponses et l’état de la case à cocher.
+  <div class="btns"><button class="btn" id="btn-export" type="button">Exporter mon compte rendu (JSON)</button><button class="btn sec" id="btn-copy" type="button">Copier le JSON</button></div>
+  <div id="export-msg" class="msg" role="status"></div></div></div>
+<div class="stepline"><b class="num">3</b><div><b>Déposez</b> dans le devoir du TP 2 sur <b>Classroom</b>, en une seule remise, les deux fichiers : <code>TP2_NOM_Prenom.json</code> et <code>tp2.c</code>. Renommez le fichier de code avec votre nom (par exemple <code>tp2_NOM.c</code>), puis cliquez sur « Remettre ».</div></div>
+<div class="warn" style="margin-top:16px"><b>Reprendre un travail plus tard</b><br>Sur le même ordinateur, la page se souvient de tout. Sur un autre ordinateur, importez votre JSON : <label class="btn sec" style="cursor:pointer;margin-left:6px">Importer un JSON<input id="file-import" type="file" accept=".json,application/json" style="display:none"></label> <button class="btn sec" id="btn-reset" type="button" style="margin-left:6px">Tout effacer</button></div>
+<div class="savebar"><span id="save-status">Brouillon enregistré dans ce navigateur.</span><b id="progress"></b></div>
+
+<h2 id="aide">Aide</h2>
+<details><summary>Le programme plante (erreur de segmentation)</summary><div>Cherchez un pointeur suivi alors qu’il vaut <code>NULL</code>, ou un <code>Noeud **</code> utilisé sans <code>*</code>. Ajoutez des <code>printf</code> pour afficher où le programme s’arrête.</div></details>
+<details><summary>La liste affichée est vide ou incomplète après l’insertion</summary><div>Vérifiez l’ordre de vos trois instructions : le nouveau nœud doit désigner l’ancienne tête <b>avant</b> que <code>*tete</code> change. Vérifiez aussi que vous écrivez bien <code>*tete = n</code> et non <code>tete = n</code>.</div></details>
+<details><summary>Les compteurs malloc et free sont différents</summary><div>Un nœud n’a pas été libéré. Vérifiez que <code>supprimer</code> et <code>liberer</code> font chacune <code>nb_free++</code> à chaque <code>free</code>.</div></details>
+<details><summary>La suppression du premier nœud ne marche pas</summary><div>Quand <code>prec</code> vaut <code>NULL</code>, il n’y a pas de nœud avant : c’est <code>*tete</code> qui doit changer, pas un champ <code>suivant</code>.</div></details>
+<details><summary>Mes temps de la liste valent tous 0</summary><div>Le chronomètre est trop peu précis pour une durée très courte. La fonction répète déjà la construction ; si besoin, augmentez le nombre de répétitions dans <code>chrono_liste</code> (variable <code>reps</code>).</div></details>
+<details><summary>Le tableau met trop de temps</summary><div>Seuls les rapports comptent. Si une mesure dépasse 30 secondes, retirez la plus grande valeur de n dans <code>partie3</code>.</div></details>
+<details><summary>La file perd des éléments, ou le programme plante après le dernier défilage</summary><div>Vérifiez les deux cas particuliers : file vide à l’enfilage (<code>tete</code> doit changer aussi) et file devenue vide au défilage (<code>queue</code> doit valoir <code>NULL</code>). Dans <code>file_enfiler</code>, ne parcourez jamais la liste : <code>queue</code> désigne déjà le dernier nœud.</div></details>
+<details><summary>Le bouton d’export ne télécharge rien</summary><div>Utilisez « Copier le JSON », collez le contenu dans un fichier texte nommé <code>TP2_NOM_Prenom.json</code>, puis déposez ce fichier.</div></details>
+</article>
+</div>
+<script src="../assets/doc.js"></script>
+<script src="../assets/tp.js"></script>
+</body>
+</html>
