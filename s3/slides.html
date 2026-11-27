@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Séance 3 · Arbres, tas et files de priorité</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
-<link rel="stylesheet" href="../assets/theme.css?v=1795710847651">
-<link rel="stylesheet" href="../assets/deck.css?v=1795710847651">
+<link rel="stylesheet" href="../assets/theme.css?v=1795774133677">
+<link rel="stylesheet" href="../assets/deck.css?v=1795774133677">
 <style>
   /* Éléments propres à cette séance */
   .flow { display: flex; align-items: center; justify-content: center; gap: 26px; }
@@ -485,6 +485,36 @@
 </section>
 
 <section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Profondeur : une pile. Largeur : une file.</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="panel col step" data-g="1"><span class="tag">En profondeur</span><h3>La pile d’appels</h3><div>Le dernier nœud rencontré est le premier traité : <b>dernier entré, premier sorti</b>. Exactement le comportement d’une <b>pile</b>, que la récursion gère toute seule.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">En largeur</span><h3>Une file explicite</h3><div>Les nœuds sont traités dans l’ordre d’arrivée : <b>premier entré, premier sorti</b>. Il faut une <b>file</b> (celle de la séance 2) : la récursion ne convient pas.</div></div>
+  </div>
+  <div class="keep step" data-g="3">Remplacer la <b>file</b> par une <b>pile</b> dans l’algorithme en largeur donne un parcours en <b>profondeur</b> sans récursion. Les structures de la séance 2 servent ici.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Combien coûte un parcours ?</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Chaque nœud est visité <b>une seule fois</b>, et chaque visite fait un travail constant. Donc le coût est <b>proportionnel au nombre de nœuds</b>, quelle que soit la forme de l’arbre.</div>
+      <div class="callout step" data-g="2">Attention à la <b>mémoire</b> : la pile d’appels monte jusqu’à la <b>hauteur</b> de l’arbre. Pour un arbre dégénéré de 100 000 nœuds, cela peut faire <b>déborder la pile</b>.</div>
+    </div>
+    <div class="def formal step" data-g="3" data-t="Cadre formel"><span class="fx">T(n) = T(g) + T(d) + Θ(1)</span> avec <span class="fx">g + d = n − 1</span>.<br>Il y a <span class="fx">n</span> appels sur des nœuds et <span class="fx">n + 1</span> appels sur NULL, soit <span class="fx">2n + 1</span> appels de coût constant :<br><b>T(n) = Θ(n)</b>.<br>Espace : <span class="fx">Θ(h)</span> pour la pile d’appels.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Les parcours en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code C d’un parcours s’exécuter ligne par ligne.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>ligne en cours</b> dans le code, la <b>pile d’appels</b> et l’ordre d’affichage. Seule la ligne du <span class="mono">printf</span> change entre les trois parcours.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Passez de Préfixe à Postfixe : quelle ligne a changé de place ?</div></div>
+  </div>
+  <div id="sim-trav-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
   <h2 class="title">Calculer la hauteur, pas à pas</h2>
   <div class="obj">
     <div class="panel"><span class="tag">Objectif</span><div>Trouver la hauteur d’un arbre en la demandant à chaque sous-arbre.</div></div>
@@ -503,47 +533,6 @@
     </div>
     <div id="st-haut" class="step" data-g="1"></div>
   </div>
-</section>
-
-<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
-  <h2 class="title">Combien coûte un parcours ?</h2>
-  <div class="split even">
-    <div class="col" style="gap:22px">
-      <div class="txt step" data-g="1">Chaque nœud est visité <b>une seule fois</b>, et chaque visite fait un travail constant. Donc le coût est <b>proportionnel au nombre de nœuds</b>, quelle que soit la forme de l’arbre.</div>
-      <div class="callout step" data-g="2">Attention à la <b>mémoire</b> : la pile d’appels monte jusqu’à la <b>hauteur</b> de l’arbre. Pour un arbre dégénéré de 100 000 nœuds, cela peut faire <b>déborder la pile</b>.</div>
-    </div>
-    <div class="def formal step" data-g="3" data-t="Cadre formel"><span class="fx">T(n) = T(g) + T(d) + Θ(1)</span> avec <span class="fx">g + d = n − 1</span>.<br>Il y a <span class="fx">n</span> appels sur des nœuds et <span class="fx">n + 1</span> appels sur NULL, soit <span class="fx">2n + 1</span> appels de coût constant :<br><b>T(n) = Θ(n)</b>.<br>Espace : <span class="fx">Θ(h)</span> pour la pile d’appels.</div>
-  </div>
-</section>
-
-<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
-  <h2 class="title">Profondeur : une pile. Largeur : une file.</h2>
-  <div class="grid2" style="gap:36px">
-    <div class="panel col step" data-g="1"><span class="tag">En profondeur</span><h3>La pile d’appels</h3><div>Le dernier nœud rencontré est le premier traité : <b>dernier entré, premier sorti</b>. Exactement le comportement d’une <b>pile</b>, que la récursion gère toute seule.</div></div>
-    <div class="panel col step" data-g="2"><span class="tag">En largeur</span><h3>Une file explicite</h3><div>Les nœuds sont traités dans l’ordre d’arrivée : <b>premier entré, premier sorti</b>. Il faut une <b>file</b> (celle de la séance 2) : la récursion ne convient pas.</div></div>
-  </div>
-  <div class="keep step" data-g="3">Remplacer la <b>file</b> par une <b>pile</b> dans l’algorithme en largeur donne un parcours en <b>profondeur</b> sans récursion. Les structures de la séance 2 servent ici.</div>
-</section>
-
-<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
-  <h2 class="title">Passons à l’écriture</h2>
-  <div class="split even">
-    <div class="col" style="gap:24px">
-      <div class="txt">Vous savez <b>quoi</b> visiter, <b>dans quel ordre</b>, et comment calculer une hauteur. Les fonctions en C vont suivre exactement ces règles, instruction par instruction.</div>
-      <div class="callout step" data-g="1">Pourquoi s’y intéresser ? Parce que c’est ce que vous écrirez au TP, et qu’un oubli se paie en <b>fuite mémoire</b>.</div>
-    </div>
-    <div class="panel col step" data-g="2"><span class="tag">Au programme</span><ul class="lst sm"><li>les trois parcours en C, exécutés pas à pas</li><li>la hauteur en C, avec ses variables locales</li><li>la libération d’un arbre : dans quel ordre ?</li></ul></div>
-  </div>
-</section>
-
-<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
-  <h2 class="title">Les parcours en C, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Voir le code C d’un parcours s’exécuter ligne par ligne.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>La <b>ligne en cours</b> dans le code, la <b>pile d’appels</b> et l’ordre d’affichage. Seule la ligne du <span class="mono">printf</span> change entre les trois parcours.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>Passez de Préfixe à Postfixe : quelle ligne a changé de place ?</div></div>
-  </div>
-  <div id="sim-trav-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="2" data-chname="Parcourir un arbre">
@@ -629,6 +618,16 @@
 </section>
 
 <section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">La recherche en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle de recherche s’exécuter sur l’arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> descend d’un nœud à chaque tour : on ne dépasse jamais la hauteur de l’arbre.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cherchez 5 (absent) : quelle ligne s’exécute à la fin ?</div></div>
+  </div>
+  <div id="sim-search-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
   <h2 class="title">Insérer dans un ABR</h2>
   <div class="obj">
     <div class="panel"><span class="tag">Objectif</span><div>Voir qu’on insère un nouveau nœud <b>là où on le chercherait</b>, comme une feuille.</div></div>
@@ -636,6 +635,16 @@
     <div class="panel"><span class="tag">À essayer</span><div>Insérez <b>5</b>, puis <b>2</b> : dans quel sous-arbre se trouvent-ils ?</div></div>
   </div>
   <div id="sim-ins" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">L’insertion en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Suivre l’insertion récursive et comprendre comment le nouveau nœud est accroché.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Chaque appel descend d’un niveau, puis le <b>return a</b> remonte en remettant les liens en place.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 12 : quel champ reçoit le nouveau nœud ?</div></div>
+  </div>
+  <div id="sim-ins-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Arbre de recherche">
@@ -654,6 +663,16 @@
     </div>
     <div class="col" style="gap:14px;align-items:center"><div id="st-minmax" class="step" data-g="1"></div><div class="small step" data-g="1">minimum <b>1</b> (vert à gauche), maximum <b>14</b> (vert à droite)</div></div>
   </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Minimum et maximum en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle qui descend tout à gauche, ou tout à droite.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> suit un seul chemin ; le compteur de déplacements ne dépasse jamais la hauteur.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Comparez le minimum et le maximum : quelle ligne du code change ?</div></div>
+  </div>
+  <div id="sim-min-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Arbre de recherche">
@@ -720,47 +739,6 @@
     <tr class="step" data-g="4"><td><b>ABR équilibré</b></td><td class="mono">Θ(log n)</td><td class="mono">Θ(log n)</td><td class="mono">Θ(log n)</td><td class="mono">Θ(n)</td></tr>
   </table>
   <div class="keep step" data-g="5">Seul l’arbre <b>équilibré</b> est rapide partout. L’ABR « simple » est une bonne structure à condition que les données arrivent <b>dans un ordre quelconque</b>.</div>
-</section>
-
-<section class="slide" data-ch="3" data-chname="Arbre de recherche">
-  <h2 class="title">Passons à l’écriture</h2>
-  <div class="split even">
-    <div class="col" style="gap:24px">
-      <div class="txt">Vous connaissez les règles : chercher, insérer, trouver le minimum. Voyons comment elles se traduisent en C, et comment le code <b>s’exécute</b> sur l’arbre.</div>
-      <div class="callout step" data-g="1">Un point à surveiller dans l’insertion : le <b>pointeur du père</b> doit être mis à jour. Le code récursif le fait presque sans effort.</div>
-    </div>
-    <div class="panel col step" data-g="2"><span class="tag">Au programme</span><ul class="lst sm"><li>la recherche en C</li><li>l’insertion en C</li><li>le minimum et le maximum en C</li></ul></div>
-  </div>
-</section>
-
-<section class="slide" data-ch="3" data-chname="Arbre de recherche">
-  <h2 class="title">La recherche en C, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle de recherche s’exécuter sur l’arbre.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> descend d’un nœud à chaque tour : on ne dépasse jamais la hauteur de l’arbre.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>Cherchez 5 (absent) : quelle ligne s’exécute à la fin ?</div></div>
-  </div>
-  <div id="sim-search-c" class="step gate"></div>
-</section>
-
-<section class="slide" data-ch="3" data-chname="Arbre de recherche">
-  <h2 class="title">L’insertion en C, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Suivre l’insertion récursive et comprendre comment le nouveau nœud est accroché.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>Chaque appel descend d’un niveau, puis le <b>return a</b> remonte en remettant les liens en place.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>Insérez 12 : quel champ reçoit le nouveau nœud ?</div></div>
-  </div>
-  <div id="sim-ins-c" class="step gate"></div>
-</section>
-
-<section class="slide" data-ch="3" data-chname="Arbre de recherche">
-  <h2 class="title">Minimum et maximum en C, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle qui descend tout à gauche, ou tout à droite.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> suit un seul chemin ; le compteur de déplacements ne dépasse jamais la hauteur.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>Comparez le minimum et le maximum : quelle ligne du code change ?</div></div>
-  </div>
-  <div id="sim-min-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="3" data-chname="Arbre de recherche">
@@ -899,6 +877,33 @@
 </section>
 
 <section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Le tas en C : un tableau et un entier</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt">Le tas n’est qu’un <b>tableau</b> et un entier <span class="mono">n</span>. Grâce aux formules d’indices, la remontée et la descente tiennent en <b>une petite boucle</b> chacune.</div>
+      <div class="callout step" data-g="1">C’est le code le plus délicat du TP : lisez bien les cas limites (un seul fils, tas presque vide).</div>
+    </div>
+    <div class="col" style="gap:16px">
+      <pre class="code free step" data-g="1" style="font-size:28px">typedef struct {
+    int t[MAX];
+    int n;
+} Tas;</pre>
+      <div class="small step" data-g="1">Déclaration : un tableau de valeurs et le nombre d’éléments. La fonction <span class="mono">echanger(&amp;x, &amp;y)</span> permute deux valeurs.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">L’insertion dans le tas, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de remontée s’exécuter sur le tableau et sur l’arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>i</b> remonte de parent en parent, avec une case du tableau qui s’allume en même temps.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 1 : combien de tours de boucle ?</div></div>
+  </div>
+  <div id="sim-hins-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
   <h2 class="title">Extraire le minimum : descendre</h2>
   <div class="obj">
     <div class="panel"><span class="tag">Objectif</span><div>Retirer la racine et réparer le tas.</div></div>
@@ -906,6 +911,16 @@
     <div class="panel"><span class="tag">À essayer</span><div>Pourquoi échange-t-on avec le plus petit des deux fils, et pas avec le plus grand ?</div></div>
   </div>
   <div id="sim-hext" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">L’extraction du minimum, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de descente s’exécuter.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le choix du <b>plus petit fils</b> (<b>j</b>), puis l’échange. Attention au test <span class="mono">j + 1 &lt; h-&gt;n</span> qui évite de lire hors du tas.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>À quelle ligne la boucle s’arrête-t-elle ?</div></div>
+  </div>
+  <div id="sim-hext-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="4" data-chname="Le tas">
@@ -963,43 +978,6 @@
     <div class="panel col step" data-g="3"><span class="tag">Données</span><h3>Les k plus grands</h3><div class="small">Garder les 10 meilleurs scores d’un flux de millions de valeurs.</div></div>
   </div>
   <div class="callout step" data-g="4">Tas-max : même programme avec les comparaisons inversées. La racine est alors le <b>maximum</b>. Les bibliothèques fournissent des tas tout faits : <span class="mono">heapq</span> en Python, <span class="mono">PriorityQueue</span> en Java.</div>
-</section>
-
-<section class="slide" data-ch="4" data-chname="Le tas">
-  <h2 class="title">Passons à l’écriture</h2>
-  <div class="split even">
-    <div class="col" style="gap:22px">
-      <div class="txt">Le tas n’est qu’un <b>tableau</b> et un entier <span class="mono">n</span>. Grâce aux formules d’indices, la remontée et la descente tiennent en <b>une petite boucle</b> chacune.</div>
-      <div class="callout step" data-g="1">C’est le code le plus délicat du TP : lisez bien les cas limites (un seul fils, tas presque vide).</div>
-    </div>
-    <div class="col" style="gap:16px">
-      <pre class="code free step" data-g="1" style="font-size:28px">typedef struct {
-    int t[MAX];
-    int n;
-} Tas;</pre>
-      <div class="small step" data-g="1">Déclaration : un tableau de valeurs et le nombre d’éléments. La fonction <span class="mono">echanger(&amp;x, &amp;y)</span> permute deux valeurs.</div>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-ch="4" data-chname="Le tas">
-  <h2 class="title">L’insertion dans le tas, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de remontée s’exécuter sur le tableau et sur l’arbre.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>La variable <b>i</b> remonte de parent en parent, avec une case du tableau qui s’allume en même temps.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>Insérez 1 : combien de tours de boucle ?</div></div>
-  </div>
-  <div id="sim-hins-c" class="step gate"></div>
-</section>
-
-<section class="slide" data-ch="4" data-chname="Le tas">
-  <h2 class="title">L’extraction du minimum, pas à pas</h2>
-  <div class="obj">
-    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de descente s’exécuter.</div></div>
-    <div class="panel"><span class="tag">À observer</span><div>Le choix du <b>plus petit fils</b> (<b>j</b>), puis l’échange. Attention au test <span class="mono">j + 1 &lt; h-&gt;n</span> qui évite de lire hors du tas.</div></div>
-    <div class="panel"><span class="tag">À essayer</span><div>À quelle ligne la boucle s’arrête-t-elle ?</div></div>
-  </div>
-  <div id="sim-hext-c" class="step gate"></div>
 </section>
 
 <section class="slide" data-ch="4" data-chname="Le tas">
@@ -1093,9 +1071,9 @@
 </div>
 </div>
 
-<script src="../assets/sim.js?v=1795710847651"></script>
-<script src="../assets/sim2.js?v=1795710847651"></script>
-<script src="../assets/sim3.js?v=1795710847651"></script>
+<script src="../assets/sim.js?v=1795774133677"></script>
+<script src="../assets/sim2.js?v=1795774133677"></script>
+<script src="../assets/sim3.js?v=1795774133677"></script>
 <script>
 (function () {
   var S2 = Sim2, S3 = Sim3, T = S3.T, h = Sim.h;
@@ -1179,6 +1157,6 @@
   Sim.quiz('#q10', { q: 'On insère n valeurs une à une dans un tas, puis on les extrait toutes. Quel est le coût total ?', opts: ['Θ(n)', 'Θ(n log n)', 'Θ(n²)', 'Θ(log n)'], ans: 1, why: 'n insertions de coût Θ(log n) plus n extractions de coût Θ(log n) : Θ(n log n). C’est le tri par tas, bien plus rapide que les Θ(n²) du tri par insertion.' });
 })();
 </script>
-<script src="../assets/deck.js?v=1795710847651"></script>
+<script src="../assets/deck.js?v=1795774133677"></script>
 </body>
 </html>
