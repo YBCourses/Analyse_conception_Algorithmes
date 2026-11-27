@@ -52,6 +52,7 @@
       for (i = 0; i < els.length && !res; i++) {
         e = els[i];
         if (!e.clientHeight || !e.clientWidth || /(^|\s)(arr|ac|cell|mb|mb-row|mb-arrow|ops)(\s|$)/.test(e.className + '')) continue;
+        if (e.ownerSVGElement || (e.parentNode && e.parentNode.classList && e.parentNode.classList.contains('t3') && /^svg$/i.test(e.tagName))) continue;
         if (e.scrollHeight > e.clientHeight + 4 || e.scrollWidth > e.clientWidth + 4) res = true;
       }
       box.style.flex = pf;

@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support de cours · Séance 3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/doc.css">
+</head>
+<body>
+<header class="top"><div class="gut">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 3</div>
+  <h1>Arbres, tas et files de priorité</h1>
+  <div class="meta"><span>Support de cours</span><span>Yassine Ben-Aboud</span><span>INPT · 2026–2027</span></div>
+  <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a class="cur" href="support.html">Support de cours</a><a href="tp.html">Sujet du TP 3</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
+</div></header>
+
+<div class="gut layout">
+<aside class="toc"><h4>Sommaire</h4>
+  <a href="#arbre">1 · L’arbre binaire</a>
+  <a href="#parcours">2 · Parcourir un arbre</a>
+  <a href="#abr">3 · Arbres binaires de recherche</a>
+  <a href="#tas">4 · Le tas et la file de priorité</a>
+  <a href="#code">5 · Code de référence</a>
+  <a href="#exercices">6 · Exercices corrigés</a>
+  <a href="#glossaire">7 · Glossaire</a>
+</aside>
+<article>
+
+<h2 id="arbre"><span class="n">1</span>L’arbre binaire</h2>
+<h3>Pourquoi un arbre ?</h3>
+<p>Dans une liste chaînée, chercher une valeur oblige à parcourir les nœuds un par un : <b>Θ(n)</b>. Avec un million de nœuds, il peut falloir un million de comparaisons. Or, chercher dans un <b>tableau trié</b> est bien plus rapide : on regarde le milieu, et on élimine la moitié des valeurs d’un coup (recherche dichotomique, <b>Θ(log n)</b>). Mais insérer dans un tableau trié oblige à décaler. Peut-on avoir à la fois la recherche rapide d’un tableau trié et l’insertion souple d’une liste chaînée ? <b>C’est le rôle des arbres.</b></p>
+<p>Les arbres servent aussi à représenter ce qui est naturellement <b>hiérarchique</b> : dossiers et fichiers, organigramme, arbre généalogique, expression arithmétique, décisions successives.</p>
+<h3>Le vocabulaire</h3>
+<div class="def" data-t="Définition">Un <span class="kw">arbre binaire</span> est un ensemble de <b>nœuds</b> reliés par des liens parent-enfant. Chaque nœud a <b>au plus deux fils</b>, appelés <b>fils gauche</b> et <b>fils droit</b>. Un nœud, la <span class="kw">racine</span>, n’a pas de parent. Un nœud sans fils est une <span class="kw">feuille</span>.</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 284 188" width="284" style="max-width:100%;height:auto" role="img" aria-label="arbre de racine 8"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="254" y2="94" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">1</text><text x="53" y="144" font-family="Open Sans,sans-serif" font-weight="700" font-size="12" fill="var(--accent)">feuille</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">3</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">6</text><text x="165" y="144" font-family="Open Sans,sans-serif" font-weight="700" font-size="12" fill="var(--accent)">feuille</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text><text x="221" y="16" font-family="Open Sans,sans-serif" font-weight="700" font-size="12" fill="var(--accent)">racine</text><circle cx="254" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">10</text><text x="277" y="80" font-family="Open Sans,sans-serif" font-weight="700" font-size="12" fill="var(--accent)">feuille</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">La racine est en haut ; les feuilles sont en bas. Le nœud 3 est le parent de 1 et 6, qui sont ses fils.</figcaption></figure></div>
+<ul>
+  <li>Un <b>sous-arbre</b> est un nœud et tous ses descendants. Le sous-arbre gauche de 8 est celui de racine 3.</li>
+  <li>La <b>profondeur</b> d’un nœud est le nombre de liens entre la racine et lui : 0 pour la racine, 1 pour ses fils, etc.</li>
+  <li>La <b>hauteur</b> d’un arbre est la profondeur de son nœud le plus profond. Ici : <b>2</b>. Une feuille seule a pour hauteur 0, et on convient que l’arbre <b>vide</b> a pour hauteur <b>−1</b>.</li>
+  <li>La <b>taille</b> est le nombre de nœuds (ici 5).</li>
+</ul>
+<h3>Un arbre est fait d’arbres</h3>
+<p>Regardez le nœud 3 avec ses descendants : c’est lui-même un arbre binaire. Cette remarque est capitale : presque tous les algorithmes sur les arbres s’écrivent par <b>récursivité</b> (un cas pour l’arbre vide, un cas pour « racine + sous-arbre gauche + sous-arbre droit »).</p>
+<div class="def" data-t="Cadre formel"><p><b>Définition récursive.</b> Un arbre binaire est soit l’arbre vide, noté ∅, soit un triplet (x, G, D) où x est la valeur de la racine et G, D sont deux arbres binaires (les sous-arbres gauche et droit).</p>
+<p>Hauteur : h(∅) = −1 et h((x, G, D)) = 1 + max(h(G), h(D)). Taille : n(∅) = 0 et n((x, G, D)) = 1 + n(G) + n(D).</p></div>
+<h3>Combien de nœuds pour une hauteur donnée ?</h3>
+<p>Le niveau 0 contient au plus 1 nœud (la racine), le niveau 1 au plus 2, le niveau 2 au plus 4 : <b>chaque niveau peut doubler</b>. Un arbre de hauteur 3 contient donc au plus 1 + 2 + 4 + 8 = 15 nœuds. C’est ce qui rend les arbres si efficaces : <b>un arbre bien rempli de seulement 20 niveaux contient plus d’un million de nœuds</b>, et on atteint n’importe lequel en au plus 20 pas.</p>
+<div class="def" data-t="Cadre formel"><p>Le niveau k contient au plus 2<sup>k</sup> nœuds. Un arbre de hauteur h contient donc au plus</p>
+<p style="text-align:center"><b>n ≤ 1 + 2 + 4 + … + 2<sup>h</sup> = 2<sup>h+1</sup> − 1</b></p>
+<p>Réciproquement, un arbre de n nœuds a une hauteur d’au moins <b>h ≥ ⌈log<sub>2</sub>(n + 1)⌉ − 1</b>. Avec le pire cas (un seul fils par nœud, comme une liste), on a au plus <b>h ≤ n − 1</b>. Donc : ⌈log<sub>2</sub>(n + 1)⌉ − 1 ≤ h ≤ n − 1.</p></div>
+<h3>Le nœud en C</h3>
+<p>C’est la liste chaînée de la séance 2, avec <b>deux</b> pointeurs au lieu d’un : un vers le fils gauche, un vers le fils droit. Un champ qui vaut <code>NULL</code> signifie « pas de fils de ce côté ».</p>
+<pre class="code" data-lang="C">typedef struct Noeud {
+    int valeur;
+    struct Noeud *gauche;   /* adresse du fils gauche, ou NULL */
+    struct Noeud *droit;    /* adresse du fils droit, ou NULL */
+} Noeud;
+
+Noeud *creer_noeud(int v) {
+    Noeud *n = (Noeud *)malloc(sizeof(Noeud));
+    n-&gt;valeur = v;
+    n-&gt;gauche = NULL;
+    n-&gt;droit = NULL;
+    return n;
+}</pre>
+<p>Pour construire l’arbre de la figure, on crée les cinq nœuds dans le <b>tas</b> avec <code>creer_noeud</code> puis on les relie :</p>
+<pre class="code" data-lang="C">Noeud *r = creer_noeud(8), *g = creer_noeud(3), *d = creer_noeud(10);
+Noeud *gg = creer_noeud(1), *gd = creer_noeud(6);
+r-&gt;gauche = g;   r-&gt;droit = d;       /* 3 et 10 sont les fils de 8 */
+g-&gt;gauche = gg;  g-&gt;droit = gd;      /* 1 et 6 sont les fils de 3  */</pre>
+<p>La seule variable locale est l’adresse de la racine : comme la tête d’une liste, c’est l’<b>unique entrée</b> de l’arbre. Chaque nœud est un bloc du tas : il faudra donc tous les libérer.</p>
+<div class="keep">Un arbre binaire, c’est un nœud et deux sous-arbres. Hauteur et nombre de nœuds sont reliés par les puissances de 2 : un arbre bien rempli de n nœuds a une hauteur d’environ log<sub>2</sub> n.</div>
+
+<h2 id="parcours"><span class="n">2</span>Parcourir un arbre</h2>
+<p>Parcourir un arbre, c’est visiter chacun de ses nœuds une fois. Contrairement à une liste, il y a <b>plusieurs ordres naturels</b>, selon le moment où l’on traite la racine par rapport à ses deux sous-arbres.</p>
+<h3>Les trois parcours en profondeur</h3>
+<pre class="code" data-lang="pseudo-code">préfixe(a):  si a ≠ ∅ alors  visiter(a.racine) ; préfixe(a.gauche) ; préfixe(a.droit)
+infixe(a):   si a ≠ ∅ alors  infixe(a.gauche) ; visiter(a.racine) ; infixe(a.droit)
+postfixe(a): si a ≠ ∅ alors  postfixe(a.gauche) ; postfixe(a.droit) ; visiter(a.racine)</pre>
+<p>Les trois fonctions sont identiques, seule la <b>place de la ligne « visiter »</b> change. Pour l’arbre ci-dessous :</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 284 188" width="284" style="max-width:100%;height:auto" role="img" aria-label="arbre 8, 3, 10, 1, 6"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="254" y2="94" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">1</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">3</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">6</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text><circle cx="254" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">10</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Même arbre pour les trois parcours.</figcaption></figure></div>
+<div class="tw"><table class="tbl">
+  <tr><th>Parcours</th><th>La racine est visitée…</th><th>Résultat</th><th>Usage typique</th></tr>
+  <tr><td><b>préfixe</b></td><td>avant ses sous-arbres</td><td class="num"><code>8 3 1 6 10</code></td><td>copier un arbre, afficher une hiérarchie</td></tr>
+  <tr><td><b>infixe</b></td><td>entre les deux sous-arbres</td><td class="num"><code>1 3 6 8 10</code></td><td>dans un ABR : valeurs triées</td></tr>
+  <tr><td><b>postfixe</b></td><td>après ses sous-arbres</td><td class="num"><code>1 6 3 10 8</code></td><td>libérer un arbre, calculer une expression</td></tr>
+</table></div>
+<p>L’appel récursif utilise la <b>pile d’appels</b> vue en séance 1 : tant qu’on explore le sous-arbre gauche, la fonction de la racine attend, posée sur la pile. On pourrait remplacer la récursivité par une <b>pile explicite</b> (séance 2) : le parcours en profondeur est « le parcours de la pile ».</p>
+<pre class="code" data-lang="C">void infixe(Noeud *a) {
+    if (a == NULL) return;      /* arbre vide : rien à faire */
+    infixe(a-&gt;gauche);
+    printf("%d ", a-&gt;valeur);
+    infixe(a-&gt;droit);
+}</pre>
+<h3>Le parcours en largeur</h3>
+<p>On visite l’arbre <b>niveau par niveau</b>, de gauche à droite : 8, puis 3 et 10, puis 1 et 6. On utilise une <b>file</b> (séance 2) : on y met la racine ; tant que la file n’est pas vide, on défile un nœud, on le visite, et on <b>enfile ses deux fils</b>.</p>
+<pre class="code" data-lang="pseudo-code">file ← file vide ;  enfiler(racine)
+tant que file non vide faire
+    n ← défiler()
+    visiter(n)
+    si n.gauche ≠ NULL alors enfiler(n.gauche)
+    si n.droit  ≠ NULL alors enfiler(n.droit)</pre>
+<p>Sur l’arbre ci-dessus, la file passe par : [8] → [3, 10] → [10, 1, 6] → [1, 6] → [6] → vide, et les visites donnent <code>8 3 10 1 6</code>. Une pile donne le parcours en profondeur, une file donne le parcours en largeur.</p>
+<h3>Hauteur et libération</h3>
+<p>Deux fonctions écrites sur le même modèle. La <b>hauteur</b> suit la définition récursive. La <b>libération</b> doit être <b>postfixe</b> : si on libérait la racine d’abord, on ne pourrait plus lire ses champs <code>gauche</code> et <code>droit</code> pour libérer les fils.</p>
+<pre class="code" data-lang="C">int hauteur(Noeud *a) {
+    int g, d;
+    if (a == NULL) return -1;
+    g = hauteur(a-&gt;gauche);
+    d = hauteur(a-&gt;droit);
+    return 1 + (g &gt; d ? g : d);
+}
+
+void liberer(Noeud *a) {
+    if (a == NULL) return;
+    liberer(a-&gt;gauche);        /* d'abord les fils... */
+    liberer(a-&gt;droit);
+    free(a);                   /* ...puis la racine   */
+}</pre>
+<h3>Coût d’un parcours</h3>
+<p>Chaque nœud est visité <b>une seule fois</b>, avec un travail constant (afficher, tester, appeler deux fois la fonction). Le coût est donc proportionnel au nombre de nœuds : <b>Θ(n)</b>, quelle que soit la forme de l’arbre.</p>
+<div class="def" data-t="Cadre formel"><p>Soit T(a) le nombre d’opérations pour un arbre a. Pour l’arbre vide, T(∅) = c₀ (un test). Pour un arbre (x, G, D) : T(a) = T(G) + T(D) + c, où c est le travail constant sur la racine. En dépliant, chaque nœud contribue exactement c, chaque arbre vide contribue c₀, et il y a n + 1 arbres vides. Donc <b>T(a) = c·n + c₀·(n + 1) = Θ(n)</b>.</p></div>
+<div class="keep">Trois parcours en profondeur (préfixe, infixe, postfixe) ne diffèrent que par la place de « visiter ». En largeur, on utilise une file. Tout parcours coûte Θ(n). On libère un arbre en postfixe.</div>
+
+<h2 id="abr"><span class="n">3</span>Les arbres binaires de recherche</h2>
+<h3>La règle</h3>
+<div class="def" data-t="Définition">Un <span class="kw">arbre binaire de recherche</span> (ABR) est un arbre binaire dans lequel, pour chaque nœud, <b>toutes les valeurs du sous-arbre gauche sont plus petites</b> et <b>toutes celles du sous-arbre droit sont plus grandes</b> que la valeur du nœud.</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="ABR 50, 30, 70, 20, 40, 60, 80"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Un ABR : à gauche de 50 tout est plus petit, à droite tout est plus grand, et la règle se répète à chaque nœud.</figcaption></figure></div>
+<div class="def" data-t="Cadre formel"><p>Pour tout nœud x : <b>∀ y ∈ G(x), y &lt; x</b> et <b>∀ z ∈ D(x), z &gt; x</b>, où G(x) et D(x) sont les valeurs des sous-arbres gauche et droit de x. (On suppose ici les valeurs distinctes.) Il ne suffit pas de comparer un nœud à ses fils : la règle porte sur <b>tout le sous-arbre</b>.</p></div>
+<h3>Rechercher</h3>
+<p>C’est la recherche dichotomique, dessinée dans l’arbre : à chaque nœud, <b>un seul côté</b> peut contenir la valeur cherchée. On compare, puis on part à gauche ou à droite, en éliminant d’un coup tout l’autre sous-arbre. Pour chercher 60 : 50 (60 est plus grand, on va à droite), 70 (plus petit, on va à gauche), 60 : trouvé en 3 comparaisons. Pour 65 : 50, 70, 60, puis on tombe sur un sous-arbre vide : absent.</p>
+<pre class="code" data-lang="pseudo-code">chercher(a, x):
+    tant que a ≠ NULL faire
+        si x = a.valeur alors retourner a
+        sinon si x &lt; a.valeur alors a ← a.gauche
+        sinon a ← a.droit
+    retourner NULL</pre>
+<h3>Insérer</h3>
+<p>On suit le chemin de la recherche jusqu’à tomber sur un <b>sous-arbre vide</b> : c’est là que la valeur doit se trouver, et on y accroche un nouveau nœud. Pour insérer 45 : 50 → gauche, 30 → droite, 40 → droite (vide) : 45 devient fils droit de 40. Aucun autre nœud ne bouge.</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="avant"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Chemin suivi pour 45 : 50, 30, 40</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 452 252" width="452" style="max-width:100%;height:auto" role="img" aria-label="après"><line x1="254" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="142" y1="158" x2="198" y2="222" stroke="var(--muted)" stroke-width="2"/><line x1="254" y1="30" x2="366" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="366" y1="94" x2="310" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="366" y1="94" x2="422" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="222" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="227" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">45</text><circle cx="254" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="310" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="366" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="422" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="422" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Après : 45 est une feuille, fils droit de 40</figcaption></figure></div>
+<pre class="code" data-lang="C">Noeud *abr_inserer(Noeud *a, int v) {
+    if (a == NULL) return creer_noeud(v);              /* sous-arbre vide : on crée ici */
+    if (v &lt; a-&gt;valeur) a-&gt;gauche = abr_inserer(a-&gt;gauche, v);
+    else if (v &gt; a-&gt;valeur) a-&gt;droit = abr_inserer(a-&gt;droit, v);
+    return a;                                          /* v déjà présent : rien à faire */
+}
+/* appel : racine = abr_inserer(racine, 45); */</pre>
+<p>Chaque appel <b>renvoie la racine de son sous-arbre</b>, et l’appelant range cette valeur dans <code>gauche</code> ou <code>droit</code> : c’est ainsi que le nouveau nœud se retrouve relié à son parent (et que la racine est créée si l’arbre était vide).</p>
+<h3>Le parcours infixe donne l’ordre trié</h3>
+<p>Le parcours infixe visite le sous-arbre gauche (tout ce qui est plus petit), puis la racine, puis le sous-arbre droit (tout ce qui est plus grand). Dans un ABR, il affiche donc les valeurs <b>dans l’ordre croissant</b> : 20 30 40 50 60 70 80. Insérer n valeurs dans un ABR puis faire un parcours infixe, c’est <b>trier</b>.</p>
+<h3>Minimum et maximum</h3>
+<p>Le plus petit élément est tout en bas à gauche : on descend par le fils gauche tant qu’il existe. Le plus grand est tout en bas à droite. Coût : au plus la hauteur de l’arbre.</p>
+<h3>Supprimer</h3>
+<p>C’est l’opération la plus délicate, car il ne faut pas casser la règle de l’ABR. Il y a trois cas, selon le nombre de fils du nœud à supprimer.</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="cas 1"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px"><b>Cas 1 : une feuille</b> (20). On la retire : son parent n’a plus de fils de ce côté.</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 452 252" width="452" style="max-width:100%;height:auto" role="img" aria-label="cas 2"><line x1="254" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="142" y1="158" x2="198" y2="222" stroke="var(--muted)" stroke-width="2"/><line x1="254" y1="30" x2="366" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="366" y1="94" x2="310" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="366" y1="94" x2="422" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="222" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="227" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">45</text><circle cx="254" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="310" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="366" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="422" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="422" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px"><b>Cas 2 : un seul fils</b> (40 a le fils 45). Le fils prend la place du nœud : 30 désigne 45 directement.</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="cas 3"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">20</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">30</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">40</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">50</text><circle cx="254" cy="158" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">60</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">70</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">80</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px"><b>Cas 3 : deux fils</b> (50). On remplace sa valeur par celle de son <b>successeur infixe</b>, 60 (le minimum du sous-arbre droit), puis on supprime ce successeur, qui a au plus un fils.</figcaption></figure></div>
+<pre class="code" data-lang="pseudo-code">supprimer(a, x):                         // renvoie la nouvelle racine
+    si a = NULL alors retourner NULL
+    si x &lt; a.valeur alors a.gauche ← supprimer(a.gauche, x)
+    sinon si x &gt; a.valeur alors a.droit ← supprimer(a.droit, x)
+    sinon                                // on a trouvé le nœud
+        si a.gauche = NULL alors { r ← a.droit ; libérer(a) ; retourner r }
+        si a.droit  = NULL alors { r ← a.gauche ; libérer(a) ; retourner r }
+        s ← minimum(a.droit)             // successeur infixe
+        a.valeur ← s.valeur
+        a.droit ← supprimer(a.droit, s.valeur)
+    retourner a</pre>
+<h3>Combien ça coûte ?</h3>
+<p>Chercher, insérer, supprimer suivent un seul chemin de la racine vers le bas : le coût est proportionnel à la <b>hauteur</b> h de l’arbre. Mais la hauteur dépend de l’<b>ordre d’insertion</b> :</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="arbre équilibré"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">1</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">2</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">3</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">6</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">7</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Insérer 4, 2, 6, 1, 3, 5, 7 : hauteur 2, au plus 3 comparaisons.</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 300 324" width="300" style="max-width:100%;height:auto" role="img" aria-label="arbre dégénéré"><line x1="30" y1="30" x2="70" y2="74" stroke="var(--muted)" stroke-width="2"/><line x1="70" y1="74" x2="110" y2="118" stroke="var(--muted)" stroke-width="2"/><line x1="110" y1="118" x2="150" y2="162" stroke="var(--muted)" stroke-width="2"/><line x1="150" y1="162" x2="190" y2="206" stroke="var(--muted)" stroke-width="2"/><line x1="190" y1="206" x2="230" y2="250" stroke="var(--muted)" stroke-width="2"/><line x1="230" y1="250" x2="270" y2="294" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">1</text><circle cx="70" cy="74" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="70" y="79" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">2</text><circle cx="110" cy="118" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="110" y="123" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">3</text><circle cx="150" cy="162" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="150" y="167" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="190" cy="206" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="190" y="211" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text><circle cx="230" cy="250" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="230" y="255" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">6</text><circle cx="270" cy="294" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="270" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">7</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Insérer 1, 2, 3, 4, 5, 6, 7 : hauteur 6, c’est une liste !</figcaption></figure></div>
+<p>Si on insère des valeurs <b>déjà triées</b>, chaque nouvelle valeur est plus grande que toutes les autres et va à droite : l’arbre devient une <b>liste</b> et la recherche redevient Θ(n). Avec un ordre « mélangé », la hauteur reste en pratique de l’ordre de log n.</p>
+<div class="def" data-t="Cadre formel"><p>Chercher, insérer et supprimer dans un ABR de hauteur h coûtent <b>Θ(h)</b> dans le pire cas, avec :</p>
+<p style="text-align:center">⌈log<sub>2</sub>(n + 1)⌉ − 1 ≤ h ≤ n − 1</p>
+<p>Meilleur cas (arbre bien rempli) : <b>Θ(log n)</b>. Pire cas (arbre dégénéré) : <b>Θ(n)</b>. Pour garantir Θ(log n) quel que soit l’ordre, on utilise des <b>arbres équilibrés</b> (AVL, arbres rouge-noir), qui se réorganisent à chaque insertion : ils ne sont pas au programme de cette séance.</p></div>
+<div class="tw"><table class="tbl">
+  <tr><th>Structure</th><th>Rechercher</th><th>Insérer</th><th>Parcourir trié</th></tr>
+  <tr><td>Liste chaînée</td><td class="t-bad">Θ(n)</td><td class="t-ok">Θ(1) en tête</td><td class="t-bad">tri nécessaire</td></tr>
+  <tr><td>Tableau trié</td><td class="t-ok">Θ(log n)</td><td class="t-bad">Θ(n) (décalages)</td><td class="t-ok">Θ(n)</td></tr>
+  <tr><td>ABR (cas favorable)</td><td class="t-ok">Θ(log n)</td><td class="t-ok">Θ(log n)</td><td class="t-ok">Θ(n) (infixe)</td></tr>
+  <tr><td>ABR (cas défavorable)</td><td class="t-bad">Θ(n)</td><td class="t-bad">Θ(n)</td><td class="t-ok">Θ(n) (infixe)</td></tr>
+</table></div>
+<div class="keep">Un ABR combine la recherche rapide d’un tableau trié et l’insertion souple d’une liste, <b>si l’arbre reste équilibré</b>. Son coût est Θ(h) : tout dépend de la hauteur.</div>
+
+<h2 id="tas"><span class="n">4</span>Le tas et la file de priorité</h2>
+<h3>Le besoin : traiter d’abord le plus urgent</h3>
+<p>Aux urgences, on ne soigne pas dans l’ordre d’arrivée (file), mais selon la <b>gravité</b>. Un système d’exploitation choisit, parmi les tâches prêtes, la plus prioritaire. On a besoin d’une structure qui permet, à tout moment : d’<b>ajouter</b> un élément, de <b>trouver</b> le plus prioritaire, et de le <b>retirer</b>. C’est une <span class="kw">file de priorité</span>.</p>
+<p>Avec une liste non triée, trouver le plus prioritaire coûte Θ(n). Avec un tableau trié, l’insertion coûte Θ(n). Un ABR est équilibré seulement si on a de la chance. Le <b>tas</b> offre Θ(log n) pour l’insertion <b>et</b> pour l’extraction, toujours.</p>
+<p>Dans ce cours, la <b>plus petite valeur est la plus prioritaire</b> : c’est un <b>tas-min</b> (c’est aussi le cas du plus court chemin en séance 6). Le tas-max est symétrique : il suffit d’inverser toutes les comparaisons.</p>
+<h3>Qu’est-ce qu’un tas ?</h3>
+<div class="def" data-t="Définition">Un <span class="kw">tas-min</span> est un arbre binaire <b>parfait</b> (tous les niveaux sont remplis, sauf peut-être le dernier, rempli <b>de gauche à droite</b>) dans lequel <b>chaque nœud est inférieur ou égal à ses fils</b>. Le plus petit élément est donc toujours <b>à la racine</b>.</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 340 188" width="340" style="max-width:100%;height:auto" role="img" aria-label="tas"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Un tas-min de 6 éléments : chaque parent est plus petit que ses fils. Pas de relation entre frères.</figcaption></figure></div>
+<p>Contrairement à l’ABR, le tas <b>n’est pas trié</b> : on sait seulement que chaque parent est plus petit que ses enfants. C’est une règle plus faible, donc plus facile à maintenir, mais qui suffit pour retrouver le minimum.</p>
+<h3>Un arbre rangé dans un tableau</h3>
+<p>Comme l’arbre est parfait, il n’a aucun « trou » : on peut le ranger dans un <b>tableau</b>, niveau par niveau, de gauche à droite, sans aucun pointeur. La racine est dans la case 0, ses fils dans les cases 1 et 2, leurs fils dans les cases 3 à 6, etc.</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 340 188" width="340" style="max-width:100%;height:auto" role="img" aria-label="tas"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">L’arbre</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 288 72" width="288" style="max-width:100%;height:auto" role="img" aria-label="tableau"><rect x="6" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="29" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><text x="29" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">0</text><rect x="52" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="75" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><text x="75" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">1</text><rect x="98" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="121" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text><text x="121" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">2</text><rect x="144" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="167" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><text x="167" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">3</text><rect x="190" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="213" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><text x="213" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">4</text><rect x="236" y="4" width="46" height="38" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="259" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><text x="259" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="var(--muted)">5</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">Le tableau : le même tas, lu niveau par niveau</figcaption></figure></div>
+<div class="tw"><table class="tbl">
+  <tr><th>Pour la case i</th><th>Formule</th><th>Exemple avec i = 4 (valeur 17)</th></tr>
+  <tr><td>fils gauche</td><td class="num"><code>2i + 1</code></td><td>case 9 (n’existe pas : le tas n’a que 6 éléments)</td></tr>
+  <tr><td>fils droit</td><td class="num"><code>2i + 2</code></td><td>case 10 (n’existe pas non plus)</td></tr>
+  <tr><td>parent</td><td class="num"><code>(i − 1) / 2</code> (division entière)</td><td>case 1 (valeur 9)</td></tr>
+</table></div>
+<div class="def" data-t="Cadre formel"><p>Un tableau A[0 … n − 1] est un tas-min si et seulement si pour tout i ≥ 1 : <b>A[⌊(i − 1) / 2⌋] ≤ A[i]</b>. La hauteur d’un arbre parfait de n nœuds est <b>⌊log<sub>2</sub> n⌋</b>.</p></div>
+<h3>Insérer : on remonte</h3>
+<p>On range le nouvel élément dans la première case libre (le tableau reste donc « parfait »), ce qui peut violer la règle avec son parent. On <b>remonte</b> : tant que le parent est plus grand, on échange. Exemple : insérer 5 dans [4, 9, 8, 23, 17, 42].</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="insertion"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text><circle cx="366" cy="158" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">1. 5 est placé à la case 6. Son parent (8) est plus grand : on échange.</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 396 188" width="396" style="max-width:100%;height:auto" role="img" aria-label="résultat"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="366" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">4</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text><circle cx="366" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="366" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">2. 5 est en case 2 ; son parent 4 est plus petit : on s’arrête. Tableau : [4, 9, 5, 23, 17, 42, 8]</figcaption></figure></div>
+<pre class="code" data-lang="pseudo-code">insérer(tas, x):
+    tas[n] ← x ;  n ← n + 1 ;  i ← n - 1
+    tant que i &gt; 0 et tas[(i-1)/2] &gt; tas[i] faire
+        échanger(tas[i], tas[(i-1)/2])
+        i ← (i-1)/2</pre>
+<p>Chaque échange fait monter l’élément d’un niveau : au plus <b>⌊log₂ n⌋ échanges</b>, donc <b>Θ(log n)</b>.</p>
+<h3>Extraire le minimum : on descend</h3>
+<p>Le minimum est en case 0. Pour le retirer sans laisser de trou, on met à sa place le <b>dernier élément</b> du tableau (ce qui raccourcit le tableau d’une case), puis on le fait <b>descendre</b> : tant qu’il est plus grand qu’un de ses fils, on l’échange avec le <b>plus petit</b> des deux (c’est lui qui doit devenir le parent des deux). Exemple : extraire le minimum de [4, 9, 5, 23, 17, 42, 8].</p>
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0"><figure style="margin:0;text-align:center"><svg viewBox="0 0 340 188" width="340" style="max-width:100%;height:auto" role="img" aria-label="étape 1"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">1. On renvoie 4. Le dernier (8) prend la racine.</figcaption></figure><figure style="margin:0;text-align:center"><svg viewBox="0 0 340 188" width="340" style="max-width:100%;height:auto" role="img" aria-label="étape 2"><line x1="198" y1="30" x2="86" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="30" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="86" y1="94" x2="142" y2="158" stroke="var(--muted)" stroke-width="2"/><line x1="198" y1="30" x2="310" y2="94" stroke="var(--muted)" stroke-width="2"/><line x1="310" y1="94" x2="254" y2="158" stroke="var(--muted)" stroke-width="2"/><circle cx="30" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="30" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">23</text><circle cx="86" cy="94" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="86" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">9</text><circle cx="142" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="142" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">17</text><circle cx="198" cy="30" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="198" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">5</text><circle cx="254" cy="158" r="20" fill="var(--surface)" stroke="var(--head)" stroke-width="2"/><text x="254" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">42</text><circle cx="310" cy="94" r="20" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><text x="310" y="99" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="15" fill="var(--head)">8</text></svg><figcaption style="font-size:14px;color:var(--muted);margin-top:6px">2. Fils : 9 et 5. Le plus petit (5) monte, 8 descend. Plus de fils plus petit : fini. Tableau : [5, 9, 8, 23, 17, 42]</figcaption></figure></div>
+<pre class="code" data-lang="pseudo-code">extraire_min(tas):
+    min ← tas[0]
+    n ← n - 1 ;  tas[0] ← tas[n] ;  i ← 0
+    répéter
+        p ← indice du plus petit parmi i, 2i+1, 2i+2 (en restant dans le tas)
+        si p = i alors arrêter
+        échanger(tas[i], tas[p]) ;  i ← p
+    retourner min</pre>
+<p>De même, au plus un échange par niveau : <b>Θ(log n)</b>. Consulter le minimum, lui, ne demande qu’une lecture de la case 0 : <b>Θ(1)</b>.</p>
+<div class="def" data-t="Cadre formel"><p>Un arbre parfait de n nœuds a pour hauteur ⌊log<sub>2</sub> n⌋. Insertion et extraction font au plus un échange par niveau : <b>T(n) ≤ ⌊log<sub>2</sub> n⌋ = O(log n)</b>, et même Θ(log n) dans le pire cas. Pour un million d’éléments, cela fait environ 20 échanges au plus.</p></div>
+<h3>La file de priorité</h3>
+<div class="def" data-t="Définition">Une <span class="kw">file de priorité</span> est une structure qui permet d’<b>insérer</b> un élément avec sa priorité et d’<b>extraire</b> celui de plus petite priorité (opérations <code>enfiler</code>, <code>extraire_min</code>, <code>minimum</code>). Le <b>tas</b> en est l’implémentation standard.</div>
+<div class="tw"><table class="tbl">
+  <tr><th>Implémentation</th><th>Insérer</th><th>Trouver le minimum</th><th>Extraire le minimum</th></tr>
+  <tr><td>Liste ou tableau non trié</td><td class="t-ok">Θ(1)</td><td class="t-bad">Θ(n)</td><td class="t-bad">Θ(n)</td></tr>
+  <tr><td>Tableau trié</td><td class="t-bad">Θ(n)</td><td class="t-ok">Θ(1)</td><td class="t-ok">Θ(1) (si trié décroissant)</td></tr>
+  <tr><td><b>Tas</b></td><td class="t-ok">Θ(log n)</td><td class="t-ok">Θ(1)</td><td class="t-ok">Θ(log n)</td></tr>
+</table></div>
+<h3>Le tri par tas</h3>
+<p>Insérer les n valeurs dans un tas, puis extraire le minimum n fois : les valeurs sortent <b>dans l’ordre croissant</b>. Coût : n insertions en Θ(log n), plus n extractions en Θ(log n), soit <b>Θ(n log n)</b>, bien meilleur que les tris en Θ(n²) de la séance 1 (pour n = 10⁶ : environ 2×10⁷ opérations contre 10¹²).</p>
+<pre class="code" data-lang="C">/* tri par tas : trier le tableau v de n valeurs */
+Tas h;  tas_init(&amp;h);
+for (i = 0; i &lt; n; i++) tas_inserer(&amp;h, v[i]);
+for (i = 0; i &lt; n; i++) v[i] = tas_extraire_min(&amp;h);   /* v est trié */</pre>
+<div class="keep">Le tas est un arbre parfait rangé dans un tableau : parent (i−1)/2, fils 2i+1 et 2i+2. Insérer = remonter, extraire = descendre, toujours en Θ(log n). C’est la structure d’une file de priorité, et la base du tri par tas en Θ(n log n).</div>
+
+<h2 id="code"><span class="n">5</span>Code de référence</h2>
+<h3>Arbre binaire de recherche</h3>
+<pre class="code" data-lang="C">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *gauche;
+    struct Noeud *droit;
+} Noeud;
+
+Noeud *creer_noeud(int v) {
+    Noeud *n = (Noeud *)malloc(sizeof(Noeud));
+    n-&gt;valeur = v;  n-&gt;gauche = NULL;  n-&gt;droit = NULL;
+    return n;
+}
+
+Noeud *abr_inserer(Noeud *a, int v) {
+    if (a == NULL) return creer_noeud(v);
+    if (v &lt; a-&gt;valeur) a-&gt;gauche = abr_inserer(a-&gt;gauche, v);
+    else if (v &gt; a-&gt;valeur) a-&gt;droit = abr_inserer(a-&gt;droit, v);
+    return a;
+}
+
+Noeud *abr_chercher(Noeud *a, int v) {
+    while (a != NULL) {
+        if (v == a-&gt;valeur) return a;
+        a = (v &lt; a-&gt;valeur) ? a-&gt;gauche : a-&gt;droit;
+    }
+    return NULL;
+}
+
+Noeud *abr_min(Noeud *a) {            /* a ne doit pas être NULL */
+    while (a-&gt;gauche != NULL) a = a-&gt;gauche;
+    return a;
+}
+
+Noeud *abr_supprimer(Noeud *a, int v) {
+    Noeud *r;
+    if (a == NULL) return NULL;
+    if (v &lt; a-&gt;valeur) a-&gt;gauche = abr_supprimer(a-&gt;gauche, v);
+    else if (v &gt; a-&gt;valeur) a-&gt;droit = abr_supprimer(a-&gt;droit, v);
+    else if (a-&gt;gauche == NULL) { r = a-&gt;droit;  free(a); return r; }
+    else if (a-&gt;droit == NULL)  { r = a-&gt;gauche; free(a); return r; }
+    else {                              /* deux fils : successeur infixe */
+        Noeud *s = abr_min(a-&gt;droit);
+        a-&gt;valeur = s-&gt;valeur;
+        a-&gt;droit = abr_supprimer(a-&gt;droit, s-&gt;valeur);
+    }
+    return a;
+}
+
+int hauteur(Noeud *a) {
+    int g, d;
+    if (a == NULL) return -1;
+    g = hauteur(a-&gt;gauche);  d = hauteur(a-&gt;droit);
+    return 1 + (g &gt; d ? g : d);
+}
+
+void infixe(Noeud *a) {
+    if (a == NULL) return;
+    infixe(a-&gt;gauche);  printf("%d ", a-&gt;valeur);  infixe(a-&gt;droit);
+}
+
+void liberer(Noeud *a) {
+    if (a == NULL) return;
+    liberer(a-&gt;gauche);  liberer(a-&gt;droit);  free(a);
+}</pre>
+<h3>Parcours en largeur (avec une file)</h3>
+<p>La file est celle de la séance 2 (tableau circulaire ou liste) ; ici une version simple en tableau de pointeurs, assez grande pour l’arbre.</p>
+<pre class="code" data-lang="C">void largeur(Noeud *racine) {
+    Noeud *file[100];
+    int debut = 0, fin = 0;               /* enfiler : file[fin++], défiler : file[debut++] */
+    if (racine == NULL) return;
+    file[fin++] = racine;
+    while (debut &lt; fin) {
+        Noeud *n = file[debut++];
+        printf("%d ", n-&gt;valeur);
+        if (n-&gt;gauche != NULL) file[fin++] = n-&gt;gauche;
+        if (n-&gt;droit  != NULL) file[fin++] = n-&gt;droit;
+    }
+}</pre>
+<h3>Tas-min dans un tableau</h3>
+<pre class="code" data-lang="C">#define MAX 100
+
+typedef struct {
+    int t[MAX];
+    int n;                                  /* nombre d'éléments */
+} Tas;
+
+void tas_init(Tas *h) { h-&gt;n = 0; }
+
+void echanger(int *x, int *y) { int tmp = *x; *x = *y; *y = tmp; }
+
+void tas_inserer(Tas *h, int v) {
+    int i;
+    if (h-&gt;n == MAX) return;
+    i = h-&gt;n++;
+    h-&gt;t[i] = v;
+    while (i &gt; 0 &amp;&amp; h-&gt;t[(i - 1) / 2] &gt; h-&gt;t[i]) {      /* remonter */
+        echanger(&amp;h-&gt;t[i], &amp;h-&gt;t[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+
+int tas_extraire_min(Tas *h) {              /* on suppose h-&gt;n &gt; 0 */
+    int min = h-&gt;t[0], i = 0;
+    h-&gt;n--;
+    h-&gt;t[0] = h-&gt;t[h-&gt;n];                   /* le dernier prend la racine */
+    for (;;) {                              /* descendre */
+        int g = 2 * i + 1, d = 2 * i + 2, p = i;
+        if (g &lt; h-&gt;n &amp;&amp; h-&gt;t[g] &lt; h-&gt;t[p]) p = g;
+        if (d &lt; h-&gt;n &amp;&amp; h-&gt;t[d] &lt; h-&gt;t[p]) p = d;
+        if (p == i) break;
+        echanger(&amp;h-&gt;t[i], &amp;h-&gt;t[p]);
+        i = p;
+    }
+    return min;
+}</pre>
+
+<h2 id="exercices"><span class="n">6</span>Exercices corrigés</h2>
+<p>Cherchez d’abord seul, sur papier, en dessinant les arbres, puis ouvrez la solution.</p>
+<h3>Arbres et parcours</h3>
+<div class="card"><h4>Exercice 1 (vocabulaire)</h4>Pour l’arbre de racine 8 (fils 3 et 10 ; 3 a pour fils 1 et 6), donnez : la hauteur, la profondeur du nœud 6, les feuilles, le parcours préfixe, infixe, postfixe et en largeur.<details><summary>Solution</summary><div>Hauteur : <b>2</b>. Profondeur de 6 : <b>2</b>. Feuilles : <b>1, 6, 10</b>. Préfixe : <code>8 3 1 6 10</code>. Infixe : <code>1 3 6 8 10</code>. Postfixe : <code>1 6 3 10 8</code>. Largeur : <code>8 3 10 1 6</code>.</div></details></div>
+<div class="card"><h4>Exercice 2 (hauteur et nombre de nœuds)</h4>Quel est le nombre maximal de nœuds d’un arbre binaire de hauteur 4 ? Quelle est la hauteur minimale d’un arbre de 100 nœuds ?<details><summary>Solution</summary><div>Au plus 2<sup>5</sup> − 1 = <b>31</b> nœuds. Pour 100 nœuds : ⌈log<sub>2</sub>(101)⌉ − 1 = 7 − 1 = <b>6</b> (car 2<sup>6</sup> = 64 &lt; 101 ≤ 128 = 2<sup>7</sup>). Vérification : hauteur 5 donne au plus 63 nœuds (insuffisant), hauteur 6 donne au plus 127.</div></details></div>
+<div class="card"><h4>Exercice 3 (écrire une fonction)</h4>Écrivez une fonction récursive <code>compter(Noeud *a)</code> qui renvoie le nombre de nœuds d’un arbre, puis <code>feuilles(Noeud *a)</code> qui renvoie le nombre de feuilles. Quel est leur coût ?<details><summary>Solution</summary><div><pre class="code" data-lang="C">int compter(Noeud *a) {
+    if (a == NULL) return 0;
+    return 1 + compter(a-&gt;gauche) + compter(a-&gt;droit);
+}
+int feuilles(Noeud *a) {
+    if (a == NULL) return 0;
+    if (a-&gt;gauche == NULL &amp;&amp; a-&gt;droit == NULL) return 1;
+    return feuilles(a-&gt;gauche) + feuilles(a-&gt;droit);
+}</pre>Les deux visitent chaque nœud une fois : <b>Θ(n)</b>.</div></details></div>
+<h3>Arbres binaires de recherche</h3>
+<div class="card"><h4>Exercice 4 (construire un ABR)</h4>On insère dans cet ordre, dans un ABR initialement vide : 15, 8, 20, 4, 12, 18, 25, 10. Dessinez l’arbre. Quelle est sa hauteur ? Quel est le parcours infixe ?<details><summary>Solution</summary><div>15 est la racine ; 8 à gauche, 20 à droite ; 4 et 12 sont les fils de 8 ; 18 et 25 sont les fils de 20 ; 10 est le fils gauche de 12. Hauteur : <b>3</b> (chemin 15, 8, 12, 10). Infixe : <b>4 8 10 12 15 18 20 25</b> (trié).</div></details></div>
+<div class="card"><h4>Exercice 5 (recherche)</h4>Dans l’arbre de l’exercice 4, quels nœuds examine-t-on pour chercher 10 ? Pour chercher 16 ? Dans quel cas la recherche est-elle la plus coûteuse ?<details><summary>Solution</summary><div>Pour 10 : 15, 8, 12, 10 (4 comparaisons). Pour 16 : 15, 20, 18, puis on tombe sur un sous-arbre vide : 3 comparaisons, 16 est <b>absent</b>. Le pire cas est de descendre jusqu’à une feuille profonde : au plus <b>h + 1 = 4</b> comparaisons ici, soit Θ(h).</div></details></div>
+<div class="card"><h4>Exercice 6 (suppression)</h4>Dans l’arbre de l’exercice 4, supprimez successivement 4, puis 20, puis 15. Donnez le parcours préfixe après chaque suppression.<details><summary>Solution</summary><div>Suppression de 4 (feuille) : préfixe <code>15 8 12 10 20 18 25</code>. Suppression de 20 (deux fils, 18 et 25) : le successeur infixe (minimum du sous-arbre droit) est 25, feuille : sa valeur remplace celle de 20 et la feuille est supprimée ; 18 reste fils gauche du nœud devenu 25 : préfixe <code>15 8 12 10 25 18</code>. Suppression de 15 (deux fils) : successeur = minimum du sous-arbre droit = 18, qui remplace 15 ; le nœud 18 d’origine, une feuille, est supprimé : préfixe <code>18 8 12 10 25</code>.</div></details></div>
+<div class="card"><h4>Exercice 7 (ABR dégénéré)</h4>On insère 1, 2, 3, …, n dans un ABR vide. Quelle est la hauteur ? Combien de comparaisons coûte la i-ème insertion ? Quel est le coût total ? Comment éviter ce problème ?<details><summary>Solution</summary><div>Chaque valeur va à droite de la précédente : l’arbre est une liste, de hauteur <b>n − 1</b>. La i-ème insertion compare avec i − 1 nœuds. Total : 0 + 1 + … + (n − 1) = n(n − 1)/2 = <b>Θ(n²)</b>. On l’évite en insérant dans un ordre mélangé, ou en utilisant un arbre équilibré (AVL, rouge-noir) qui garantit h = Θ(log n).</div></details></div>
+<div class="card"><h4>Exercice 8 (ABR ou non ?)</h4>L’arbre de racine 10, de fils gauche 5 et de fils droit 15, où 5 a pour fils droit 12, est-il un ABR ?<details><summary>Solution</summary><div><b>Non.</b> Chaque nœud est bien compris entre ses fils (5 &lt; 10 &lt; 15 ; 12 &gt; 5), mais 12 est dans le <b>sous-arbre gauche</b> de 10 alors que 12 &gt; 10 : la règle porte sur tout le sous-arbre, pas seulement sur les fils directs. Son parcours infixe, <code>5 12 10 15</code>, n’est pas trié, ce qui trahit l’erreur.</div></details></div>
+<h3>Tas et files de priorité</h3>
+<div class="card"><h4>Exercice 9 (insertion dans un tas)</h4>Dans le tas-min [3, 8, 5, 12, 9, 7], insérez 4 puis 2. Donnez le tableau après chaque insertion.<details><summary>Solution</summary><div>Insérer 4 : case 6, parent case 2 (valeur 5) : 5 &gt; 4, on échange ; parent case 0 (3) &lt; 4 : stop. Tableau : <b>[3, 8, 4, 12, 9, 7, 5]</b>. Insérer 2 : case 7, parent case 3 (12) : échange ; parent case 1 (8) : échange ; parent case 0 (3) : échange ; 2 est à la racine. Tableau : <b>[2, 3, 4, 8, 9, 7, 5, 12]</b>. Trois échanges : une montée de trois niveaux, la hauteur de l’arbre.</div></details></div>
+<div class="card"><h4>Exercice 10 (extraction dans un tas)</h4>Dans le tas-min [2, 3, 4, 8, 9, 7, 5, 12], extrayez le minimum deux fois. Donnez les valeurs renvoyées et le tableau final.<details><summary>Solution</summary><div>1re extraction : on renvoie <b>2</b> ; le dernier (12) prend la racine : [12, 3, 4, 8, 9, 7, 5] ; fils 3 et 4 : 3 monte, 12 descend en case 1 ; fils 8 et 9 : 8 monte, 12 en case 3, plus de fils. Tableau : [3, 8, 4, 12, 9, 7, 5]. 2e extraction : on renvoie <b>3</b> ; le dernier (5) prend la racine : [5, 8, 4, 12, 9, 7] ; fils 8 et 4 : 4 monte, 5 descend en case 2 ; fils case 5 : 7 &gt; 5, stop. Tableau final : <b>[4, 8, 5, 12, 9, 7]</b>.</div></details></div>
+<div class="card"><h4>Exercice 11 (tableau et arbre)</h4>Pour un tas de 10 éléments, donnez le parent, le fils gauche et le fils droit de la case 3, puis de la case 4. Quelles cases sont des feuilles ?<details><summary>Solution</summary><div>Case 3 : parent (3 − 1)/2 = <b>1</b>, fils gauche 2·3 + 1 = <b>7</b>, fils droit <b>8</b>. Case 4 : parent <b>1</b>, fils <b>9</b> et <b>10</b> (la case 10 n’existe pas : le tas a les cases 0 à 9). Les feuilles sont les cases sans fils, c’est-à-dire d’indice i avec 2i + 1 ≥ 10, soit les cases <b>5 à 9</b>.</div></details></div>
+<h3>Choisir une structure</h3>
+<div class="card"><h4>Exercice 12 (choisir la structure)</h4>Pour chaque besoin, proposez la structure la plus adaptée parmi liste chaînée, pile, file, ABR, tas : (a) annuler la dernière action d’un éditeur ; (b) traiter des clients dans l’ordre d’arrivée ; (c) retrouver rapidement un mot dans un dictionnaire dynamique ; (d) toujours traiter la tâche la plus urgente.<details><summary>Solution</summary><div>(a) <b>pile</b> (dernier entré, premier sorti). (b) <b>file</b> (premier entré, premier sorti). (c) <b>ABR</b> (équilibré de préférence) : recherche et insertion en Θ(log n). (d) <b>tas</b> (file de priorité) : extraction du plus urgent en Θ(log n).</div></details></div>
+<div class="card"><h4>Exercice 13 (supplémentaire : tri par tas)</h4>Triez 5, 3, 8, 1 avec un tas-min : donnez le tas après chaque insertion, puis l’ordre des extractions. Quelle est la complexité totale pour n valeurs ?<details><summary>Solution</summary><div>Insertions : [5] ; [3, 5] (3 remonte) ; [3, 5, 8] ; [1, 3, 8, 5] (1 remonte de deux niveaux). Extractions : <b>1, 3, 5, 8</b>. Coût : n insertions et n extractions en Θ(log n) chacune : <b>Θ(n log n)</b>.</div></details></div>
+<div class="card"><h4>Exercice 14 (supplémentaire : k plus petits)</h4>On reçoit un flux de n valeurs et on veut garder les k plus grandes. Quelle structure et quelle stratégie, et quel coût ?<details><summary>Solution</summary><div>Un <b>tas-min de taille k</b> : on y met les k premières valeurs ; pour chaque nouvelle valeur, si elle est plus grande que le minimum (racine), on extrait le minimum puis on insère la nouvelle. Le tas contient toujours les k plus grandes vues. Coût : <b>Θ(n log k)</b>, avec k éléments seulement en mémoire.</div></details></div>
+
+<h2 id="glossaire"><span class="n">7</span>Glossaire</h2>
+<div class="tw"><table class="tbl">
+  <tr><th>Terme</th><th>Définition</th></tr>
+  <tr><td>Arbre binaire</td><td>Ensemble de nœuds où chacun a au plus deux fils (gauche et droit) ; défini récursivement : vide, ou (racine, sous-arbre gauche, sous-arbre droit).</td></tr>
+  <tr><td>Racine</td><td>Nœud sans parent, point d’entrée de l’arbre.</td></tr>
+  <tr><td>Feuille</td><td>Nœud sans fils.</td></tr>
+  <tr><td>Profondeur d’un nœud</td><td>Nombre de liens entre la racine et ce nœud.</td></tr>
+  <tr><td>Hauteur</td><td>Profondeur du nœud le plus profond ; −1 pour l’arbre vide, 0 pour une feuille seule.</td></tr>
+  <tr><td>Parcours préfixe, infixe, postfixe</td><td>Parcours en profondeur : racine avant, entre ou après ses sous-arbres.</td></tr>
+  <tr><td>Parcours en largeur</td><td>Parcours niveau par niveau, à l’aide d’une file.</td></tr>
+  <tr><td>ABR</td><td>Arbre binaire de recherche : à gauche de chaque nœud tout est plus petit, à droite tout est plus grand.</td></tr>
+  <tr><td>Successeur infixe</td><td>Le plus petit élément du sous-arbre droit : il remplace un nœud à deux fils qu’on supprime.</td></tr>
+  <tr><td>Arbre dégénéré</td><td>Arbre dont chaque nœud a un seul fils : il se comporte comme une liste (hauteur n − 1).</td></tr>
+  <tr><td>Arbre équilibré</td><td>Arbre de hauteur Θ(log n) garantie (AVL, rouge-noir).</td></tr>
+  <tr><td>Arbre parfait</td><td>Arbre dont tous les niveaux sont remplis, sauf le dernier, rempli de gauche à droite.</td></tr>
+  <tr><td>Tas-min</td><td>Arbre parfait dont chaque nœud est inférieur ou égal à ses fils : le minimum est à la racine. Rangé dans un tableau.</td></tr>
+  <tr><td>Remonter, descendre</td><td>Les deux réparations du tas : après une insertion, on remonte ; après une extraction, on descend.</td></tr>
+  <tr><td>File de priorité</td><td>Structure où l’on insère des éléments et où l’on extrait le plus prioritaire (ici le plus petit).</td></tr>
+  <tr><td>Tri par tas</td><td>Tri en Θ(n log n) : n insertions dans un tas puis n extractions du minimum.</td></tr>
+</table></div>
+<div class="keep">Séance suivante : hachage (retrouver en Θ(1) en moyenne) et diviser pour régner (tri fusion). Revoyez la récursivité : elle sert dans tous les algorithmes sur les arbres.</div>
+</article>
+</div>
+<script src="../assets/doc.js"></script>
+</body>
+</html>

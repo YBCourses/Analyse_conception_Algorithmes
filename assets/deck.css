@@ -342,3 +342,11 @@ svg .gl { stroke: var(--line); stroke-dasharray: 3 5; }
 .fitbox { display: flex; flex-direction: column; gap: 24px; flex: 1; min-height: 0; }
 .mv-v { min-width: 84px; }
 .mb.noheap .mb-list { max-width: 600px; }
+
+/* Cadre formel (séance 3) : encadré mathématique placé après l'intuition */
+.def.formal { background: var(--panel); border-color: var(--blue); border-left-width: 10px; box-shadow: none; }
+.fx { font: 600 .9em var(--mono); color: var(--head); }
+.fx sup, .fx sub { font-size: .7em; }
+.mx3 { display: grid; gap: 10px; }
+.split.cw { grid-template-columns: 7fr 5fr; }
+div.t3 { width: 100%; box-sizing: border-box; }

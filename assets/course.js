@@ -30,9 +30,12 @@ window.COURSE = {
       ]
     },
     {
-      n: 3, titre: "Arbres, tas et files de priorité", duree: "3 h", statut: "bientot",
-      resume: "Arbres binaires, arbres binaires de recherche, tas et file de priorité.",
-      diaporama: null, support: null, fichiers: []
+      n: 3, titre: "Arbres, tas et files de priorité", duree: "3 h · cours, TD et TP", statut: "disponible",
+      resume: "Arbres binaires, parcours, arbres binaires de recherche, tas et file de priorité.",
+      diaporama: "s3/slides.html", support: "s3/support.html", tp: "s3/tp.html",
+      fichiers: [
+        { nom: "TP 3 · code de départ en C", chemin: "files/s3/tp3.c", type: "C" }
+      ]
     },
     {
       n: 4, titre: "Hachage et diviser pour régner", duree: "3 h", statut: "bientot",

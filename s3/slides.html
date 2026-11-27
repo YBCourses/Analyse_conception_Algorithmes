@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Séance 3 · Arbres, tas et files de priorité</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css?v=1795710847651">
+<link rel="stylesheet" href="../assets/deck.css?v=1795710847651">
+<style>
+  /* Éléments propres à cette séance */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 26px; }
+  .fbox { background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 34px; text-align: center; font-size: 34px; line-height: 1.35; box-shadow: 0 14px 36px rgba(15,53,87,.08); }
+  .fbox.algo { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); min-width: 320px; font-size: 30px; }
+  .fbox .mono { white-space: nowrap; }
+  .fbox { padding: 24px 28px; font-size: 32px; }
+  .flow { gap: 16px; }
+  .fbox.algo small { color: #BCD3E8; font-size: 26px; }
+  .fbox .mono { font-size: 38px; color: var(--accent); font-weight: 700; }
+  .fbox b.l { display: block; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .fbox.algo b.l { color: var(--cover-accent); }
+  .farrow { font-size: 64px; color: var(--blue); line-height: 1; }
+  .tl { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; padding-top: 40px; flex: 1; align-content: start; }
+  .tl::before { content: ""; position: absolute; left: 4%; right: 4%; top: 62px; height: 6px; background: var(--line); border-radius: 3px; }
+  .tl .nd { position: relative; display: flex; flex-direction: column; gap: 16px; align-items: stretch; }
+  .tl .dot { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 6px solid var(--line); margin: 0 auto; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: var(--muted); z-index: 1; }
+  .tl .nd.now .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tl .nd .panel { padding: 26px 24px; font-size: 27px; flex: 1; }
+  .tl .nd.now .panel { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .tl .nd.now .panel h3 { color: #fff; }
+  .tl .nd.now .small { color: #A9C2DB; }
+  .tl h3 { font-size: 34px; }
+  .cyc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; align-items: stretch; }
+  .cyc .c { position: relative; background: var(--surface); border: 3px solid var(--line); border-radius: 22px; padding: 26px 20px; text-align: center; font-size: 29px; line-height: 1.3; margin-right: 38px; box-shadow: 0 14px 36px rgba(15,53,87,.07); }
+  .cyc .c:last-child { margin-right: 0; }
+  .cyc .c::after { content: "›"; position: absolute; right: -37px; top: 50%; transform: translateY(-58%); font-size: 64px; color: var(--blue); }
+  .cyc .c:last-child::after { display: none; }
+  .cyc .c b.n { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 32px; margin: 0 auto 14px; }
+  .cyc .c.hot { background: var(--cover-bg); color: #fff; border-color: var(--cover-bg); }
+  .cyc .c.hot b.n { background: var(--cover-accent); color: #06121f; }
+  .mach { text-align: center; }
+  .mach .ic { font-size: 74px; line-height: 1; margin-bottom: 8px; }
+  .mach .sec { font: 800 78px var(--mono); color: var(--head); }
+  .mach .opsb { display: inline-block; margin-top: 12px; background: var(--ok-soft); color: var(--ok); font: 700 28px var(--mono); border-radius: 12px; padding: 8px 18px; }
+  .dbl { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 22px; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 28px 38px; font-size: 38px; box-shadow: 0 8px 22px rgba(15,53,87,.06); }
+  .dbl .nm { font: 700 36px var(--mono); color: var(--accent); text-align: right; }
+  .dbl .ef b { color: var(--head); }
+  .dbl .ar { font-size: 44px; text-align: center; color: var(--blue); }
+  .sq { display: inline-block; width: 46px; height: 46px; border-radius: 10px; margin: 5px; }
+  .sq.f { background: var(--c-one); } .sq.l { background: var(--blue); } .sq.l2 { background: var(--c-n2); }
+  .doll { border: 5px solid var(--blue); border-radius: 34px; padding: 22px 26px; background: color-mix(in srgb, var(--accent-soft) 80%, transparent); font: 700 28px var(--serif); color: var(--head); }
+  .doll.d2 { border-color: var(--c-nlog); } .doll.d3 { border-color: var(--c-n2); } .doll.d4 { border-color: var(--c-exp); }
+  .fibchips { display: flex; gap: 18px; align-items: center; flex-wrap: nowrap; }
+  .fibchips .ch { width: 118px; height: 118px; border-radius: 22px; border: 4px solid var(--blue); background: var(--accent-soft); display: grid; place-items: center; font: 800 52px var(--mono); color: var(--head); }
+  .fibchips .ch.s { border-color: var(--ok); background: var(--ok-soft); }
+  .fibchips .pl { font-size: 38px; color: var(--muted); }
+  .rl { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .blk { background: var(--accent); color: #fff; border-radius: 14px; padding: 12px 30px; font: 700 30px var(--mono); }
+  :root[data-theme="dark"] .blk { color: #06121f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .blk { color: #06121f; } }
+  .blk.b2 { background: var(--c-n2); color: #fff; }
+  .gridmini { display: grid; gap: 6px; }
+  .gridmini i { width: 34px; height: 34px; border-radius: 7px; background: var(--accent); }
+  .eq { font: 700 78px var(--serif); color: var(--head); text-align: center; line-height: 1.2; }
+  .eqc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; text-align: center; font-size: 30px; margin-top: 14px; }
+  .eqc div { background: var(--accent-soft); border-radius: 16px; padding: 16px 20px; color: var(--head); }
+  .fm { font: 700 66px var(--serif); text-align: center; color: var(--head); }
+  .ann { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 8px; font-size: 31px; }
+  .ann div { background: var(--panel); border-radius: 18px; padding: 20px 26px; }
+  .ann b { display: block; font: 800 40px var(--mono); color: var(--accent); margin-bottom: 4px; }
+  .mini { width: 100%; height: auto; }
+  .mini text { fill: var(--muted); font-size: 22px; }
+</style>
+</head>
+<body data-autofit>
+<div id="viewport">
+<div id="stage">
+<div id="bar"></div>
+<header id="head">
+  <div class="brand"><img class="logo" src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"><span class="sep"></span><span class="course">Conception et Analyse des Algorithmes</span></div>
+  <div id="chip"></div>
+</header>
+
+<section class="slide cover">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Module M111 · Algorithmique et Programmation · AP 3</div>
+  <h1>Conception et Analyse des Algorithmes</h1>
+  <div class="sub2">Séance 3 · Arbres, tas et files de priorité</div>
+  <div class="who"><b>Yassine Ben-Aboud</b><br><span>INPT · Année universitaire 2026–2027</span></div>
+  <aside class="notes">Accueil. Même format que la séance 2 : deux heures de cours et de TD avec simulations, puis une heure de TP en C. Les arbres reprennent le nœud de la liste chaînée avec deux pointeurs au lieu d’un.</aside>
+</section>
+
+<section class="slide">
+  <h2 class="title">Là où nous en sommes</h2>
+  <p class="sub">La séance 2 a donné trois structures linéaires. Voici ce qu’elles coûtent pour <b>chercher</b> une valeur.</p>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Liste chaînée</span><h3>Chercher : Θ(n)</h3><div class="small">Il faut suivre les pointeurs un par un depuis la tête.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Pile et file</span><h3>Un seul accès</h3><div class="small">On ne voit que le sommet, ou que le premier : pas de recherche.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Tableau trié</span><h3>Chercher : Θ(log n)</h3><div class="small">La dichotomie, mais insérer coûte Θ(n) (décalages).</div></div>
+  </div>
+  <div class="callout step" data-g="4">Aujourd’hui : une structure qui <b>cherche et insère en Θ(log n)</b>, et une autre qui donne <b>toujours le plus urgent</b> en Θ(log n).</div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Question d’échauffement</h2>
+  <p class="sub">On range un million de valeurs. Au mieux, combien de comparaisons faut-il pour savoir si <b>42</b> en fait partie, sans rien parcourir en entier ?</p>
+  <div class="grid4" style="flex:none">
+    <div class="panel step" data-g="1" style="text-align:center;font:700 40px var(--mono)">1</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 40px var(--mono)">20</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 40px var(--mono)">1 000</div>
+    <div class="panel step" data-g="1" style="text-align:center;font:700 40px var(--mono)">1 000 000</div>
+  </div>
+  <div class="callout step" data-g="2">Votez à main levée. La réponse (log₂ 1 000 000 ≈ 20) arrive avec les <b>arbres binaires de recherche</b>.</div>
+  <aside class="notes">Rappeler la dichotomie de la séance 1 : on divise par deux à chaque comparaison. Le défi est de garder cette efficacité quand on insère.</aside>
+</section>
+
+<section class="slide">
+  <h2 class="title">Six séances pour apprendre à concevoir et à comparer des algorithmes</h2>
+  <div class="tl">
+    <div class="nd"><div class="dot">1</div><div class="panel"><h3>Complexité</h3><div class="small">Mesurer, comparer, prévoir le coût d’un algorithme</div></div></div>
+    <div class="nd"><div class="dot">2</div><div class="panel"><h3>Structures linéaires</h3><div class="small">Mémoire en C, listes, piles, files</div></div></div>
+    <div class="nd now"><div class="dot">3</div><div class="panel"><h3>Arbres et tas</h3><div class="small">Arbres binaires, ABR, tas, file de priorité</div></div></div>
+    <div class="nd"><div class="dot">4</div><div class="panel"><h3>Hachage et diviser pour régner</h3><div class="small">Tables, tri fusion</div></div></div>
+    <div class="nd"><div class="dot">5</div><div class="panel"><h3>Glouton et prog. dynamique</h3><div class="small">Choix local, mémoïsation</div></div></div>
+    <div class="nd"><div class="dot">6</div><div class="panel"><h3>Graphes</h3><div class="small">Parcours, plus courts chemins</div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2 class="title">Au programme aujourd’hui</h2>
+  <div class="split even">
+    <ol class="num">
+      <li class="step"><span><b>L’arbre binaire</b><br><span class="small">vocabulaire, nœud en C, hauteur et nombre de nœuds</span></span></li>
+      <li class="step"><span><b>Parcourir un arbre</b><br><span class="small">préfixe, infixe, postfixe, en largeur</span></span></li>
+      <li class="step"><span><b>L’arbre binaire de recherche</b><br><span class="small">chercher, insérer, supprimer, et le risque de dégénérer</span></span></li>
+      <li class="step"><span><b>Le tas</b><br><span class="small">un arbre rangé dans un tableau, file de priorité, tri par tas</span></span></li>
+    </ol>
+    <div class="panel navy col" style="gap:20px">
+      <span class="tag" style="color:var(--cover-accent)">Objectifs</span>
+      <h3>À la fin de la séance, vous saurez :</h3>
+      <ul class="lst sm" style="color:#E6F0FA">
+        <li>construire un arbre binaire en C et le parcourir par récursivité</li>
+        <li>expliquer pourquoi la <b>hauteur</b> décide du coût</li>
+        <li>chercher, insérer et supprimer dans un arbre de recherche</li>
+        <li>ranger un arbre dans un tableau et maintenir un <b>tas</b></li>
+        <li>utiliser une file de priorité et trier avec un tas</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">1</div>
+  <div class="eyebrow">Chapitre 1</div>
+  <h2>L’arbre binaire</h2>
+  <div class="q">Comment ranger des données qui se <b>ramifient</b>, et que gagne-t-on à les ranger ainsi ?</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Des hiérarchies partout</h2>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Fichiers</span><h3>Dossiers et sous-dossiers</h3><pre class="code free" style="font-size:25px;line-height:1.5">projet
+├ src
+│  ├ main.c
+│  └ arbre.c
+└ docs</pre></div>
+    <div class="panel col step" data-g="2"><span class="tag">Calcul</span><h3>Une expression</h3><pre class="code free" style="font-size:25px;line-height:1.5">(2 + 3) * 4
+
+        *
+       / \
+      +   4
+     / \
+    2   3</pre></div>
+    <div class="panel col step" data-g="3"><span class="tag">Décision</span><h3>Un questionnaire</h3><pre class="code free" style="font-size:25px;line-height:1.5">Connecté ?
+├ oui : Admin ?
+│   ├ oui : tout
+│   └ non : lecture
+└ non : refuser</pre></div>
+  </div>
+  <div class="keep step" data-g="4">Dès qu’un élément en <b>contient</b> ou en <b>commande</b> plusieurs autres, la structure naturelle est un <b>arbre</b>.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">D’un chemin unique à une ramification</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="panel step" data-g="1"><b>Une liste</b> : un seul chemin. Pour atteindre la dernière valeur, on traverse toutes les autres.</div>
+      <div class="panel step" data-g="2"><b>Un arbre</b> : à chaque élément, <b>deux directions</b> possibles, gauche ou droite. On en <b>choisit une</b> et on abandonne l’autre moitié.</div>
+    </div>
+    <div class="col" style="gap:30px;align-items:center">
+      <div class="panel step" data-g="1" style="padding:22px 34px;font:700 38px var(--mono);text-align:center">7 → 3 → 9 → 5 → 1</div>
+      <div id="st-small" class="step" data-g="2"></div>
+    </div>
+  </div>
+  <div class="callout step" data-g="3">Si chaque choix écarte la moitié des éléments, on atteint n’importe lequel en <b>log₂ n</b> pas au lieu de n : c’est tout l’intérêt de l’arbre.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Le vocabulaire des arbres</h2>
+  <div class="split even">
+    <div class="col" style="gap:20px">
+      <div class="def step" data-g="1" data-t="Racine">Le nœud <b>du haut</b> : il n’a pas de parent. L’arbre entier s’atteint par lui.</div>
+      <div class="def step" data-g="2" data-t="Parent et fils">Un nœud relié aux nœuds juste en dessous : ses <b>fils</b>. Chaque nœud a au plus <b>un parent</b>. Dans un arbre <b>binaire</b> : au plus un fils <b>gauche</b> et un fils <b>droit</b>.</div>
+      <div class="def step" data-g="3" data-t="Feuille">Un nœud <b>sans fils</b> (ses deux pointeurs valent NULL).</div>
+      <div class="def step" data-g="4" data-t="Sous-arbre">Un nœud et tous ses descendants : un arbre plus petit, <b>dans</b> l’arbre.</div>
+    </div>
+    <div id="st-vocab" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Explorez un arbre</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Lire le vocabulaire sur un exemple : parent, fils, feuille, profondeur, hauteur.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le <b>sous-arbre</b> du nœud choisi (pointillés) et le <b>chemin</b> jusqu’à la racine (jaune).</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cliquez sur <b>E</b>, puis sur <b>G</b>. Pourquoi la hauteur de E vaut-elle 1 alors que sa profondeur vaut 2 ?</div></div>
+  </div>
+  <div id="sim-explore" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Profondeur, hauteur, taille</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="def step" data-g="1" data-t="Profondeur d’un nœud">Le nombre de <b>pas</b> (arêtes) de la racine jusqu’à lui. La racine est à la profondeur <b>0</b>.</div>
+      <div class="def step" data-g="2" data-t="Hauteur">Le nombre de pas du chemin <b>le plus long</b> qui descend vers une feuille. Une feuille a pour hauteur <b>0</b>. L’arbre vide a pour hauteur <b>−1</b>.</div>
+      <div class="def step" data-g="3" data-t="Taille">Le nombre total de nœuds, noté <b>n</b>.</div>
+      <div class="callout step" data-g="4">La <b>hauteur de l’arbre</b> est la hauteur de sa racine : c’est la profondeur du nœud le plus profond. <b>C’est elle qui donnera le coût des opérations.</b></div>
+    </div>
+    <div id="st-prof" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">La définition mathématique d’un arbre</h2>
+  <div class="split even">
+    <div class="col" style="gap:16px">
+      <div class="def step" data-g="1" data-t="Graphe">Un <b>graphe</b> est un couple <span class="fx">G = (V, E)</span> : un ensemble <span class="fx">V</span> de <b>nœuds</b> (sommets) et un ensemble <span class="fx">E</span> d’<b>arêtes</b>, chacune reliant deux nœuds.</div>
+      <div class="def step" data-g="2" data-t="Arbre">Un <b>arbre</b> est un graphe <b>connexe</b> (un chemin relie deux nœuds quelconques) et <b>sans cycle</b>. Conséquences : le chemin entre deux nœuds est <b>unique</b>, et <span class="fx">|E| = |V| − 1</span>.</div>
+      <div class="def step" data-g="3" data-t="Arbre enraciné">On choisit un nœud <span class="fx">r</span>, la <b>racine</b>. Le <b>parent</b> de <span class="fx">x</span> est son voisin sur le chemin vers <span class="fx">r</span> ; ses autres voisins sont ses <b>fils</b>.</div>
+      <div class="def step" data-g="4" data-t="Arbre binaire">Un arbre enraciné où chaque nœud a <b>au plus deux fils</b>, distingués : un fils <b>gauche</b> et un fils <b>droit</b>.</div>
+    </div>
+    <div class="col" style="gap:18px;align-items:center">
+      <div id="st-def1" class="step" data-g="2"></div>
+      <div class="panel step" data-g="1" style="font-size:28px"><span class="fx">V = {A, B, C, D, E, F, G, H, I}</span><br><span class="fx">E = {{A,B}, {A,C}, {B,D}, {B,E}, {E,H}, {E,I}, {C,F}, {F,G}}</span><br><span class="fx">|V| = 9 ; |E| = 8 = |V| − 1</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Mesurer un arbre : d, h et t</h2>
+  <p class="sub">Soit <span class="fx">a</span> un arbre enraciné en <span class="fx">r</span>. Trois notations serviront pour toute la séance.</p>
+  <div class="split even">
+    <div class="col" style="gap:16px">
+      <div class="def step" data-g="1" data-t="Profondeur"><span class="fx">d(x)</span> = nombre d’arêtes du chemin <b>unique</b> de <span class="fx">r</span> à <span class="fx">x</span>. Ainsi <span class="fx">d(r) = 0</span>.</div>
+      <div class="def step" data-g="2" data-t="Hauteur"><span class="fx">h(a)</span> = <span class="fx">max d(x)</span> pour <span class="fx">x</span> dans <span class="fx">V</span> : la profondeur du nœud le plus profond. Un arbre réduit à sa racine a <span class="fx">h = 0</span> ; par convention l’arbre vide a <span class="fx">h = −1</span>.</div>
+      <div class="def step" data-g="3" data-t="Taille"><span class="fx">t(a) = |V|</span> : le nombre de nœuds. On le note aussi <span class="fx">n</span>.</div>
+      <div class="callout step" data-g="4">Sur l’arbre de droite : <span class="fx">d(G) = 3</span>, <span class="fx">h(a) = 3</span>, <span class="fx">t(a) = 9</span>. Pour tout arbre : <span class="fx">h(a) ≤ t(a) − 1</span>.</div>
+    </div>
+    <div id="st-def2" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Un arbre est un objet récursif</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="def" data-t="Idée">Le fils gauche de la racine, avec tout ce qu’il y a dessous, est <b>un arbre</b>. Idem à droite. Un arbre est donc une <b>racine</b> et deux <b>arbres plus petits</b>.</div>
+      <div class="txt step" data-g="1">Presque tous les algorithmes sur les arbres sont donc <b>récursifs</b>. Le cas d’arrêt est l’<b>arbre vide</b> (NULL).</div>
+      <div class="def formal step" data-g="2" data-t="Cadre formel">Un arbre binaire <span class="fx">a</span> est <span class="fx">∅</span> (vide) ou un triplet <span class="fx">(x, G, D)</span> : <span class="fx">x</span> est la valeur de la racine, <span class="fx">G</span> et <span class="fx">D</span> sont ses sous-arbres gauche et droit (des arbres binaires).<br>On retrouve les mesures précédentes : <span class="fx">t(a)</span> est la taille, <span class="fx">h(a)</span> la hauteur.<br><span class="fx">t(∅) = 0</span> ; <span class="fx">t(x, G, D) = 1 + t(G) + t(D)</span><br><span class="fx">h(∅) = −1</span> ; <span class="fx">h(x, G, D) = 1 + max(h(G), h(D))</span></div>
+    </div>
+    <div id="st-rec" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Combien de nœuds peut-on ranger ?</h2>
+  <p class="sub">Un arbre binaire de hauteur h ne peut pas contenir n’importe quel nombre de nœuds. Quel est le maximum ?</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Trouver le nombre maximal de nœuds d’un arbre binaire de hauteur donnée.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nombre de nœuds de chaque <b>niveau</b> : il <b>double</b> à chaque fois.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Montez h jusqu’à 4. Combien de nœuds au niveau 4 ? Au total ?</div></div>
+  </div>
+  <div id="sim-levels" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Un arbre bien rempli est très bas</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Au niveau k, on peut avoir au plus <b>2ᵏ</b> nœuds. On additionne les niveaux de 0 à h : 1 + 2 + 4 + … + 2ʰ.</div>
+      <div class="def formal step" data-g="2" data-t="Cadre formel">Un arbre binaire de hauteur <span class="fx">h</span> contient au plus <span class="fx">n<sub>max</sub> = 2<sup>h+1</sup> − 1</span> nœuds.<br>Réciproquement, un arbre de <span class="fx">n</span> nœuds a une hauteur <span class="fx">h ≥ ⌈log₂(n + 1)⌉ − 1</span>.</div>
+      <div class="callout step" data-g="3">Il suffit donc de <b>20 niveaux</b> pour ranger plus d’un million de valeurs, et de 30 pour plus d’un milliard.</div>
+    </div>
+    <table class="tbl step" data-g="2" style="font-size:31px">
+      <tr><th>Hauteur h</th><th>Nœuds au plus</th></tr>
+      <tr><td class="mono">3</td><td class="mono">15</td></tr>
+      <tr><td class="mono">10</td><td class="mono">2 047</td></tr>
+      <tr><td class="mono">19</td><td class="mono">1 048 575</td></tr>
+      <tr><td class="mono">29</td><td class="mono">1 073 741 823</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Le même nombre de nœuds, deux formes</h2>
+  <p class="sub">Sept nœuds peuvent former un arbre bas et large, ou un arbre haut et étroit.</p>
+  <div class="grid2" style="gap:40px;align-items:start">
+    <div class="panel col step" data-g="1" style="align-items:center"><span class="pill ok">Équilibré</span><div id="st-eq"></div><div>Hauteur <b>2</b> : au plus 3 nœuds à traverser.</div></div>
+    <div class="panel col step" data-g="2" style="align-items:center"><span class="pill bad">Dégénéré (en « peigne »)</span><div id="st-peigne"></div><div>Hauteur <b>6</b> : l’arbre est devenu une <b>liste</b>.</div></div>
+  </div>
+  <div class="keep step" data-g="3">Les algorithmes coûteront « la hauteur » : entre <b>log n</b> et <b>n</b> selon la forme. Retenez cette phrase, elle reviendra deux fois.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">À quoi servent les arbres binaires ?</h2>
+  <div class="grid2" style="gap:28px">
+    <div class="panel col step" data-g="1"><span class="tag">Chercher vite</span><h3>Index et dictionnaires</h3><div>Les index des bases de données, <span class="mono">TreeMap</span> en Java, <span class="mono">std::map</span> en C++ reposent sur des arbres de recherche. Pour <b>un milliard</b> d’entrées, environ <b>30 comparaisons</b> suffisent.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Calculer</span><h3>Compilateurs et calculatrices</h3><div>Une expression comme <span class="mono">(2 + 3) × 4</span> est représentée par un <b>arbre</b> : les opérateurs sont les nœuds, les nombres sont les feuilles. On l’évalue en le parcourant.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Compresser</span><h3>Codage de Huffman</h3><div>ZIP, JPEG et MP3 utilisent un arbre binaire pour donner des <b>codes courts aux symboles fréquents</b> : chaque chemin gauche/droite est un 0 ou un 1.</div></div>
+    <div class="panel col step" data-g="4"><span class="tag">Décider et trier</span><h3>Priorités et décisions</h3><div>Les <b>arbres de décision</b> (jeux, apprentissage automatique) et les <b>tas</b> (ordonnanceurs, chapitre 4) sont aussi des arbres binaires.</div></div>
+  </div>
+  <div class="keep step" data-g="5">Dans chaque cas, c’est la <b>forme en arbre</b> qui permet de ne parcourir qu’<b>un chemin</b> au lieu de tout l’ensemble.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Deux applications en images</h2>
+  <div class="grid2" style="gap:40px;align-items:start">
+    <div class="panel col step" data-g="1" style="align-items:center"><span class="pill ok">Expression arithmétique</span><div id="st-expr"></div><div class="small">Parcours <b>postfixe</b> : <span class="mono">2 3 + 4 ×</span>. On empile, on applique : 5 puis <b>20</b>. Les parcours du chapitre 2 servent ici.</div></div>
+    <div class="panel col step" data-g="2" style="align-items:center"><span class="pill ok">Codage de Huffman</span><div id="st-huff"></div><div class="small"><span class="mono">A = 0, B = 10, C = 110, D = 111</span>. Le message <b>ABAC</b> tient en <b>7 bits</b> (0 10 0 110) au lieu de 32 en ASCII.</div></div>
+  </div>
+  <div class="callout step" data-g="3">Le but de cette séance : apprendre à <b>construire</b>, <b>parcourir</b> et <b>maintenir</b> ces arbres, pour que la recherche, le calcul ou la priorité restent rapides.</div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Et maintenant, comment l’écrire en C ?</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="txt">Vous savez ce qu’est un arbre, comment on le décrit et pourquoi sa <b>hauteur</b> décide de tout. Il reste à le <b>construire dans un programme</b>.</div>
+      <div class="callout step" data-g="1">Bonne nouvelle : vous connaissez déjà l’outil. Le nœud d’une <b>liste chaînée</b> contenait un pointeur vers le suivant. Le nœud d’un arbre en contient <b>deux</b> : un vers chaque fils.</div>
+      <div class="callout good step" data-g="2">Ce que vous allez gagner : pouvoir écrire un arbre en 3 lignes de C, et comprendre d’où viennent les fuites de mémoire quand on le libère mal (chapitre 2).</div>
+    </div>
+    <div class="col" style="gap:34px;align-items:center"><div id="chain-l" class="step" data-g="1"></div><div id="st-small2" class="step" data-g="1"></div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Un nœud d’arbre en C</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <pre class="code free" style="font-size:30px">typedef struct Noeud {
+    int valeur;
+    struct Noeud *gauche;
+    struct Noeud *droit;
+} Noeud;</pre>
+      <div class="txt step" data-g="1">Même idée que le nœud de la liste : un <b>entier</b> et des <b>pointeurs</b>. Il y en a <b>deux</b> au lieu d’un : <span class="mono">gauche</span> et <span class="mono">droit</span>.</div>
+      <div class="callout step" data-g="2">Un arbre se désigne par <b>l’adresse de sa racine</b> : un <span class="mono">Noeud *racine</span>. L’arbre vide est <span class="mono">NULL</span>, comme la liste vide.</div>
+    </div>
+    <div class="col" style="gap:18px">
+      <div id="mem-static-node3" class="step" data-g="1"></div>
+      <table class="tbl step" data-g="2" style="font-size:30px">
+        <tr><th>Pour un pointeur <span class="mono">a</span></th><th>On écrit</th></tr>
+        <tr><td>la valeur</td><td class="mono">a-&gt;valeur</td></tr>
+        <tr><td>le fils gauche</td><td class="mono">a-&gt;gauche</td></tr>
+        <tr><td>le fils droit</td><td class="mono">a-&gt;droit</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Construire un arbre en mémoire</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir qu’un arbre est un ensemble de blocs du <b>tas</b> reliés par des pointeurs.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Chaque <b>arc</b> du dessin est un <b>pointeur</b> rangé dans <b>gauche</b> ou <b>droit</b>. Les champs sans flèche valent NULL.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez pas à pas : combien de <span class="mono">malloc</span> faut-il pour un arbre de n nœuds ?</div></div>
+  </div>
+  <div id="sim-build" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Question 1</h2>
+  <div id="q1" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="1" data-chname="L’arbre binaire">
+  <h2 class="title">Question 2</h2>
+  <div id="q2" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 1 et 2 : lire un arbre</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 1</b>
+      <div class="panel" style="font-size:29px">Racine <b>10</b> ; fils gauche <b>4</b> (fils : 2 et 7) ; fils droit <b>15</b> (un seul fils, à droite : 20). Donnez les feuilles, la taille, la hauteur, la profondeur de 7.</div>
+      <div class="callout good step" style="font-size:27px">Feuilles : <b>2, 7, 20</b>. Taille : <b>6</b>. Hauteur : <b>2</b> (10 → 4 → 7). Profondeur de 7 : <b>2</b>.</div></div>
+    <div class="col"><b class="acc">Exercice 2</b>
+      <div class="panel" style="font-size:29px">Un arbre binaire a <b>100</b> nœuds. Quelles sont sa hauteur <b>minimale</b> et sa hauteur <b>maximale</b> ?</div>
+      <div class="callout good step" style="font-size:27px">Minimale : 2⁶ − 1 = 63 &lt; 100 ≤ 127 = 2⁷ − 1, donc <b>h = 6</b> (formule : ⌈log₂ 101⌉ − 1 = 6). Maximale : l’arbre « peigne », <b>h = 99</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">2</div>
+  <div class="eyebrow">Chapitre 2</div>
+  <h2>Parcourir un arbre</h2>
+  <div class="q">Comment visiter <b>tous les nœuds</b>, une fois chacun, quand il y a plusieurs chemins ?</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Dans quel ordre visiter ?</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="txt">Une liste n’a qu’<b>un seul ordre</b> naturel : de la tête à la fin. Dans un arbre, à chaque nœud il y a un <b>choix</b> : la racine d’abord ? Le fils gauche d’abord ? Et le fils droit, quand ?</div>
+      <div class="panel step" data-g="1"><b>En profondeur</b> : on va <b>jusqu’au bout</b> d’une branche avant de remonter. Trois variantes selon le moment où l’on <b>visite</b> le nœud : <span class="kw">préfixe</span>, <span class="kw">infixe</span>, <span class="kw">postfixe</span>.</div>
+      <div class="panel step" data-g="2"><b>En largeur</b> : on visite <b>niveau par niveau</b>, de haut en bas.</div>
+    </div>
+    <div id="st-trav" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Des parcours dans la vie réelle</h2>
+  <p class="sub">Chaque ordre de visite répond à un besoin concret. Le même arbre sert à quatre usages différents.</p>
+  <div class="grid2" style="gap:26px">
+    <div class="panel col step" data-g="1"><span class="tag">Préfixe : le parent avant ses enfants</span><h3>Copier un dossier</h3><div>Pour copier ou afficher une arborescence, on crée d’abord <b>le dossier</b>, puis on y met son contenu. Exemple : <span class="mono">projet</span> puis <span class="mono">src</span> puis <span class="mono">main.c</span>.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Postfixe : les enfants avant le parent</span><h3>Calculer la taille, supprimer</h3><div>Pour connaître la taille d’un dossier, ou le supprimer, il faut <b>d’abord traiter tout son contenu</b>. On ne peut effacer un dossier qu’une fois vide.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Infixe : gauche, nœud, droite</span><h3>Un annuaire trié</h3><div>Dans un arbre de recherche (chapitre 3), l’ordre infixe donne les noms <b>par ordre alphabétique</b>, sans aucun tri supplémentaire.</div></div>
+    <div class="panel col step" data-g="4"><span class="tag">Largeur : niveau par niveau</span><h3>Organigramme, réseau social</h3><div>La direction, puis les chefs de service, puis les employés. Sur un réseau : mes amis, puis les amis de mes amis (les <b>degrés de séparation</b>).</div></div>
+  </div>
+  <div class="keep step" data-g="5">Le bon ordre dépend du <b>problème à résoudre</b>. Voyons d’abord comment chacun fonctionne, sans écrire de code.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Trois façons de visiter en profondeur</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt">En profondeur, on va <b>jusqu’au bout d’une branche</b> avant de remonter. À chaque nœud, trois choses à faire : parcourir son sous-arbre <b>gauche</b>, son sous-arbre <b>droit</b>, et <b>visiter</b> le nœud lui-même. Les trois variantes ne diffèrent que par <b>le moment de la visite</b>.</div>
+      <div class="grid3" style="gap:14px">
+        <div class="panel col step" data-g="1" style="padding:20px 24px;align-items:center"><span class="pill ok">Préfixe</span><div class="mono" style="font-size:28px;text-align:center">visiter<br>gauche<br>droit</div><div class="small">nœud <b>avant</b></div></div>
+        <div class="panel col step" data-g="2" style="padding:20px 24px;align-items:center"><span class="pill ok">Infixe</span><div class="mono" style="font-size:28px;text-align:center">gauche<br>visiter<br>droit</div><div class="small">nœud <b>entre</b></div></div>
+        <div class="panel col step" data-g="3" style="padding:20px 24px;align-items:center"><span class="pill ok">Postfixe</span><div class="mono" style="font-size:28px;text-align:center">gauche<br>droit<br>visiter</div><div class="small">nœud <b>après</b></div></div>
+      </div>
+    </div>
+    <div id="st-trav2" class="step" data-g="1"></div>
+  </div>
+  <div class="callout step" data-g="4">Quand un sous-arbre est vide, il n’y a rien à visiter : on <b>remonte</b>. C’est ce qui garantit que le parcours se termine.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Trois ordres en profondeur</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir comment la récursion visite les nœuds, et comment l’ordre change quand on déplace « visiter ».</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>pile d’appels</b> (une boîte par appel en cours) et la <b>liste des nœuds visités</b>. Un nœud vert est visité.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez les trois ordres. Prédisez le premier nœud visité en <b>infixe</b> avant d’avancer.</div></div>
+  </div>
+  <div id="sim-trav" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Le parcours en largeur</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Visiter niveau par niveau avec une <b>file</b>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les nœuds <b>en attente</b> (bleu) dans la file. Les fils d’un nœud se placent à la <b>fin</b>.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avant d’avancer, prédisez : après A, quels nœuds seront dans la file ?</div></div>
+  </div>
+  <div id="sim-bfs" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Un même arbre, quatre ordres</h2>
+  <div class="split" style="grid-template-columns:minmax(0,0.8fr) minmax(0,1.5fr);align-items:start">
+    <div id="st-comp" class="step" data-g="1"></div>
+    <table class="tbl" style="font-size:31px">
+      <tr class="step" data-g="1"><th>Parcours</th><th>Résultat</th><th>Il sert à…</th></tr>
+      <tr class="step" data-g="2"><td><b>Préfixe</b></td><td class="mono" style="white-space:nowrap">A B D E H I C F G</td><td>copier l’arbre, l’afficher avec son indentation</td></tr>
+      <tr class="step" data-g="3"><td><b>Infixe</b></td><td class="mono" style="white-space:nowrap">D B H E I A C G F</td><td>lire un arbre de recherche en <b>ordre trié</b></td></tr>
+      <tr class="step" data-g="4"><td><b>Postfixe</b></td><td class="mono" style="white-space:nowrap">D H I E B G F C A</td><td><b>libérer</b> l’arbre, calculer une expression</td></tr>
+      <tr class="step" data-g="5"><td><b>Largeur</b></td><td class="mono" style="white-space:nowrap">A B C D E F H I G</td><td>niveau par niveau, plus court chemin</td></tr>
+    </table>
+  </div>
+  <div class="keep step" data-g="6">Le <b>postfixe</b> traite les fils avant le parent : c’est l’ordre qu’il faut pour <b>libérer</b> sans rien perdre.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Calculer la hauteur, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Trouver la hauteur d’un arbre en la demandant à chaque sous-arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>pile d’appels</b> (les sous-arbres en cours d’étude) et les valeurs <b>h = …</b> qui apparaissent quand un nœud a terminé son calcul.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez jusqu’au nœud E : de quelles deux valeurs a-t-il besoin pour calculer sa hauteur ?</div></div>
+  </div>
+  <div id="sim-haut" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">La hauteur par récursion : la formule</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">La simulation a répondu d’abord pour les <b>branches vides</b> (−1), puis pour les <b>feuilles</b> (0), puis chaque parent a pris <b>1 + la plus grande hauteur de ses fils</b>.</div>
+      <div class="def formal step" data-g="2" data-t="Cadre formel"><span class="fx">h(∅) = −1</span><br><span class="fx">h(feuille) = 1 + max(−1, −1) = 0</span><br><span class="fx">h(B) = 1 + max(h(D), h(E)) = 1 + max(0, 0) = 1</span><br><span class="fx">h(A) = 1 + max(h(B), h(C)) = 1 + max(1, 0) = 2</span></div>
+    </div>
+    <div id="st-haut" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Combien coûte un parcours ?</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Chaque nœud est visité <b>une seule fois</b>, et chaque visite fait un travail constant. Donc le coût est <b>proportionnel au nombre de nœuds</b>, quelle que soit la forme de l’arbre.</div>
+      <div class="callout step" data-g="2">Attention à la <b>mémoire</b> : la pile d’appels monte jusqu’à la <b>hauteur</b> de l’arbre. Pour un arbre dégénéré de 100 000 nœuds, cela peut faire <b>déborder la pile</b>.</div>
+    </div>
+    <div class="def formal step" data-g="3" data-t="Cadre formel"><span class="fx">T(n) = T(g) + T(d) + Θ(1)</span> avec <span class="fx">g + d = n − 1</span>.<br>Il y a <span class="fx">n</span> appels sur des nœuds et <span class="fx">n + 1</span> appels sur NULL, soit <span class="fx">2n + 1</span> appels de coût constant :<br><b>T(n) = Θ(n)</b>.<br>Espace : <span class="fx">Θ(h)</span> pour la pile d’appels.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Profondeur : une pile. Largeur : une file.</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="panel col step" data-g="1"><span class="tag">En profondeur</span><h3>La pile d’appels</h3><div>Le dernier nœud rencontré est le premier traité : <b>dernier entré, premier sorti</b>. Exactement le comportement d’une <b>pile</b>, que la récursion gère toute seule.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">En largeur</span><h3>Une file explicite</h3><div>Les nœuds sont traités dans l’ordre d’arrivée : <b>premier entré, premier sorti</b>. Il faut une <b>file</b> (celle de la séance 2) : la récursion ne convient pas.</div></div>
+  </div>
+  <div class="keep step" data-g="3">Remplacer la <b>file</b> par une <b>pile</b> dans l’algorithme en largeur donne un parcours en <b>profondeur</b> sans récursion. Les structures de la séance 2 servent ici.</div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Passons à l’écriture</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="txt">Vous savez <b>quoi</b> visiter, <b>dans quel ordre</b>, et comment calculer une hauteur. Les fonctions en C vont suivre exactement ces règles, instruction par instruction.</div>
+      <div class="callout step" data-g="1">Pourquoi s’y intéresser ? Parce que c’est ce que vous écrirez au TP, et qu’un oubli se paie en <b>fuite mémoire</b>.</div>
+    </div>
+    <div class="panel col step" data-g="2"><span class="tag">Au programme</span><ul class="lst sm"><li>les trois parcours en C, exécutés pas à pas</li><li>la hauteur en C, avec ses variables locales</li><li>la libération d’un arbre : dans quel ordre ?</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Les parcours en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code C d’un parcours s’exécuter ligne par ligne.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>ligne en cours</b> dans le code, la <b>pile d’appels</b> et l’ordre d’affichage. Seule la ligne du <span class="mono">printf</span> change entre les trois parcours.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Passez de Préfixe à Postfixe : quelle ligne a changé de place ?</div></div>
+  </div>
+  <div id="sim-trav-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">La hauteur en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Suivre la fonction récursive <span class="mono">hauteur</span> avec ses variables locales.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les variables <b>g</b> et <b>d</b> de l’appel en cours, qui se remplissent au fil des retours.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Avancez jusqu’à ce que <b>E</b> ait fini. Que valent g et d dans cet appel ?</div></div>
+  </div>
+  <div id="sim-haut-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Libérer un arbre : fils d’abord</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Un arbre de n nœuds a n malloc : il faut n free. Dans quel ordre ? C’est un parcours <b>postfixe</b>.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Ce qu’il advient des nœuds 3 et 10 quand on libère la <b>racine en premier</b> : plus personne ne connaît leurs adresses.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez « Racine d’abord », puis « Fils d’abord ».</div></div>
+  </div>
+  <div id="sim-free" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Question 3</h2>
+  <div id="q3" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="2" data-chname="Parcourir un arbre">
+  <h2 class="title">Question 4</h2>
+  <div id="q4" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 3 et 4 : parcours</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 3</b>
+      <div class="panel" style="font-size:28px">Arbre : racine <b>1</b>, fils gauche <b>2</b> (fils 4 et 5), fils droit <b>3</b> (un seul fils, à droite : 6). Donnez les quatre parcours.</div>
+      <div class="callout good step" style="font-size:27px">Préfixe : <b>1 2 4 5 3 6</b>. Infixe : <b>4 2 5 1 3 6</b>. Postfixe : <b>4 5 2 6 3 1</b>. Largeur : <b>1 2 3 4 5 6</b>.</div></div>
+    <div class="col"><b class="acc">Exercice 4</b>
+      <div class="panel" style="font-size:28px">Écrivez <span class="mono">compter_feuilles(a)</span>, qui renvoie le nombre de feuilles d’un arbre. Quel est son coût ?</div>
+      <div class="callout good step" style="font-size:26px">Règle récursive : arbre vide → <b>0</b> ; nœud sans fils → <b>1</b> ; sinon → <b>feuilles(gauche) + feuilles(droit)</b>.</div>
+      <div class="callout good step" style="font-size:26px">Un parcours : coût <b>Θ(n)</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">3</div>
+  <div class="eyebrow">Chapitre 3</div>
+  <h2>L’arbre binaire de recherche</h2>
+  <div class="q">Comment retrouver une valeur en <b>log n</b> comparaisons, tout en pouvant <b>insérer</b> et <b>supprimer</b> ?</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Une règle d’ordre</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="def" data-t="Arbre binaire de recherche (ABR)">Un arbre binaire où, pour <b>chaque nœud</b> : toutes les valeurs de son sous-arbre <b>gauche</b> sont <b>plus petites</b>, toutes celles de son sous-arbre <b>droit</b> sont <b>plus grandes</b>.</div>
+      <div class="txt step" data-g="1">À chaque nœud, <b>une comparaison</b> suffit pour savoir de quel côté aller : on écarte d’un coup <b>tout un sous-arbre</b>. C’est la dichotomie, mais dans un arbre.</div>
+      <div class="def formal step" data-g="2" data-t="Cadre formel">Pour tout nœud <span class="fx">x</span> : <span class="fx">∀ y ∈ G(x), y &lt; x.valeur</span> et <span class="fx">∀ z ∈ D(x), z &gt; x.valeur</span>.<br>(Pour simplifier, les valeurs sont <b>distinctes</b>.)</div>
+    </div>
+    <div id="st-bst" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Attention : comparer avec le parent ne suffit pas</h2>
+  <div class="grid2" style="gap:40px;align-items:start">
+    <div class="panel col step" data-g="1" style="align-items:center"><span class="pill ok">C’est un ABR</span><div id="st-ok"></div><div class="small">Tout le sous-arbre gauche de 8 est plus petit que 8.</div></div>
+    <div class="panel col step" data-g="2" style="align-items:center"><span class="pill bad">Ce n’est pas un ABR</span><div id="st-ko"></div><div class="small"><b>9</b> est bien plus grand que son parent 3, mais il est dans le sous-arbre <b>gauche</b> de 8 : or 9 &gt; 8.</div></div>
+  </div>
+  <div class="callout warn step" data-g="3">La règle concerne <b>tout le sous-arbre</b>, pas seulement les fils directs. La chercher 9 dans l’arbre de droite échouerait : on irait à gauche dès 8.</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Chercher dans un ABR</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir comment une comparaison par nœud élimine un sous-arbre entier.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les nœuds en <b>gris pâle</b> sont éliminés. Le compteur indique le nombre de nœuds visités.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cherchez <b>5</b> (absent) puis <b>13</b>. Combien de nœuds visite-t-on, sur 9 ?</div></div>
+  </div>
+  <div id="sim-search" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Insérer dans un ABR</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir qu’on insère un nouveau nœud <b>là où on le chercherait</b>, comme une feuille.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le chemin de la racine à la place libre, puis la <b>feuille</b> verte. Aucun autre nœud ne bouge.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez <b>5</b>, puis <b>2</b> : dans quel sous-arbre se trouvent-ils ?</div></div>
+  </div>
+  <div id="sim-ins" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Le parcours infixe d’un ABR est trié</h2>
+  <p class="sub">Gauche, nœud, droite : le plus petit passe avant. Insérer puis parcourir en infixe <b>trie</b> les valeurs.</p>
+  <div id="sim-inf" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Le minimum et le maximum</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt">Le plus petit est <b>tout à gauche</b> : on descend à gauche tant qu’il y a un fils gauche. Le plus grand est <b>tout à droite</b>.</div>
+      <div class="callout step" data-g="1">Il suffit de suivre <b>un seul chemin</b> : coût <b>Θ(h)</b>, comme la recherche. Application : trouver la plus petite valeur d’un catalogue, ou le prix le plus élevé, sans tout parcourir.</div>
+      <div class="callout step" data-g="2">Le minimum du sous-arbre droit d’un nœud s’appelle son <b>successeur</b> : nous allons nous en servir pour supprimer.</div>
+    </div>
+    <div class="col" style="gap:14px;align-items:center"><div id="st-minmax" class="step" data-g="1"></div><div class="small step" data-g="1">minimum <b>1</b> (vert à gauche), maximum <b>14</b> (vert à droite)</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Supprimer : trois cas</h2>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="pill ok">Cas 1</span><h3>Une feuille</h3><div>On la <b>retire</b> : le champ du parent passe à NULL, puis on la libère.</div></div>
+    <div class="panel col step" data-g="2"><span class="pill ok">Cas 2</span><h3>Un seul fils</h3><div>Le parent <b>pointe directement vers ce fils</b>, qui prend la place de son père avec tout son sous-arbre.</div></div>
+    <div class="panel col step" data-g="3"><span class="pill warn">Cas 3</span><h3>Deux fils</h3><div>On ne peut pas retirer le nœud. On le <b>remplace par son successeur</b> (le minimum du sous-arbre droit), puis on supprime ce successeur, qui est un cas 1 ou 2.</div></div>
+  </div>
+  <div class="callout step" data-g="4">Question à se poser : par quelle valeur remplacer un nœud, pour que l’ordre soit conservé ? Elle doit être <b>juste après</b> lui dans l’ordre trié : c’est le successeur.</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">La suppression pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Appliquer les trois cas de suppression sur le même arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le nœud supprimé (rouge), les liens modifiés (jaune), le <b>successeur</b> du cas 3.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez les trois cas. Dans le cas 3, pourquoi 4 convient-il pour remplacer 3 ?</div></div>
+  </div>
+  <div id="sim-del" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">À vous de jouer avec un arbre de recherche</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Manipuler un ABR librement : insérer, chercher, supprimer.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>hauteur</b> après chaque opération, et le parcours infixe toujours trié.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 50, 30, 70, 20, 40, 60, 80, puis supprimez 30 puis 50. Vérifiez à la main.</div></div>
+  </div>
+  <div id="sim-abr" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Tout dépend de l’ordre d’arrivée</h2>
+  <p class="sub">Les mêmes sept valeurs, insérées dans deux ordres différents. Que devient la hauteur ?</p>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir qu’un ABR peut <b>dégénérer</b> en liste.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>hauteur</b> et le « pire cas de recherche » en bas à droite.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Comparez « Ordre croissant » et « Ordre équilibré ». Puis essayez les dix valeurs aléatoires.</div></div>
+  </div>
+  <div id="sim-degen" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Le coût dépend de la hauteur</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Chercher, insérer, supprimer : chacune descend <b>au plus de la racine à une feuille</b>. Le coût est <b>proportionnel à la hauteur h</b>, pas à n.</div>
+      <div class="callout warn step" data-g="3">Insérer des données <b>déjà triées</b> est le pire cas : c’est ce qui arrive dans la vraie vie (identifiants croissants, dates). Il faut un arbre qui se <b>rééquilibre</b>.</div>
+      <div class="callout good step" data-g="4">Les <b>arbres équilibrés</b> (AVL, rouge-noir) font de petites rotations pour garantir <b>h = Θ(log n)</b>. Ils sont hors programme, mais c’est ce que cachent <span class="mono">TreeMap</span> en Java ou <span class="mono">std::map</span> en C++.</div>
+    </div>
+    <div class="def formal step" data-g="2" data-t="Cadre formel">Coût de la recherche, de l’insertion, de la suppression : <span class="fx">Θ(h)</span>.<br>Meilleur cas (arbre bien rempli) : <span class="fx">h = ⌈log₂(n + 1)⌉ − 1 = Θ(log n)</span>.<br>Pire cas (arbre en peigne) : <span class="fx">h = n − 1 = Θ(n)</span>.<br>Pour <span class="fx">n = 1 000 000</span> : au plus <b>20</b> comparaisons, ou jusqu’à <b>1 000 000</b>.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">ABR ou autre structure ?</h2>
+  <p class="sub">Coût d’une opération pour n valeurs, dans le pire cas.</p>
+  <table class="tbl" style="font-size:29px">
+    <tr class="step" data-g="1"><th>Structure</th><th>Chercher</th><th>Insérer</th><th>Supprimer</th><th>Lire en ordre trié</th></tr>
+    <tr class="step" data-g="1"><td><b>Liste chaînée</b></td><td class="mono">Θ(n)</td><td class="mono">Θ(1) en tête</td><td class="mono">Θ(n)</td><td class="mono">Θ(n log n)</td></tr>
+    <tr class="step" data-g="2"><td><b>Tableau trié</b></td><td class="mono">Θ(log n)</td><td class="mono">Θ(n)</td><td class="mono">Θ(n)</td><td class="mono">Θ(n)</td></tr>
+    <tr class="step" data-g="3"><td><b>ABR quelconque</b></td><td class="mono">Θ(n)</td><td class="mono">Θ(n)</td><td class="mono">Θ(n)</td><td class="mono">Θ(n)</td></tr>
+    <tr class="step" data-g="4"><td><b>ABR équilibré</b></td><td class="mono">Θ(log n)</td><td class="mono">Θ(log n)</td><td class="mono">Θ(log n)</td><td class="mono">Θ(n)</td></tr>
+  </table>
+  <div class="keep step" data-g="5">Seul l’arbre <b>équilibré</b> est rapide partout. L’ABR « simple » est une bonne structure à condition que les données arrivent <b>dans un ordre quelconque</b>.</div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Passons à l’écriture</h2>
+  <div class="split even">
+    <div class="col" style="gap:24px">
+      <div class="txt">Vous connaissez les règles : chercher, insérer, trouver le minimum. Voyons comment elles se traduisent en C, et comment le code <b>s’exécute</b> sur l’arbre.</div>
+      <div class="callout step" data-g="1">Un point à surveiller dans l’insertion : le <b>pointeur du père</b> doit être mis à jour. Le code récursif le fait presque sans effort.</div>
+    </div>
+    <div class="panel col step" data-g="2"><span class="tag">Au programme</span><ul class="lst sm"><li>la recherche en C</li><li>l’insertion en C</li><li>le minimum et le maximum en C</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">La recherche en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle de recherche s’exécuter sur l’arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> descend d’un nœud à chaque tour : on ne dépasse jamais la hauteur de l’arbre.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cherchez 5 (absent) : quelle ligne s’exécute à la fin ?</div></div>
+  </div>
+  <div id="sim-search-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">L’insertion en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Suivre l’insertion récursive et comprendre comment le nouveau nœud est accroché.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Chaque appel descend d’un niveau, puis le <b>return a</b> remonte en remettant les liens en place.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 12 : quel champ reçoit le nouveau nœud ?</div></div>
+  </div>
+  <div id="sim-ins-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Minimum et maximum en C, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir la boucle qui descend tout à gauche, ou tout à droite.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>a</b> suit un seul chemin ; le compteur de déplacements ne dépasse jamais la hauteur.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Comparez le minimum et le maximum : quelle ligne du code change ?</div></div>
+  </div>
+  <div id="sim-min-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Question 5</h2>
+  <div id="q5" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Question 6</h2>
+  <div id="q6" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="3" data-chname="Arbre de recherche">
+  <h2 class="title">Question 7</h2>
+  <div id="q7" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 5 et 6 : construire et supprimer</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 5</b>
+      <div class="panel" style="font-size:28px">On insère, dans cet ordre, dans un ABR vide : <b>50, 30, 70, 20, 40, 60, 80</b>. Dessinez l’arbre, donnez sa hauteur. Même question pour <b>10, 20, 30, 40, 50</b>.</div>
+      <div class="callout good step" style="font-size:26px">Premier : racine 50, fils 30 (20, 40) et 70 (60, 80) : arbre parfait, <b>h = 2</b>. Second : un peigne vers la droite, <b>h = 4</b> : une liste.</div></div>
+    <div class="col"><b class="acc">Exercice 6</b>
+      <div class="panel" style="font-size:28px">Dans le premier arbre, on supprime <b>30</b>, puis <b>50</b>. Dessinez l’arbre et donnez le parcours infixe final.</div>
+      <div class="callout good step" style="font-size:26px">30 (deux fils) est remplacé par son successeur <b>40</b>. 50 (deux fils) est remplacé par <b>60</b>, minimum de son sous-arbre droit. Racine 60 ; fils 40 (fils 20) et 70 (fils droit 80). Infixe : <b>20 40 60 70 80</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercice 7 : est-ce un ABR ?</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 7</b>
+      <div class="panel" style="font-size:29px">Racine <b>20</b> ; fils gauche <b>10</b> (fils : 5 et 25) ; fils droit <b>30</b>. Est-ce un ABR ? Sinon, quelle valeur faut-il changer ? Comment <b>vérifier</b> l’ABR par programme, sans comparer qu’avec le parent ?</div>
+      <div class="callout good step" style="font-size:27px">Non : <b>25</b> est dans le sous-arbre gauche de 20 mais 25 &gt; 20. Il suffit de remplacer 25 par une valeur entre 10 et 20 (par exemple 15). Par programme : le <b>parcours infixe</b> doit être <b>strictement croissant</b>, ou bien on propage des bornes (min, max) en descendant.</div></div>
+    <div class="col"><b class="acc">Pour aller plus loin</b>
+      <div class="panel" style="font-size:29px">Combien de valeurs un ABR de hauteur 3 peut-il contenir au plus ? Au moins ? Combien de comparaisons coûte une recherche infructueuse dans le pire cas ?</div>
+      <div class="callout good step" style="font-size:27px">Au plus 2⁴ − 1 = <b>15</b>, au moins <b>4</b> (un peigne). Dans le pire cas : <b>h + 1 = 4</b> comparaisons.</div></div>
+  </div>
+</section>
+
+<section class="slide divider">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT"></div>
+  <div class="big">4</div>
+  <div class="eyebrow">Chapitre 4</div>
+  <h2>Le tas et la file de priorité</h2>
+  <div class="q">Comment obtenir <b>toujours le plus urgent</b> d’un ensemble qui change sans cesse ?</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Un besoin : la file de priorité</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt">Aux urgences, on ne soigne pas dans l’<b>ordre d’arrivée</b> mais selon la <b>gravité</b>. Un système d’exploitation choisit la tâche la plus urgente. Un GPS choisit la ville la plus proche à explorer.</div>
+      <div class="txt step" data-g="1">Une <b>file</b> classique ne convient pas : elle sert le premier arrivé. On veut une structure qui sert <b>le plus prioritaire</b>.</div>
+      <div class="callout step" data-g="2">Convention : plus le nombre est <b>petit</b>, plus l’élément est <b>prioritaire</b>. La priorité 1 passe avant la priorité 5.</div>
+    </div>
+    <div class="def step" data-g="1" data-t="File de priorité">Une structure avec trois opérations :
+      <ul class="lst sm" style="margin-top:10px">
+        <li><span class="mono">enfiler(x, p)</span> : ajouter x avec la priorité p</li>
+        <li><span class="mono">extraire_min()</span> : retirer et renvoyer le plus prioritaire</li>
+        <li><span class="mono">minimum()</span> : le consulter sans le retirer</li>
+      </ul></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Avec ce que l’on connaît déjà</h2>
+  <p class="sub">Aucune structure vue jusqu’ici n’est rapide pour <b>les deux</b> opérations.</p>
+  <table class="tbl" style="font-size:31px">
+    <tr class="step" data-g="1"><th>Structure</th><th>Insérer</th><th>Extraire le minimum</th></tr>
+    <tr class="step" data-g="1"><td><b>Liste non triée</b></td><td class="mono ok">Θ(1)</td><td class="mono bad">Θ(n)</td></tr>
+    <tr class="step" data-g="2"><td><b>Tableau ou liste triés</b></td><td class="mono bad">Θ(n)</td><td class="mono ok">Θ(1)</td></tr>
+    <tr class="step" data-g="3"><td><b>ABR</b></td><td class="mono">Θ(h)</td><td class="mono">Θ(h)</td></tr>
+    <tr class="step" data-g="4"><td><b>Tas</b></td><td class="mono ok">Θ(log n)</td><td class="mono ok">Θ(log n)</td></tr>
+  </table>
+  <div class="keep step" data-g="5">Le <b>tas</b> garantit Θ(log n) pour les deux, <b>sans jamais dégénérer</b> : sa forme est imposée.</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Le tas : un arbre parfait avec une règle d’ordre</h2>
+  <div class="split even">
+    <div class="col" style="gap:20px">
+      <div class="def step" data-g="1" data-t="Arbre parfait">Tous les niveaux sont <b>pleins</b>, sauf peut-être le dernier, qui est rempli <b>de gauche à droite</b>. Pas de trou : sa forme ne dépend que de n.</div>
+      <div class="def step" data-g="2" data-t="Propriété de tas (tas-min)">Chaque nœud est <b>plus petit ou égal</b> à ses fils. La <b>racine</b> est donc le <b>minimum</b>.</div>
+      <div class="def formal step" data-g="3" data-t="Cadre formel">Un <b>tas-min</b> est un arbre parfait où, pour tout nœud <span class="fx">x</span> ayant un parent <span class="fx">p</span> : <span class="fx">p.valeur ≤ x.valeur</span>.<br>(Un <b>tas-max</b> : même chose avec ≥ ; la racine est alors le maximum.)</div>
+    </div>
+    <div id="st-heap" class="step" data-g="1"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Un tas n’est pas un arbre de recherche</h2>
+  <table class="tbl" style="font-size:31px">
+    <tr class="step" data-g="1"><th></th><th>Arbre de recherche (ABR)</th><th>Tas-min</th></tr>
+    <tr class="step" data-g="1"><td><b>Règle</b></td><td>gauche &lt; nœud &lt; droite</td><td>parent ≤ fils</td></tr>
+    <tr class="step" data-g="2"><td><b>Ordre entre frères</b></td><td>oui : le gauche est plus petit</td><td>aucun</td></tr>
+    <tr class="step" data-g="3"><td><b>Forme</b></td><td>libre (peut dégénérer)</td><td>imposée : arbre parfait</td></tr>
+    <tr class="step" data-g="4"><td><b>Où est le minimum ?</b></td><td>en bas à gauche</td><td>à la racine</td></tr>
+    <tr class="step" data-g="5"><td><b>Chercher une valeur</b></td><td class="mono">Θ(h)</td><td class="mono">Θ(n)</td></tr>
+    <tr class="step" data-g="6"><td><b>Servir le plus urgent</b></td><td class="mono">Θ(h)</td><td class="mono ok">Θ(1) pour le lire</td></tr>
+  </table>
+  <div class="keep step" data-g="7">Le tas est <b>moins ordonné</b> que l’ABR : il ne sait pas chercher, mais il connaît très vite son minimum. Moins d’ordre, donc moins de travail pour le maintenir.</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Un arbre rangé dans un tableau</h2>
+  <div class="txt" style="margin-top:-10px">Comme l’arbre est parfait, <b>aucun pointeur n’est nécessaire</b> : on range les nœuds <b>niveau par niveau</b> dans un tableau, et un simple calcul donne parent et fils.</div>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir que le même tas peut se dessiner en arbre ou se ranger dans un tableau, avec des indices calculables.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>L’<b>indice</b> de chaque nœud, et les cases du tableau qui s’allument avec lui.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Cliquez sur l’indice <b>4</b>, puis sur <b>1</b> : retrouvez les formules.</div></div>
+  </div>
+  <div id="sim-hidx" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Parent et fils par le calcul</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Pas de <span class="mono">struct Noeud</span> ni de <span class="mono">malloc</span> pour les nœuds : un <b>tableau</b> et un entier <span class="mono">n</span> suffisent.</div>
+      <div class="callout step" data-g="2">Pour descendre d’un niveau, on <b>double</b> l’indice. Voilà pourquoi la hauteur est un logarithme.</div>
+    </div>
+    <div class="def formal step" data-g="3" data-t="Cadre formel">Dans un tableau <span class="fx">t</span> de <span class="fx">n</span> éléments (indices 0 à n − 1) :<br><span class="fx">parent(i) = ⌊(i − 1) / 2⌋</span> pour <span class="fx">i &gt; 0</span><br><span class="fx">gauche(i) = 2i + 1</span>, <span class="fx">droit(i) = 2i + 2</span> (s’ils sont &lt; n)<br>Propriété de tas : <span class="fx">t[parent(i)] ≤ t[i]</span> pour tout <span class="fx">i &gt; 0</span>.<br>Hauteur d’un tas de n éléments : <span class="fx">h = ⌊log₂ n⌋</span>.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Insérer : placer, puis remonter</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Insérer une valeur en gardant la propriété de tas.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La nouvelle valeur (vert) placée à la <b>fin</b>, puis son <b>échange</b> avec le parent tant qu’elle est plus petite.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Jouez « Insérer 1 », la valeur la plus petite. Combien d’échanges ? Quel est le maximum possible ?</div></div>
+  </div>
+  <div id="sim-hins" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Extraire le minimum : descendre</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Retirer la racine et réparer le tas.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le <b>dernier</b> élément est monté à la racine, puis <b>descend</b> en s’échangeant avec <b>le plus petit de ses deux fils</b>.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Pourquoi échange-t-on avec le plus petit des deux fils, et pas avec le plus grand ?</div></div>
+  </div>
+  <div id="sim-hext" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Pourquoi Θ(log n) ?</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1">Chaque échange <b>monte ou descend d’un niveau</b>. Il y a au plus un échange par niveau. Et la hauteur d’un tas, qui est un arbre <b>parfait</b>, est toujours petite : il ne peut pas dégénérer.</div>
+      <div class="callout good step" data-g="3">Pour <b>un million</b> d’éléments : au plus <b>19 échanges</b> par insertion ou par extraction. Une liste triée demanderait jusqu’à un million de décalages.</div>
+    </div>
+    <div class="def formal step" data-g="2" data-t="Cadre formel">Un tas de <span class="fx">n</span> éléments a pour hauteur <span class="fx">h = ⌊log₂ n⌋</span>.<br><b>Insertion</b> : au plus <span class="fx">h</span> échanges, donc <span class="fx">Θ(log n)</span>.<br><b>Extraction du minimum</b> : au plus <span class="fx">h</span> échanges (2 comparaisons par niveau), donc <span class="fx">Θ(log n)</span>.<br><b>Lire le minimum</b> : <span class="fx">Θ(1)</span> (c’est <span class="fx">t[0]</span>).</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">À vous de jouer avec un tas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Manipuler un tas librement.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La <b>racine</b> est toujours le plus petit. Les échanges se font <b>le long d’une seule branche</b>.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 5, 3, 8, 1, 9, 2 puis extrayez trois fois. Dans quel ordre sortent les valeurs ?</div></div>
+  </div>
+  <div id="sim-heap" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">La file de priorité en action</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Retrouver le besoin de départ avec un tas : servir toujours la tâche la plus urgente.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Les tâches sont servies par <b>priorité croissante</b> (1 = le plus urgent), pas dans l’ordre d’arrivée.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Ajoutez quatre tâches, puis traitez-en deux : laquelle est servie en premier ?</div></div>
+  </div>
+  <div id="sim-pq" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Le tri par tas</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt step" data-g="1"><b>Idée :</b> on <b>insère</b> toutes les valeurs dans un tas, puis on <b>extrait</b> le minimum n fois. Les valeurs sortent <b>dans l’ordre croissant</b>.</div>
+      <div class="txt step" data-g="2">Chaque insertion et chaque extraction coûte Θ(log n) : au total <b>2n opérations</b> de coût logarithmique.</div>
+      <div class="def formal step" data-g="3" data-t="Cadre formel">Tri par tas : <span class="fx">n × Θ(log n) + n × Θ(log n) = Θ(n log n)</span>, dans <b>tous</b> les cas.<br>À comparer avec le tri par insertion de la séance 1 : <span class="fx">Θ(n²)</span> dans le pire cas.</div>
+    </div>
+    <div class="col" style="gap:18px">
+      <div class="panel step" data-g="1" style="font-size:30px">Entrée : <span class="mono">7 3 9 1 5 8 2</span></div>
+      <div class="panel step" data-g="2" style="font-size:30px">Après sept extractions : <span class="mono ok">1 2 3 5 7 8 9</span></div>
+      <div class="callout step" data-g="3">Essayez dans le simulateur précédent : « Tout extraire (tri par tas) ».</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Où trouve-t-on des tas ?</h2>
+  <div class="grid3">
+    <div class="panel col step" data-g="1"><span class="tag">Systèmes</span><h3>Ordonnanceur</h3><div class="small">Choisir le processus ou la tâche la plus prioritaire.</div></div>
+    <div class="panel col step" data-g="2"><span class="tag">Graphes · séance 6</span><h3>Plus courts chemins</h3><div class="small">L’algorithme de Dijkstra extrait sans cesse le sommet le plus proche.</div></div>
+    <div class="panel col step" data-g="3"><span class="tag">Données</span><h3>Les k plus grands</h3><div class="small">Garder les 10 meilleurs scores d’un flux de millions de valeurs.</div></div>
+  </div>
+  <div class="callout step" data-g="4">Tas-max : même programme avec les comparaisons inversées. La racine est alors le <b>maximum</b>. Les bibliothèques fournissent des tas tout faits : <span class="mono">heapq</span> en Python, <span class="mono">PriorityQueue</span> en Java.</div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Passons à l’écriture</h2>
+  <div class="split even">
+    <div class="col" style="gap:22px">
+      <div class="txt">Le tas n’est qu’un <b>tableau</b> et un entier <span class="mono">n</span>. Grâce aux formules d’indices, la remontée et la descente tiennent en <b>une petite boucle</b> chacune.</div>
+      <div class="callout step" data-g="1">C’est le code le plus délicat du TP : lisez bien les cas limites (un seul fils, tas presque vide).</div>
+    </div>
+    <div class="col" style="gap:16px">
+      <pre class="code free step" data-g="1" style="font-size:28px">typedef struct {
+    int t[MAX];
+    int n;
+} Tas;</pre>
+      <div class="small step" data-g="1">Déclaration : un tableau de valeurs et le nombre d’éléments. La fonction <span class="mono">echanger(&amp;x, &amp;y)</span> permute deux valeurs.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">L’insertion dans le tas, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de remontée s’exécuter sur le tableau et sur l’arbre.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>La variable <b>i</b> remonte de parent en parent, avec une case du tableau qui s’allume en même temps.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>Insérez 1 : combien de tours de boucle ?</div></div>
+  </div>
+  <div id="sim-hins-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">L’extraction du minimum, pas à pas</h2>
+  <div class="obj">
+    <div class="panel"><span class="tag">Objectif</span><div>Voir le code de descente s’exécuter.</div></div>
+    <div class="panel"><span class="tag">À observer</span><div>Le choix du <b>plus petit fils</b> (<b>j</b>), puis l’échange. Attention au test <span class="mono">j + 1 &lt; h-&gt;n</span> qui évite de lire hors du tas.</div></div>
+    <div class="panel"><span class="tag">À essayer</span><div>À quelle ligne la boucle s’arrête-t-elle ?</div></div>
+  </div>
+  <div id="sim-hext-c" class="step gate"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Question 8</h2>
+  <div id="q8" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Question 9</h2>
+  <div id="q9" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="4" data-chname="Le tas">
+  <h2 class="title">Question 10</h2>
+  <div id="q10" style="max-width:1560px"></div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercices 8 et 9 : manipuler un tas</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 8</b>
+      <div class="panel" style="font-size:28px">Tas-min <span class="mono">[2, 5, 3, 9, 6, 8, 4]</span>. On insère <b>1</b>, puis on extrait le minimum. Donnez le tableau après chaque opération.</div>
+      <div class="callout good step" style="font-size:25px">Insertion : 1 en case 7 ; échanges avec 9, puis 5, puis 2 : <b>[1, 2, 3, 5, 6, 8, 4, 9]</b>. Extraction : on renvoie 1 ; 9 monte en racine, descend avec 2, puis avec 5 : <b>[2, 5, 3, 9, 6, 8, 4]</b> (le tableau de départ).</div></div>
+    <div class="col"><b class="acc">Exercice 9</b>
+      <div class="panel" style="font-size:28px">Dans un tas de <b>12</b> éléments, donnez le parent et les fils de l’indice <b>5</b>, puis la hauteur du tas. Le tableau <span class="mono">[1, 5, 2, 8, 3, 4]</span> est-il un tas-min ?</div>
+      <div class="callout good step" style="font-size:25px">Parent : ⌊(5 − 1) / 2⌋ = <b>2</b>. Fils : 11 (existe) et 12 (<b>absent</b>, car n = 12). Hauteur : ⌊log₂ 12⌋ = <b>3</b>. Le tableau est un tas-min : 5 ≥ 1, 2 ≥ 1, 8 ≥ 5, 3 ≥ 5 ? <b>Non</b> : 3 &lt; 5, ce n’est pas un tas.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="TD" data-chname="TD">
+  <h2 class="title">TD · Exercice 10 : choisir une structure</h2>
+  <div class="grid2" style="gap:36px">
+    <div class="col"><b class="acc">Exercice 10</b>
+      <div class="panel" style="font-size:28px">Pour chaque besoin, quelle structure choisissez-vous, et pourquoi ?<br>a) un dictionnaire de mots, avec recherche et ajout fréquents, affichés par ordre alphabétique.<br>b) un planificateur de tâches qui sert toujours la plus urgente.<br>c) un historique d’annulation (« défaire »).</div>
+      <div class="callout good step" style="font-size:26px">a) un <b>ABR</b> (équilibré), dont le parcours infixe donne l’ordre alphabétique. b) un <b>tas</b> (file de priorité). c) une <b>pile</b> : le dernier ajouté est le premier annulé.</div></div>
+    <div class="col"><b class="acc">Pour aller plus loin</b>
+      <div class="panel" style="font-size:28px">On insère n valeurs dans un tas, puis on les extrait toutes. Combien d’échanges au plus pour n = 1 000 ?</div>
+      <div class="callout good step" style="font-size:26px">Chaque opération : au plus ⌊log₂ 1000⌋ = <b>9</b> échanges. Au total, au plus 2 × 1 000 × 9 = <b>18 000</b> échanges : très loin des 1 000 000 d’un tri en Θ(n²).</div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Bilan" data-chname="Bilan">
+  <h2 class="title">À retenir</h2>
+  <div class="col" style="gap:14px;flex:1;justify-content:center">
+    <div class="panel step" style="padding:18px 34px"><b>Arbre binaire</b> : un nœud avec <b>deux pointeurs</b>. Hauteur h, au plus <b>2<sup>h+1</sup> − 1</b> nœuds, donc <b>h ≥ ⌈log₂(n + 1)⌉ − 1</b>.</div>
+    <div class="panel step" style="padding:18px 34px"><b>Parcours</b> : préfixe, infixe, postfixe (récursion, pile d’appels), largeur (file). Coût <b>Θ(n)</b>. Libérer un arbre : <b>postfixe</b>.</div>
+    <div class="panel step" style="padding:18px 34px"><b>ABR</b> : gauche &lt; nœud &lt; droite. Chercher, insérer, supprimer en <b>Θ(h)</b>. Infixe = <b>ordre trié</b>. Suppression : 3 cas, successeur.</div>
+    <div class="panel step" style="padding:18px 34px"><b>La hauteur décide</b> : <b>Θ(log n)</b> si l’arbre est équilibré, <b>Θ(n)</b> s’il dégénère en liste.</div>
+    <div class="panel step" style="padding:18px 34px"><b>Tas</b> : arbre parfait rangé dans un tableau, parent ≤ fils, racine = minimum. Insertion (remontée) et extraction (descente) en <b>Θ(log n)</b>.</div>
+    <div class="panel step" style="padding:18px 34px"><b>File de priorité</b> et <b>tri par tas</b> : Θ(n log n). Servir toujours le plus urgent.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="Suite" data-chname="Suite">
+  <h2 class="title">TP d’aujourd’hui et prochaine séance</h2>
+  <div class="grid2">
+    <div class="panel col"><span class="tag">TP 3 · une heure, en C</span><h3>Arbres de recherche et tas</h3>
+      <ul class="lst sm"><li>Construire un arbre à la main et le parcourir</li><li>Écrire l’insertion, la recherche, la hauteur et la libération d’un ABR</li><li>Mesurer : ordre croissant contre ordre mélangé</li><li>Écrire l’insertion et l’extraction d’un tas</li><li>Trier avec un tas</li></ul>
+      <div class="small" style="margin-top:auto">Le code de départ et le sujet sont sur la page du cours. Le compte rendu se dépose sur Classroom.</div></div>
+    <div class="panel navy col"><span class="tag" style="color:var(--cover-accent)">Séance 4</span><h3>Hachage et diviser pour régner</h3>
+      <ul class="lst sm" style="color:#E6F0FA"><li>Tables de hachage : chercher en Θ(1) en moyenne</li><li>Diviser pour régner</li><li>Le tri fusion</li></ul>
+      <div class="small" style="margin-top:auto">Revoyez la récursivité et les tableaux : ils servent encore.</div></div>
+  </div>
+  <div class="keep">Merci de votre attention. Des questions ?</div>
+</section>
+
+<div id="foot"><span><b>Yassine Ben-Aboud</b> · Séance 3 · Arbres, tas et files de priorité</span></div>
+<div id="nav">
+  <button id="b-prev" aria-label="Précédent" title="Précédent">◀</button>
+  <button id="b-next" aria-label="Suivant" title="Suivant">▶</button>
+  <button id="b-ov" aria-label="Aperçu" title="Aperçu (O)">▦</button>
+  <button id="b-theme" aria-label="Thème" title="Thème (T)">◐</button>
+  <button id="b-full" aria-label="Plein écran" title="Plein écran (F)">⛶</button>
+  <button id="b-help" aria-label="Aide" title="Aide (?)">?</button>
+  <span id="count"></span>
+</div>
+<div id="notes"></div>
+<div id="overview" class="ov"><h4>Plan de la séance</h4><div class="grid"></div></div>
+<div id="help" class="ov"><h4>Raccourcis</h4>
+  <table>
+    <tr><td><kbd>→</kbd> <kbd>Espace</kbd></td><td>Suivant (révèle d’abord les éléments cachés)</td></tr>
+    <tr><td><kbd>←</kbd></td><td>Précédent</td></tr>
+    <tr><td><kbd>O</kbd></td><td>Aperçu de toutes les diapositives</td></tr>
+    <tr><td><kbd>N</kbd></td><td>Notes de l’enseignant</td></tr>
+    <tr><td><kbd>T</kbd></td><td>Thème clair ou sombre</td></tr>
+    <tr><td><kbd>F</kbd></td><td>Plein écran</td></tr>
+    <tr><td><kbd>Échap</kbd></td><td>Fermer un panneau</td></tr>
+  </table>
+  <p class="small" style="margin-top:20px">Astuce : ajoutez <span class="mono">?all</span> à l’adresse pour tout afficher d’un coup.</p>
+</div>
+</div>
+</div>
+
+<script src="../assets/sim.js?v=1795710847651"></script>
+<script src="../assets/sim2.js?v=1795710847651"></script>
+<script src="../assets/sim3.js?v=1795710847651"></script>
+<script>
+(function () {
+  var S2 = Sim2, S3 = Sim3, T = S3.T, h = Sim.h;
+  [].forEach.call(document.querySelectorAll('[data-pc]'), function (e) { e.innerHTML = Sim.pc(e.textContent); });
+  var INL = { B: 1, I: 1, EM: 1, STRONG: 1, BR: 1, SUB: 1, SUP: 1, A: 1 };
+  [].forEach.call(document.querySelectorAll('.panel.col'), function (p) {
+    var kids = [].slice.call(p.childNodes), run = [];
+    function flush() { if (!run.length) return; var d = document.createElement('div'); p.insertBefore(d, run[0]); run.forEach(function (n) { d.appendChild(n); }); run = []; }
+    kids.forEach(function (n) {
+      var inline = (n.nodeType === 3 && n.textContent.trim() !== '') || (n.nodeType === 1 && (INL[n.tagName] || (n.tagName === 'SPAN' && n.className.indexOf('kw') >= 0)));
+      if (inline) run.push(n); else flush();
+    });
+    flush();
+  });
+
+  var A = S3.treeA(), BST = S3.treeBST();
+  /* Figures statiques */
+  S2.chain('#chain-l', { vals: [7, 3, 9], head: true });
+  S3.staticTree('#st-small', T(8, T(3), T(10)), { r: 32 });
+  S3.staticTree('#st-small2', T(8, T(3), T(10)), { r: 32 });
+  S3.staticTree('#st-vocab', A, { tags: { A: 'racine', D: 'feuille', H: 'feuille', I: 'feuille', G: 'feuille' }, cls: { A: 'cur' }, minN: 9 });
+  S3.staticTree('#st-def1', A, { minN: 9, r: 30, scale: .9 });
+  S3.staticTree('#st-def2', A, { tags: { A: 'd = 0', B: 'd = 1', C: 'd = 1', D: 'd = 2', E: 'd = 2', F: 'd = 2', H: 'd = 3', I: 'd = 3', G: 'd = 3' }, cls: { G: 'cur' }, minN: 9 });
+  var NN = function (id, v, l, r) { return { id: id, v: v, l: l || null, r: r || null }; };
+  S3.staticTree('#st-expr', NN('m', '×', NN('p', '+', NN('2', '2'), NN('3', '3')), NN('4', '4')), { r: 32, scale: 1.4, minN: 5 });
+  S3.staticTree('#st-huff', NN('r', '', NN('A', 'A'), NN('x', '', NN('B', 'B'), NN('y', '', NN('C', 'C'), NN('D', 'D')))), { r: 30, scale: 1.3, minN: 7, tags: { A: '0', B: '10', C: '110', D: '111' } });
+  S3.staticTree('#st-prof', A, { tags: { A: 'prof. 0', B: 'prof. 1', D: 'prof. 2', H: 'prof. 3', G: 'prof. 3' }, minN: 9 });
+  S2.memStatic('#mem-static-node3', { stack: [], heap: [{ id: 'n', addr: 2000, fields: [{ n: 'valeur', v: 8 }, { n: 'gauche', p: null, ptr: true }, { n: 'droit', p: null, ptr: true }] }] }, { sw: 120, zoom: 1.3 });
+  S3.staticTree('#st-rec', T(8, T(3, T(1), T(6)), T(10, null, T(14))), { cls: { 3: 'sub', 1: 'sub', 6: 'sub', 10: 'path', 14: 'path' }, tags: { 3: 'arbre G', 10: 'arbre D' }, r: 32 });
+  S3.staticTree('#st-eq', S3.bstFrom([4, 2, 6, 1, 3, 5, 7]), { r: 26, scale: .9 });
+  S3.staticTree('#st-peigne', S3.bstFrom([1, 2, 3, 4, 5, 6, 7]), { r: 24, scale: .8, minN: 3 });
+  S3.staticTree('#st-trav', A, { minN: 9, r: 30 });
+  S3.staticTree('#st-comp', A, { minN: 9, r: 28, scale: .8 });
+  S3.staticTree('#st-haut', A, { tags: { A: 'h = 3', B: 'h = 2', C: 'h = 2', D: 'h = 0', E: 'h = 1', F: 'h = 1', G: 'h = 0', H: 'h = 0', I: 'h = 0' }, minN: 9 });
+  S3.staticTree('#st-bst', BST, { minN: 9 });
+  S3.staticTree('#st-ok', T(8, T(3, T(1), T(6)), T(10)), { r: 28, scale: .9 });
+  S3.staticTree('#st-ko', T(8, T(3, T(1), T(9)), T(10)), { r: 28, scale: .9, cls: { 9: 'bad' } });
+  S3.staticTree('#st-minmax', BST, { minN: 9, r: 30, cls: { 8: 'path', 3: 'path', 1: 'found', 10: 'path', 14: 'found' }, scale: .9 });
+  S3.staticHeap('#st-heap', [1, 3, 2, 7, 4, 8, 5, 9, 6, 10], { levels: 4, dx: 96, r: 30, scale: .95 });
+
+  /* Simulations */
+  S3.explore('#sim-explore');
+  S3.buildTree('#sim-build');
+  S3.levels('#sim-levels');
+  S3.traverse('#sim-trav', { only: ['Préfixe', 'Infixe', 'Postfixe'], noCode: true });
+  S3.traverse('#sim-trav-c', { only: ['Préfixe', 'Infixe', 'Postfixe'] });
+  S3.heightSim('#sim-haut', { noCode: true });
+  S3.heightSim('#sim-haut-c');
+  S3.staticTree('#st-trav2', A, { minN: 9, r: 30 });
+  S3.traverse('#sim-bfs', { only: ['En largeur (avec une file)'], noCode: true });
+  S3.freeTree('#sim-free');
+  S3.abrSearch('#sim-search', { noCode: true });
+  S3.abrSearch('#sim-search-c');
+  S3.abrInsert('#sim-ins-c');
+  S3.abrMin('#sim-min-c');
+  S3.abrInsert('#sim-ins', { noCode: true });
+  S3.traverse('#sim-inf', { tree: BST, only: ['Infixe'], noCode: true, treeH: 250, scale: .76 });
+  S3.abrDelete('#sim-del');
+  S3.abrPlay('#sim-abr', { start: [8, 3, 10], hint: 'Insérez, cherchez ou supprimez des valeurs, puis regardez la hauteur.' });
+  S3.abrPlay('#sim-degen', { presets: [
+    { label: 'Ordre croissant : 1 2 3 4 5 6 7', seq: [1, 2, 3, 4, 5, 6, 7], msg: 'Chaque valeur est plus grande que toutes les précédentes : elle va toujours à droite. Un peigne.' },
+    { label: 'Ordre équilibré : 4 2 6 1 3 5 7', seq: [4, 2, 6, 1, 3, 5, 7], msg: 'On insère d’abord le milieu : l’arbre reste bas et large.' }], random: true, free: false, minN: 7, minH: 2, hint: 'Choisissez un ordre d’arrivée.' });
+  S3.heapExplore('#sim-hidx');
+  S3.heapInsert('#sim-hins', { noCode: true });
+  S3.heapInsert('#sim-hins-c');
+  S3.heapExtract('#sim-hext', { noCode: true });
+  S3.heapExtract('#sim-hext-c');
+  S3.heapPlay('#sim-heap', { start: [], hint: 'Insérez des valeurs, puis extrayez le minimum.' });
+  S3.heapPlay('#sim-pq', { pq: true, hint: 'Ajoutez des tâches, puis traitez la plus urgente.' });
+
+  /* Questions */
+  Sim.quiz('#q1', { q: 'Un arbre binaire contient 15 nœuds. Quelle est sa hauteur <b>minimale</b> ?', opts: ['2', '3', '4', '7'], ans: 1, why: 'Un arbre de hauteur 3 contient au plus 2<sup>4</sup> − 1 = 15 nœuds : 15 nœuds tiennent exactement dans un arbre parfait de hauteur 3. Formule : ⌈log₂ 16⌉ − 1 = 3.' });
+  Sim.quiz('#q2', { q: 'Un arbre binaire de n nœuds a 2n pointeurs (deux par nœud). Combien valent NULL ?', opts: ['n − 1', 'n', 'n + 1', '2n'], ans: 2, why: 'Chaque nœud, sauf la racine, est désigné par exactement un pointeur : n − 1 pointeurs ne sont pas NULL. Il reste 2n − (n − 1) = <b>n + 1</b> pointeurs NULL. Pour un seul nœud : 2 NULL, soit 1 + 1.' });
+  Sim.quiz('#q3', { q: 'Un arbre a pour racine 1, fils gauche 2 et fils droit 3. Quel parcours donne <b>2 3 1</b> ?', opts: ['Préfixe', 'Infixe', 'Postfixe', 'En largeur'], ans: 2, why: 'Le postfixe visite le sous-arbre gauche (2), le sous-arbre droit (3), puis la racine (1) : 2 3 1. Le préfixe donne 1 2 3, l’infixe 2 1 3, la largeur 1 2 3.' });
+  Sim.quiz('#q4', { q: 'Un arbre dégénéré (en peigne) de n nœuds est parcouru récursivement. Jusqu’où monte la pile d’appels ?', opts: ['Θ(1)', 'Θ(log n)', 'Θ(n)', 'Θ(n²)'], ans: 2, why: 'La pile contient un appel par niveau traversé : jusqu’à la hauteur h. Dans un peigne, h = n − 1 : la pile monte jusqu’à Θ(n). C’est pourquoi une récursion sur un arbre très déséquilibré peut déborder.' });
+  Sim.quiz('#q5', { q: 'Dans un ABR de racine 50, on cherche 40. Que peut-on éliminer dès la première comparaison ?', opts: ['Rien', 'Le sous-arbre gauche', 'Le sous-arbre droit tout entier', 'Seulement le fils droit de la racine'], ans: 2, why: '40 < 50 : si 40 est dans l’arbre, il est forcément à gauche, car tout le sous-arbre droit contient des valeurs supérieures à 50. On élimine <b>tout le sous-arbre droit</b>, pas seulement un nœud.' });
+  Sim.quiz('#q6', { q: 'On insère 1, 2, 3, 4, 5, 6, 7 dans cet ordre dans un ABR vide. Quelle est la hauteur ?', opts: ['2', '3', '6', '7'], ans: 2, why: 'Chaque valeur est plus grande que les précédentes : elle devient le fils droit de la dernière. On obtient une chaîne de 7 nœuds, donc 6 arêtes : hauteur 6. Une recherche coûte Θ(n).' });
+  Sim.quiz('#q7', { q: 'Quel parcours d’un ABR donne les valeurs dans l’ordre croissant ?', opts: ['Préfixe', 'Infixe', 'Postfixe', 'En largeur'], ans: 1, why: 'L’infixe visite le sous-arbre gauche (plus petit), le nœud, puis le sous-arbre droit (plus grand) : pour chaque nœud, tout ce qui est plus petit passe avant et tout ce qui est plus grand après.' });
+  Sim.quiz('#q8', { q: 'Un tas-min contient [3, 5, 4, 9, 6]. On insère 2. Quel est le tableau obtenu ?', opts: ['[3, 5, 4, 9, 6, 2]', '[2, 5, 3, 9, 6, 4]', '[2, 3, 5, 4, 9, 6]', '[3, 2, 4, 9, 6, 5]'], ans: 1, why: '2 est placé en case 5. Son parent (case 2) vaut 4 : on échange, [3, 5, 2, 9, 6, 4]. Le nouveau parent (case 0) vaut 3 : on échange encore, [2, 5, 3, 9, 6, 4]. 2 est à la racine, on s’arrête.' });
+  Sim.quiz('#q9', { q: 'Dans un tas-min de 1000 valeurs <b>distinctes</b>, où peut se trouver le <b>plus grand</b> élément ?', opts: ['À la racine', 'Dans la dernière case seulement', 'Forcément sur une feuille', 'N’importe où'], ans: 2, why: 'S’il avait un fils, ce fils serait plus petit que lui ou égal… non : la règle impose parent ≤ fils, donc le fils serait plus grand. Le plus grand n’a donc <b>aucun fils</b> : c’est une feuille (pas forcément la dernière case).' });
+  Sim.quiz('#q10', { q: 'On insère n valeurs une à une dans un tas, puis on les extrait toutes. Quel est le coût total ?', opts: ['Θ(n)', 'Θ(n log n)', 'Θ(n²)', 'Θ(log n)'], ans: 1, why: 'n insertions de coût Θ(log n) plus n extractions de coût Θ(log n) : Θ(n log n). C’est le tri par tas, bien plus rapide que les Θ(n²) du tri par insertion.' });
+})();
+</script>
+<script src="../assets/deck.js?v=1795710847651"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TP 3 · Arbres binaires de recherche et tas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/doc.css">
+</head>
+<body data-tp="tp3" data-seance="3" data-titre="TP 3 · Arbres binaires de recherche et tas" data-fichiers="tp3.c">
+<header class="top"><div class="gut">
+  <div class="plate"><img src="../assets/inpt-logo.png" alt="INPT, Institut National des Postes et Télécommunications"></div>
+  <div class="eyebrow">Conception et Analyse des Algorithmes · Séance 3</div>
+  <h1>TP 3 · Arbres binaires de recherche et tas</h1>
+  <div class="meta"><span>Durée : 1 heure</span><span>Langage : C</span><span>Yassine Ben-Aboud</span></div>
+  <nav class="links"><a href="../index.html">Accueil du cours</a><a href="slides.html">Diaporama</a><a href="support.html">Support de cours</a><a class="cur" href="tp.html">Sujet du TP 3</a><button class="tbtn" id="theme" type="button">Thème clair / sombre</button></nav>
+</div></header>
+
+<div class="gut layout">
+<aside class="toc"><h4>Sommaire</h4>
+  <a href="#identite">Vos informations</a>
+  <a href="#mode">Mode d’emploi</a>
+  <a href="#demarrer">Pour démarrer</a>
+  <a href="#p1">Partie 1 · Un arbre en mémoire</a>
+  <a href="#p2">Partie 2 · L’ABR</a>
+  <a href="#p3">Partie 3 · Mesurer</a>
+  <a href="#p4">Partie 4 · Le tas</a>
+  <a href="#envoi">Envoyer le compte rendu</a>
+  <a href="#aide">Aide</a>
+</aside>
+<article>
+
+<h2 id="identite">Vos informations</h2>
+<div class="ident">
+  <label>Nom<input id="f-nom" data-k="nom" autocomplete="family-name" placeholder="Nom de famille"></label>
+  <label>Prénom<input id="f-prenom" data-k="prenom" autocomplete="given-name" placeholder="Prénom"></label>
+  <label>Groupe ou filière<input id="f-groupe" data-k="groupe" placeholder="Par exemple : 1A, groupe 2"></label>
+  <label>Binôme (facultatif)<input id="f-binome" data-k="binome" placeholder="Nom et prénom de votre binôme"></label>
+</div>
+<p class="small" style="font-size:14px;color:var(--muted);margin-top:10px">Ces informations figureront dans votre fichier de compte rendu. Tout ce que vous saisissez dans cette page est enregistré automatiquement dans votre navigateur : vous pouvez fermer la page et reprendre plus tard, sur le même ordinateur.</p>
+
+<h2 id="mode">Mode d’emploi du TP</h2>
+<div class="stepline"><b class="num">1</b><div><b>Renseignez vos informations</b> ci-dessus.</div></div>
+<div class="stepline"><b class="num">2</b><div><b>Téléchargez</b> <code>tp3.c</code>, <b>complétez</b> les six TODO et <b>testez</b> votre programme partie par partie.</div></div>
+<div class="stepline"><b class="num">3</b><div><b>Remplissez les tableaux</b> de cette page avec ce que votre programme affiche, et <b>répondez aux questions</b>.</div></div>
+<div class="stepline"><b class="num">4</b><div><b>Exportez</b> votre compte rendu en JSON (section « Envoyer le compte rendu »), puis déposez dans le devoir du TP 3 sur <b>Classroom</b> <b>deux fichiers</b> : le JSON et votre <code>tp3.c</code> complété.</div></div>
+<div class="callout">Dans ce TP, vous <b>prédisez avant d’exécuter</b> : vos prédictions comptent autant que les mesures. Dessinez les arbres sur une feuille : un arbre se comprend mieux qu’il ne se lit.</div>
+
+<h2 id="demarrer">Pour démarrer</h2>
+<p>Vous allez construire un arbre en mémoire, écrire un arbre binaire de recherche (insertion, recherche, hauteur, libération), mesurer l’effet de l’ordre d’insertion, puis écrire un tas et l’utiliser pour trier.</p>
+<p><a class="btn" href="../files/s3/tp3.c" download>Télécharger tp3.c</a></p>
+<pre class="code" data-lang="terminal">gcc tp3.c -o tp3 -O0 -Wall
+./tp3            # sous Windows : tp3.exe</pre>
+<p>Le fichier contient la structure <code>Noeud</code> (avec <code>gauche</code> et <code>droit</code>), des fonctions fournies (<code>creer_noeud</code>, <code>prefixe</code>, <code>infixe</code>, le type <code>Tas</code>, <code>echanger</code>, <code>afficher_tas</code>) et six fonctions à écrire, marquées <code>TODO 1</code> à <code>TODO 6</code>. Les fonctions <code>partie1()</code> à <code>partie4()</code> font les expériences. Au départ, seule la partie 1 est active : dans <code>main</code>, vous activerez les suivantes une par une.</p>
+
+<h2 id="p1">Partie 1 · Un arbre en mémoire <span class="dur">10 min</span></h2>
+<div class="step-tp"><b>1.1</b> Lisez <code>partie1()</code> : elle crée cinq nœuds avec <code>creer_noeud</code> (de valeurs 8, 3, 10, 1 et 6) et les relie à la main. <b>Avant d’exécuter</b>, dessinez l’arbre obtenu sur papier : qui est la racine, qui sont ses fils, quelles sont les feuilles ?</div>
+<div class="step-tp"><b>1.2</b> Exécutez et recopiez ce qui s’affiche. Les adresses changent d’une machine à l’autre : seuls comptent les <b>liens</b> entre elles.</div>
+<div class="tw"><table class="tbl" data-table="p1" data-title="Partie 1 · observations">
+  <tr><th>Observation</th><th>Valeur affichée</th></tr>
+  <tr><td>adresse du nœud <code>racine</code></td><td data-in></td></tr>
+  <tr><td>valeur du champ <code>gauche</code> de la racine</td><td data-in></td></tr>
+  <tr><td>adresse du nœud <code>g</code> (valeur 3)</td><td data-in></td></tr>
+  <tr><td>valeur du champ <code>gauche</code> du nœud 10</td><td data-in></td></tr>
+  <tr><td><code>sizeof(Noeud)</code></td><td data-in></td></tr>
+  <tr><td>parcours préfixe</td><td data-in></td></tr>
+  <tr><td>parcours infixe</td><td data-in></td></tr>
+  <tr><td>hauteur de l’arbre (à la main, en arêtes)</td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p1_q1">Comparez le champ <code>gauche</code> de la racine et l’adresse du nœud 3. Que constatez-vous ? Que contient le champ <code>gauche</code> d’une feuille ?</li>
+  <li data-q="p1_q2">Dans le parcours préfixe, la racine est affichée en premier ; dans l’infixe, elle est affichée au milieu. Expliquez-le à partir du code de <code>prefixe</code> et <code>infixe</code>.</li>
+  <li data-q="p1_q3">Quelle est la hauteur de cet arbre ? Combien de nœuds un arbre de cette hauteur peut-il contenir au maximum ? (formule : 2<sup>h+1</sup> − 1)</li>
+</ol>
+
+<h2 id="p2">Partie 2 · L’arbre binaire de recherche <span class="dur">25 min</span></h2>
+<div class="step-tp"><b>2.1 · TODO 1</b> Écrivez <code>abr_inserer(Noeud *a, int v)</code> de façon <b>récursive</b>. Trois cas : l’arbre est vide (on renvoie un nouveau nœud), <code>v</code> est plus petit (on insère à gauche), plus grand (on insère à droite). Chaque appel <b>renvoie la racine</b> du sous-arbre : c’est ce qui relie le nouveau nœud à son parent.</div>
+<div class="step-tp"><b>2.2 · TODO 2</b> Écrivez <code>abr_chercher(Noeud *a, int v)</code>. Elle renvoie le nœud ou <code>NULL</code>. À chaque nœud examiné, faites <code>nb_comp++</code> : cela mesure le coût de la recherche.</div>
+<div class="step-tp"><b>2.3 · TODO 3</b> Écrivez <code>hauteur(Noeud *a)</code> : <code>-1</code> pour l’arbre vide, sinon <code>1 + max(hauteur gauche, hauteur droite)</code>.</div>
+<div class="step-tp"><b>2.4 · TODO 4</b> Écrivez <code>liberer(Noeud *a)</code> en parcours <b>postfixe</b> : les deux sous-arbres d’abord, la racine ensuite, avec <code>nb_free++</code> à chaque <code>free</code>.</div>
+<div class="step-tp"><b>2.5</b> <b>Avant d’exécuter</b>, dessinez l’ABR obtenu en insérant 50, 30, 70, 20, 40, 60, 80 dans cet ordre, et prédisez ce que <code>partie2()</code> va afficher. Puis activez <code>partie2()</code> dans <code>main</code> et recopiez ce qui s’affiche.</div>
+<div class="tw"><table class="tbl" data-table="p2" data-title="Partie 2 · l’ABR">
+  <tr><th>Étape</th><th>Attendu (votre prédiction)</th><th>Résultat du programme</th></tr>
+  <tr><td>parcours infixe</td><td data-in></td><td data-in></td></tr>
+  <tr><td>parcours préfixe</td><td data-in></td><td data-in></td></tr>
+  <tr><td>hauteur de l’arbre</td><td data-in></td><td data-in></td></tr>
+  <tr><td>chercher 60 : trouvé ? nombre de comparaisons</td><td data-in></td><td data-in></td></tr>
+  <tr><td>chercher 65 : trouvé ? nombre de comparaisons</td><td data-in></td><td data-in></td></tr>
+  <tr><td>infixe après insertion de 40 (déjà présent) puis de 65</td><td data-in></td><td data-in></td></tr>
+  <tr><td>compteurs <code>malloc</code> et <code>free</code> à la fin</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p2_q1">Pourquoi le parcours infixe d’un ABR affiche-t-il les valeurs dans l’ordre croissant ?</li>
+  <li data-q="p2_q2">Combien de comparaisons pour chercher 60, puis 65 (absent) ? Reliez ces nombres à la hauteur de l’arbre : quel est le coût de la recherche dans le pire cas, avec Θ ?</li>
+  <li data-q="p2_q3">Les compteurs <code>malloc</code> et <code>free</code> sont-ils égaux ? Pourquoi <code>liberer</code> doit-elle traiter les fils <b>avant</b> la racine ?</li>
+</ol>
+
+<h2 id="p3">Partie 3 · L’ordre d’insertion compte <span class="dur">10 min</span></h2>
+<p>Activez <code>partie3()</code>. Pour chaque n, elle construit deux ABR avec les valeurs 1 à n : l’un en les insérant <b>dans l’ordre croissant</b>, l’autre dans un <b>ordre mélangé</b> (toujours le même, graine fixe). Elle affiche la <b>hauteur</b> de chaque arbre et le <b>nombre moyen de comparaisons</b> pour retrouver une valeur, ainsi que la hauteur minimale possible pour n nœuds.</p>
+<div class="tw"><table class="tbl" data-table="p3" data-title="Partie 3 · ordre d’insertion">
+  <tr><th class="num">n</th><th>Hauteur (ordre croissant)</th><th>Comparaisons moyennes (croissant)</th><th>Hauteur (mélangé)</th><th>Comparaisons moyennes (mélangé)</th><th>Hauteur minimale possible</th></tr>
+  <tr><td class="num">7</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">31</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">127</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+  <tr><td class="num">1 023</td><td data-in></td><td data-in></td><td data-in></td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p3_q1">Dessinez l’arbre obtenu en insérant 1, 2, 3, 4 dans l’ordre. À quelle structure déjà vue ressemble-t-il ? Quelle est sa hauteur en fonction de n, et le coût d’une recherche ?</li>
+  <li data-q="p3_q2">Pour n = 1 023, comparez les comparaisons moyennes dans les deux cas. Quelle famille de croissance (1, log n, n, n²) reconnaissez-vous pour l’ordre croissant ? Pour l’ordre mélangé ?</li>
+  <li data-q="p3_q3">La hauteur minimale pour n nœuds est ⌈log<sub>2</sub>(n + 1)⌉ − 1. Vérifiez-la avec la dernière colonne pour n = 7 et n = 1 023. Que faudrait-il faire pour garantir une hauteur proche de ce minimum, quel que soit l’ordre d’insertion ?</li>
+</ol>
+
+<h2 id="p4">Partie 4 · Le tas et le tri par tas <span class="dur">15 min</span></h2>
+<p>Le tas est un <b>tas-min</b> rangé dans un tableau : la case 0 contient le plus petit élément, le parent de la case <code>i</code> est la case <code>(i-1)/2</code>, et ses fils sont les cases <code>2*i+1</code> et <code>2*i+2</code>.</p>
+<div class="step-tp"><b>4.1 · TODO 5</b> Écrivez <code>tas_inserer(Tas *h, int v)</code> : écrivez <code>v</code> dans la première case libre, puis <b>remontez</b> en échangeant avec le parent tant que celui-ci est plus grand. Comptez chaque échange avec <code>nb_echanges++</code>.</div>
+<div class="step-tp"><b>4.2 · TODO 6</b> Écrivez <code>tas_extraire_min(Tas *h)</code> : renvoyez la case 0, remplacez-la par le <b>dernier</b> élément, puis <b>descendez</b> en échangeant avec le plus petit des deux fils tant qu’il est plus petit. Attention aux fils qui n’existent pas.</div>
+<div class="step-tp"><b>4.3</b> <b>Avant d’exécuter</b>, dessinez sur papier le tas obtenu après avoir inséré 42, 17, 8, 23 dans cet ordre, et prédisez le tableau. Puis activez <code>partie4()</code> et recopiez le résultat.</div>
+<div class="tw"><table class="tbl" data-table="p4" data-title="Partie 4 · le tas">
+  <tr><th>Étape</th><th>Attendu (votre prédiction)</th><th>Résultat du programme</th></tr>
+  <tr><td>tableau après les insertions de 42, 17, 8, 23</td><td data-in></td><td data-in></td></tr>
+  <tr><td>tableau après les 10 insertions (42 17 8 23 4 15 16 9 30 2)</td><td data-in></td><td data-in></td></tr>
+  <tr><td>nombre d’échanges pendant les 10 insertions</td><td data-in></td><td data-in></td></tr>
+  <tr><td>ordre des 10 extractions successives</td><td data-in></td><td data-in></td></tr>
+  <tr><td>nombre d’échanges pendant les 10 extractions</td><td data-in></td><td data-in></td></tr>
+</table></div>
+<p><b>Questions</b></p>
+<ol>
+  <li data-q="p4_q1">Où se trouve toujours le plus petit élément ? Quelle propriété du tas le garantit ?</li>
+  <li data-q="p4_q2">Pourquoi l’insertion et l’extraction coûtent-elles Θ(log n) ? Appuyez-vous sur la hauteur d’un arbre complet de n nœuds, ⌊log<sub>2</sub> n⌋.</li>
+  <li data-q="p4_q3">Dans quel ordre sortent les valeurs ? Que réalise l’ensemble « n insertions puis n extractions » ? Donnez sa complexité avec Θ et comparez avec un tri en Θ(n²).</li>
+</ol>
+
+<h2 id="envoi">Envoyer le compte rendu</h2>
+<div class="callout">Votre compte rendu se compose de <b>deux fichiers</b> : l’export JSON de cette page et votre <code>tp3.c</code> complété.</div>
+<div class="stepline"><b class="num">1</b><div><b>Vérifiez</b> que votre programme compile sans erreur, que les parties 2, 3 et 4 donnent les résultats attendus et que <code>malloc</code> et <code>free</code> sont égaux. Cochez ensuite :
+  <label class="chk"><input type="checkbox" data-k="code_c_ok"> J’ai complété et testé <code>tp3.c</code> (TODO 1 à 6)</label></div></div>
+<div class="stepline"><b class="num">2</b><div><b>Exportez</b> votre compte rendu. Le fichier <code>TP3_NOM_Prenom.json</code> contient vos informations, les tableaux, vos réponses et l’état de la case à cocher.
+  <div class="btns"><button class="btn" id="btn-export" type="button">Exporter mon compte rendu (JSON)</button><button class="btn sec" id="btn-copy" type="button">Copier le JSON</button></div>
+  <div id="export-msg" class="msg" role="status"></div></div></div>
+<div class="stepline"><b class="num">3</b><div><b>Déposez</b> dans le devoir du TP 3 sur <b>Classroom</b>, en une seule remise, les deux fichiers : <code>TP3_NOM_Prenom.json</code> et <code>tp3.c</code>. Renommez le fichier de code avec votre nom (par exemple <code>tp3_NOM.c</code>), puis cliquez sur « Remettre ».</div></div>
+<div class="warn" style="margin-top:16px"><b>Reprendre un travail plus tard</b><br>Sur le même ordinateur, la page se souvient de tout. Sur un autre ordinateur, importez votre JSON : <label class="btn sec" style="cursor:pointer;margin-left:6px">Importer un JSON<input id="file-import" type="file" accept=".json,application/json" style="display:none"></label> <button class="btn sec" id="btn-reset" type="button" style="margin-left:6px">Tout effacer</button></div>
+<div class="savebar"><span id="save-status">Brouillon enregistré dans ce navigateur.</span><b id="progress"></b></div>
+
+<h2 id="aide">Aide</h2>
+<details><summary>Le programme plante (erreur de segmentation)</summary><div>Cherchez un pointeur suivi alors qu’il vaut <code>NULL</code> : par exemple <code>a->gauche</code> alors que <code>a</code> est <code>NULL</code>. Dans une fonction récursive, le cas « arbre vide » doit être traité <b>en premier</b>.</div></details>
+<details><summary>Après l’insertion, l’arbre reste vide ou perd des nœuds</summary><div>Vérifiez que chaque appel finit par <code>return a;</code> et que l’appel récursif est <b>affecté</b> : <code>a->gauche = abr_inserer(a->gauche, v);</code>. Sans l’affectation, le nouveau nœud n’est jamais relié à son parent. Dans <code>partie2</code>, la racine est mise à jour avec <code>r = abr_inserer(r, …)</code>.</div></details>
+<details><summary>Les compteurs malloc et free sont différents</summary><div>Un nœud n’a pas été libéré, ou <code>nb_free++</code> manque dans <code>liberer</code>. Si vous exécutez la partie 1, elle crée et libère 5 nœuds à la main : les deux compteurs partent de 5.</div></details>
+<details><summary>La hauteur affichée est fausse</summary><div>L’arbre vide a pour hauteur <code>-1</code> (et non 0), donc une feuille a pour hauteur <code>1 + max(-1, -1) = 0</code>. Vérifiez aussi que vous prenez le <b>maximum</b> des deux hauteurs et non leur somme.</div></details>
+<details><summary>Le nombre de comparaisons est toujours 0</summary><div>Faites <code>nb_comp++</code> dans <code>abr_chercher</code>, à chaque nœud non <code>NULL</code> examiné, avant de comparer les valeurs.</div></details>
+<details><summary>Le tas n’est pas dans le bon ordre</summary><div>Rappel des indices : parent <code>(i-1)/2</code>, fils <code>2*i+1</code> et <code>2*i+2</code>. Dans <code>tas_inserer</code>, comparez avec le <b>parent</b> et remontez ; dans <code>tas_extraire_min</code>, comparez avec les <b>deux fils</b> et descendez vers le plus petit.</div></details>
+<details><summary>L’extraction lit des valeurs absurdes</summary><div>Après <code>h->n--</code>, seules les cases d’indice inférieur à <code>h->n</code> comptent. Avant d’utiliser le fils <code>g</code> ou <code>d</code>, testez <code>g &lt; h->n</code> et <code>d &lt; h->n</code>.</div></details>
+<details><summary>Le bouton d’export ne télécharge rien</summary><div>Utilisez « Copier le JSON », collez le contenu dans un fichier texte nommé <code>TP3_NOM_Prenom.json</code>, puis déposez ce fichier.</div></details>
+</article>
+</div>
+<script src="../assets/doc.js"></script>
+<script src="../assets/tp.js"></script>
+</body>
+</html>
